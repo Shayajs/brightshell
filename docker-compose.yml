@@ -1,0 +1,50 @@
+services:
+  brightshell_app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: brightshell_app
+    user: "1000:1000"
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - .:/var/www/html
+    networks:
+      - brightshell_internal
+    depends_on:
+      - brightshell_db
+
+  brightshell_nginx:
+    image: nginx:alpine
+    container_name: brightshell_nginx
+    restart: unless-stopped
+    volumes:
+      - .:/var/www/html:ro
+      - ./docker/nginx/brightshell.conf:/etc/nginx/conf.d/default.conf:ro
+    networks:
+      - brightshell_internal
+      - laravel_net
+    depends_on:
+      - brightshell_app
+
+  brightshell_db:
+    image: mysql:8.0
+    container_name: brightshell_db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: brightshell
+      MYSQL_ROOT_PASSWORD: "${DB_PASSWORD:-brightshell_secret}"
+    volumes:
+      - brightshell_db_data:/var/lib/mysql
+    networks:
+      - brightshell_internal
+
+networks:
+  brightshell_internal:
+    driver: bridge
+  laravel_net:
+    external: true
+    name: www_laravel_net
+
+volumes:
+  brightshell_db_data:

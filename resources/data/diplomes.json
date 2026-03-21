@@ -1,0 +1,41 @@
+[
+  {
+    "date": "Juillet 2024 - Janvier 2025",
+    "diplome": "Master M1 - Cybersécurité Management School",
+    "etablissement": "Cybersécurité Management School",
+    "lieu": "Lille",
+    "details": [
+      "Sécurisations des applications et réseaux",
+      "Analyse Forensique",
+      "Test d'intrusion Web",
+      "Business Management (NIST, RGPD, ISO27001)"
+    ]
+  },
+  {
+    "date": "Septembre 2022 - Juillet 2024",
+    "diplome": "Licence Informatique (Validée)",
+    "etablissement": "UFR SFA Informatique Poitiers",
+    "lieu": "Poitiers",
+    "details": [
+      "Programmation Fonctionnelle",
+      "Linux Avancé",
+      "Réseau",
+      "Théorie des langages",
+      "Architecture Système",
+      "Techno Web",
+      "Tous les langages confirmés par un projet"
+    ]
+  },
+  {
+    "date": "2018 - 2024",
+    "diplome": "L2 Licence Science de l'ingénieur",
+    "etablissement": "Université de Poitiers",
+    "lieu": "Poitiers"
+  },
+  {
+    "date": "2018",
+    "diplome": "Baccalauréat Science pour l'ingénieur",
+    "etablissement": "Pons",
+    "lieu": "Pons"
+  }
+]

@@ -1,0 +1,14 @@
+[
+  {
+    "nom": "Scoutisme",
+    "description": "Animateur - Gestion de grands groupes, respect des valeurs, connaissance survie nature"
+  },
+  {
+    "nom": "Spatial",
+    "description": "Passion pour l'aérospatiale et les technologies spatiales"
+  },
+  {
+    "nom": "Électronique Embarquée",
+    "description": "Intérêt pour les systèmes embarqués et l'électronique"
+  }
+]

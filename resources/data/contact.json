@@ -1,0 +1,18 @@
+{
+  "etat_civil": {
+    "prenom": "Lucas",
+    "nom": "ESPINAR",
+    "titre": "Développeur Full Stack",
+    "email": "espinar.lucas0@gmail.com",
+    "telephone": "+33 6 44 07 30 37",
+    "site_web": "https://brightshell.fr",
+    "localisation": "Bussac-Forêt",
+    "permis": "Permis B"
+  },
+  "reseaux_sociaux": {
+    "github": "@Shayajs",
+    "linkedin": "@lucas-espinar",
+    "twitter_x": "@lucas_shaya"
+  },
+  "resume_profil": "Développeur Full Stack motivé ayant construit des outils de gestion et participé à des projets web complets pendant son parcours académique et ses missions opérationnelles."
+}

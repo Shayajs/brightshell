@@ -1,0 +1,20 @@
+[
+  {
+    "titre": "Brevet d'Initiation en Aéronautique (BIA)",
+    "details": "Mention Très Bien",
+    "annees": ["2015", "2025"]
+  },
+  {
+    "titre": "Méthodologies Agiles",
+    "details": ["Scrum", "Kanban", "XP"]
+  },
+  {
+    "titre": "AFEV",
+    "details": "Association de la Fondation Étudiante pour la Ville - Bénévolat"
+  },
+  {
+    "titre": "Scoutisme",
+    "role": "Animateur",
+    "details": "Gestion de grands groupes, respect des valeurs, connaissance survie nature"
+  }
+]

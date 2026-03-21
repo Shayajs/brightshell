@@ -1,0 +1,697 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --bg-dark: #0a0e1a;
+    --bg-darker: #050810;
+    --text-light: #e8f0f8;
+    --text-secondary: #a8b8d8;
+    --accent-blue: #4a6fa5;
+    --accent-light: #d0dff0;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-darker) 100%);
+    color: var(--text-light);
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+    cursor: none; /* Cacher le curseur par défaut */
+}
+
+/* Curseur personnalisé : rond avec un point au centre */
+body * {
+    cursor: none;
+}
+
+/* Créer le curseur personnalisé avec SVG */
+.custom-cursor {
+    position: fixed;
+    width: 40px;
+    height: 40px;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s ease-out;
+}
+
+.custom-cursor::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--accent-light);
+    border-radius: 50%;
+    background: transparent;
+    transition: all 0.2s ease-out;
+}
+
+.custom-cursor::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 6px;
+    height: 6px;
+    background: var(--accent-light);
+    border-radius: 50%;
+    transition: all 0.2s ease-out;
+}
+
+/* Animation au clic */
+.custom-cursor.clicking::before {
+    width: 30px;
+    height: 30px;
+    border-width: 2px;
+    opacity: 0.8;
+}
+
+.custom-cursor.clicking::after {
+    width: 8px;
+    height: 8px;
+    opacity: 0.9;
+}
+
+/* Animation au survol d'un lien */
+.custom-cursor.hovering::before {
+    width: 50px;
+    height: 50px;
+    border-width: 1.5px;
+    opacity: 0.6;
+}
+
+.custom-cursor.hovering::after {
+    width: 10px;
+    height: 10px;
+    opacity: 1;
+}
+
+/* Animation au clic droit */
+.custom-cursor.right-clicking::before {
+    width: 35px;
+    height: 35px;
+    border-width: 2px;
+    opacity: 0.7;
+    transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.custom-cursor.right-clicking::after {
+    width: 7px;
+    height: 7px;
+    opacity: 0.9;
+}
+
+/* Animation lors de mouvements rapides prolongés */
+.custom-cursor.fast-moving::before {
+    width: 60px;
+    height: 60px;
+    border-width: 1.5px;
+    opacity: 0.5;
+    animation: fastPulse 0.5s ease-in-out infinite;
+}
+
+.custom-cursor.fast-moving::after {
+    width: 12px;
+    height: 12px;
+    opacity: 0.8;
+}
+
+@keyframes fastPulse {
+    0%, 100% {
+        transform: translate(-50%, -50%) scale(1);
+    }
+    50% {
+        transform: translate(-50%, -50%) scale(1.1);
+    }
+}
+
+/* Menu contextuel personnalisé */
+.context-menu {
+    position: fixed;
+    background: rgba(10, 14, 26, 0.95);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(208, 223, 240, 0.2);
+    border-radius: 8px;
+    padding: 0.5rem 0;
+    min-width: 200px;
+    z-index: 10000;
+    opacity: 0;
+    transform: scale(0.9) translateY(-10px);
+    transition: all 0.2s ease-out;
+    pointer-events: none;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.context-menu.active {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    pointer-events: all;
+}
+
+.context-menu-item {
+    padding: 0.75rem 1.5rem;
+    color: var(--text-light);
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.context-menu-item:hover {
+    background: rgba(208, 223, 240, 0.1);
+    color: var(--accent-light);
+    padding-left: 2rem;
+}
+
+.context-menu-item::before {
+    content: '';
+    width: 4px;
+    height: 4px;
+    background: var(--accent-light);
+    border-radius: 50%;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.context-menu-item:hover::before {
+    opacity: 1;
+}
+
+.context-menu-separator {
+    height: 1px;
+    background: rgba(208, 223, 240, 0.1);
+    margin: 0.5rem 0;
+}
+
+/* Animated background elements */
+.background-decoration {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+}
+
+.circle {
+    position: absolute;
+    border: 1px solid rgba(208, 223, 240, 0.1);
+    border-radius: 50%;
+    animation: float 20s infinite ease-in-out;
+}
+
+.circle.small {
+    width: 8px;
+    height: 8px;
+}
+
+.circle.medium {
+    width: 120px;
+    height: 120px;
+}
+
+.circle.large {
+    width: 200px;
+    height: 200px;
+}
+
+.star {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: var(--text-light);
+    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+    animation: twinkle 4s infinite ease-in-out;
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translate(0, 0) rotate(0deg);
+        opacity: 0.1;
+    }
+
+    50% {
+        transform: translate(30px, -30px) rotate(180deg);
+        opacity: 0.2;
+    }
+}
+
+@keyframes twinkle {
+
+    0%,
+    100% {
+        opacity: 0.3;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.8;
+        transform: scale(1.5);
+    }
+}
+
+/* Navigation */
+nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 2rem 4rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 1000;
+    background: linear-gradient(to bottom, rgba(10, 14, 26, 0.9) 0%, transparent 100%);
+}
+
+.nav-logo {
+    font-size: 0.9rem;
+    font-weight: 500;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--text-light);
+    transition: all 0.3s ease;
+}
+
+.nav-logo:hover {
+    letter-spacing: 5px;
+}
+
+.nav-links {
+    display: flex;
+    gap: 3rem;
+    list-style: none;
+}
+
+.nav-links a {
+    color: var(--text-light);
+    text-decoration: none;
+    font-size: 0.85rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    position: relative;
+    transition: all 0.3s ease;
+    font-weight: 300;
+}
+
+.nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: var(--text-light);
+    transition: width 0.3s ease;
+}
+
+.nav-links a:hover::after {
+    width: 100%;
+}
+
+.nav-links a:hover {
+    letter-spacing: 4px;
+}
+
+/* Main content */
+main {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+}
+
+/* Logo section */
+.logo-container {
+    position: relative;
+    margin-bottom: 4rem;
+    animation: fadeInDown 1.5s ease-out;
+}
+
+.main-logo {
+    width: 180px;
+    height: auto;
+    filter: brightness(1.1) drop-shadow(0 0 20px rgba(208, 223, 240, 0.3));
+    animation: logoFloat 6s ease-in-out infinite;
+}
+
+@keyframes logoFloat {
+
+    0%,
+    100% {
+        transform: translateY(0) scale(1);
+    }
+
+    50% {
+        transform: translateY(-10px) scale(1.02);
+    }
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-50px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Brand name */
+.brand-name {
+    position: relative;
+    text-align: center;
+    animation: fadeInUp 1.5s ease-out 0.3s both;
+    max-width: 90%;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.brand-text-image {
+    width: 100%;
+    max-width: 1200px;
+    height: auto;
+    filter: brightness(1.05) drop-shadow(0 0 30px rgba(208, 223, 240, 0.2));
+    animation: brandGlow 4s ease-in-out infinite;
+    transition: transform 0.4s ease;
+}
+
+.brand-text-image:hover {
+    transform: scale(1.02);
+    filter: brightness(1.1) drop-shadow(0 0 40px rgba(208, 223, 240, 0.3));
+}
+
+@keyframes brandGlow {
+
+    0%,
+    100% {
+        filter: brightness(1.05) drop-shadow(0 0 30px rgba(208, 223, 240, 0.2));
+    }
+
+    50% {
+        filter: brightness(1.08) drop-shadow(0 0 35px rgba(208, 223, 240, 0.25));
+    }
+}
+
+/* Decorative dots around the brand */
+.brand-name::before,
+.brand-name::after {
+    content: '';
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    border: 1px solid var(--accent-light);
+    border-radius: 50%;
+    animation: pulse 3s ease-in-out infinite;
+}
+
+.brand-name::before {
+    top: 20%;
+    left: 10%;
+}
+
+.brand-name::after {
+    bottom: 20%;
+    right: 10%;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(50px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 0.3;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1.5);
+    }
+}
+
+/* Bottom navigation */
+.bottom-nav {
+    position: fixed;
+    bottom: 2rem;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 4rem;
+    z-index: 1000;
+}
+
+.bottom-link {
+    color: var(--text-light);
+    text-decoration: none;
+    font-size: 0.85rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 300;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.bottom-link::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: var(--text-light);
+    transition: width 0.3s ease;
+}
+
+.bottom-link:hover::after {
+    width: 100%;
+}
+
+.bottom-link:hover {
+    letter-spacing: 4px;
+}
+
+/* Scroll indicator */
+.scroll-indicator {
+    position: fixed;
+    bottom: 6rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1px;
+    height: 60px;
+    background: linear-gradient(to bottom, transparent, var(--text-light), transparent);
+    animation: scrollPulse 2s ease-in-out infinite;
+}
+
+@keyframes scrollPulse {
+
+    0%,
+    100% {
+        opacity: 0.3;
+        height: 60px;
+    }
+
+    50% {
+        opacity: 1;
+        height: 80px;
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    /* Désactiver le curseur personnalisé sur mobile */
+    body,
+    body * {
+        cursor: auto !important;
+    }
+
+    .custom-cursor {
+        display: none;
+    }
+
+    nav {
+        padding: 1rem 1.5rem;
+    }
+
+    .nav-logo {
+        font-size: 0.75rem;
+        letter-spacing: 2px;
+    }
+
+    .nav-links {
+        gap: 1rem;
+        font-size: 0.75rem;
+    }
+
+    .nav-links a {
+        font-size: 0.75rem;
+        letter-spacing: 1px;
+    }
+
+    main {
+        padding: 1rem;
+        min-height: calc(100vh - 60px);
+    }
+
+    .logo-container {
+        margin-bottom: 2rem;
+    }
+
+    .main-logo {
+        width: 100px;
+    }
+
+    .brand-text-image {
+        max-width: 95%;
+    }
+
+    .bottom-nav {
+        left: 50%;
+        right: auto;
+        transform: translateX(-50%);
+        width: fit-content;
+        padding: 0.75rem 2rem;
+        flex-direction: row;
+        justify-content: center;
+        gap: 2rem;
+        bottom: 1.5rem;
+        border-radius: 50px;
+        background: rgba(10, 14, 26, 0.5);
+        backdrop-filter: blur(40px);
+        -webkit-backdrop-filter: blur(40px);
+        border: 1px solid rgba(208, 223, 240, 0.2);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    }
+
+    .bottom-link {
+        font-size: 0.75rem;
+        letter-spacing: 1px;
+    }
+
+    .scroll-indicator {
+        display: none;
+    }
+
+    .geometric-line {
+        opacity: 0.1;
+    }
+
+    .line-1,
+    .line-2 {
+        width: 100px;
+    }
+}
+
+@media (max-width: 480px) {
+    nav {
+        padding: 0.75rem 1rem;
+    }
+
+    .nav-logo {
+        font-size: 0.65rem;
+        letter-spacing: 1.5px;
+    }
+
+    .nav-links {
+        gap: 0.75rem;
+    }
+
+    .nav-links a {
+        font-size: 0.7rem;
+        letter-spacing: 0.5px;
+    }
+
+    main {
+        padding: 0.75rem;
+    }
+
+    .logo-container {
+        margin-bottom: 1.5rem;
+    }
+
+    .main-logo {
+        width: 80px;
+    }
+
+    .brand-text-image {
+        max-width: 98%;
+    }
+
+    .bottom-nav {
+        left: 50%;
+        right: auto;
+        transform: translateX(-50%);
+        width: fit-content;
+        padding: 0.65rem 1.5rem;
+        gap: 1.5rem;
+        bottom: 1rem;
+        border-radius: 50px;
+        background: rgba(10, 14, 26, 0.5);
+        backdrop-filter: blur(40px);
+        -webkit-backdrop-filter: blur(40px);
+        border: 1px solid rgba(208, 223, 240, 0.2);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    }
+
+    .bottom-link {
+        font-size: 0.7rem;
+    }
+}
+
+/* Additional artistic touches */
+.geometric-line {
+    position: absolute;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent-light), transparent);
+    opacity: 0.2;
+}
+
+.line-1 {
+    width: 200px;
+    top: 30%;
+    left: 5%;
+    transform: rotate(-45deg);
+}
+
+.line-2 {
+    width: 150px;
+    bottom: 25%;
+    right: 8%;
+    transform: rotate(30deg);
+}

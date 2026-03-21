@@ -1,0 +1,66 @@
+[
+  {
+    "entreprise": "BrightShell",
+    "poste": "Auto-entrepreneur",
+    "lieu": "Bussac-Forêt",
+    "date_debut": "Novembre 2025",
+    "date_fin": "Présent",
+    "description": "Nouvellement sur le marché des systèmes d'informations.",
+    "realisations": [
+      "Deux clients de projet d'envergure",
+      "Création d'université",
+      "Gestionnaire de flux télévisé en ligne"
+    ]
+  },
+  {
+    "entreprise": "Aéroclub Marcillac Estuaire (ACME)",
+    "poste": "Service Civique",
+    "lieu": "Val-de-Livenne",
+    "date_debut": "Mars 2025",
+    "date_fin": "Novembre 2025",
+    "description": "Développement d'une application de gestion de flotte et de membres (200+ utilisateurs).",
+    "technologies": ["PHP", "JS", "CSS", "MySQL", "MariaDB", "Linux"],
+    "realisations": [
+      "Remplacement et centralisation des processus manuels existants en partant de zéro"
+    ]
+  },
+  {
+    "entreprise": "LOTIXAM SAS",
+    "poste": "Développeur Full Stack",
+    "lieu": "Bussac-Forêt",
+    "date_debut": "Avril 2024",
+    "date_fin": "Juin 2024",
+    "description": "Développement de solutions web pour la gestion immobilière.",
+    "technologies": ["PHP", "Symfony", "JavaScript", "PostgreSQL", "MySQL"],
+    "realisations": [
+      "Développement de la base de données avec PostgreSQL et MySQL",
+      "Développement du site web avec PHP/Symfony et JavaScript",
+      "Mise en place du SEO",
+      "Intégration d'outils CRM"
+    ]
+  },
+  {
+    "entreprise": "Quick",
+    "poste": "Agent Polyvalent",
+    "lieu": "Poitiers",
+    "date_debut": "2021",
+    "date_fin": "2023",
+    "description": "Service client, préparation des commandes et gestion de la restauration rapide."
+  },
+  {
+    "entreprise": "Futuroscope",
+    "poste": "Linger",
+    "lieu": "Poitiers",
+    "date_debut": "Été 2021",
+    "date_fin": "Été 2021",
+    "description": "Accueil et encadrement des visiteurs du parc d'attractions."
+  },
+  {
+    "entreprise": "PIC LaPoste",
+    "poste": "Agent de production grade 1.2",
+    "lieu": "Poitiers",
+    "date_debut": "2019",
+    "date_fin": "2019",
+    "description": "Tri et traitement du courrier."
+  }
+]

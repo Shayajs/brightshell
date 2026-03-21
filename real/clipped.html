@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Clipped Text - BrightShell</title>
+    <link rel="icon" href="../img/etoile_sans_fond_contours_fin.png" type="image/png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            font-family: 'Arial', sans-serif;
+            color: #e8f0f8;
+            overflow-x: hidden;
+        }
+
+        .header {
+            padding: 2rem 3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.7rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            opacity: 0.6;
+        }
+
+        .main-demo {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            padding-bottom: 25vh; /* Laisser de la place pour les contrôles */
+            gap: 2rem;
+        }
+
+        #demo-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 0;
+            min-height: 0;
+        }
+
+        .controls {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.95);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1.5rem 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            align-items: flex-end;
+            backdrop-filter: blur(10px);
+            max-height: 50vh;
+            overflow-y: auto;
+        }
+
+        .control-group {
+            flex: 1;
+            min-width: 120px;
+            max-width: 200px;
+        }
+
+        .control-group label {
+            display: block;
+            font-size: 0.6rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 0.4rem;
+            opacity: 0.6;
+        }
+
+        .control-group input[type="range"] {
+            width: 100%;
+            height: 4px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            cursor: pointer;
+        }
+
+        .control-group input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 12px;
+            height: 12px;
+            background: #F5F8FF;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .control-group input[type="text"],
+        .control-group input[type="number"] {
+            width: 100%;
+            padding: 0.4rem 0.6rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #e8f0f8;
+            border-radius: 3px;
+            font-size: 0.75rem;
+        }
+
+        .value-display {
+            font-size: 0.7rem;
+            opacity: 0.7;
+            margin-top: 0.3rem;
+            font-variant-numeric: tabular-nums;
+        }
+
+        button {
+            padding: 0.6rem 1.5rem;
+            background: rgba(208, 223, 240, 0.1);
+            border: 1px solid rgba(208, 223, 240, 0.3);
+            color: #e8f0f8;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.65rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            transition: all 0.2s ease;
+        }
+
+        button:hover {
+            background: rgba(208, 223, 240, 0.2);
+            border-color: rgba(208, 223, 240, 0.5);
+        }
+
+        .integration-section {
+            position: fixed;
+            top: 4rem;
+            right: 2rem;
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 1.5rem;
+            max-width: 400px;
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+        }
+
+        .integration-section h3 {
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+            opacity: 0.7;
+        }
+
+        .integration-code {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            padding: 1rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.75rem;
+            color: #e8f0f8;
+            margin-bottom: 1rem;
+            word-break: break-all;
+            line-height: 1.6;
+        }
+
+        .integration-code code {
+            display: block;
+            white-space: pre-wrap;
+        }
+
+        .copy-integration-btn {
+            width: 100%;
+            padding: 0.6rem 1rem;
+            background: rgba(208, 223, 240, 0.1);
+            border: 1px solid rgba(208, 223, 240, 0.3);
+            color: #e8f0f8;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.65rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            transition: all 0.2s ease;
+        }
+
+        .copy-integration-btn:hover {
+            background: rgba(208, 223, 240, 0.2);
+            border-color: rgba(208, 223, 240, 0.5);
+        }
+
+        .copy-integration-btn.copied {
+            background: rgba(74, 111, 165, 0.3);
+            border-color: rgba(74, 111, 165, 0.5);
+        }
+
+        @font-face {
+            font-family: 'Gilroy ExtraBold';
+            src: url('../fonts/Gilroy-ExtraBold.otf') format('opentype');
+            font-weight: 800;
+            font-style: normal;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <span>Clipped Stratified Text</span>
+        <span>BrightShell</span>
+    </div>
+
+    <div class="integration-section">
+        <h3>Intégration</h3>
+        <div class="integration-code" id="integration-code-display">
+            <code id="integration-code-text">&lt;script src="js/clipped-text.js"&gt;&lt;/script&gt;</code>
+        </div>
+        <button class="copy-integration-btn" id="copy-integration-btn">Copier le code</button>
+    </div>
+
+    <div class="main-demo">
+        <div id="demo-container"></div>
+    </div>
+
+    <div class="controls">
+        <div class="control-group">
+            <label for="text">Texte</label>
+            <input type="text" id="text" value="R.A.">
+        </div>
+
+        <div class="control-group">
+            <label for="fontSize">Taille police</label>
+            <input type="number" id="fontSize" value="200" min="50" max="500" step="10">
+        </div>
+
+        <div class="control-group">
+            <label for="maxRepetitions">Répétitions</label>
+            <input type="range" id="maxRepetitions" min="3" max="30" value="12">
+            <div class="value-display" id="maxRepetitions-value">12</div>
+        </div>
+
+        <div class="control-group">
+            <label for="startOffset">Offset initial (px)</label>
+            <input type="range" id="startOffset" min="0" max="5" step="0.1" value="0.5">
+            <div class="value-display" id="startOffset-value">0.5</div>
+        </div>
+
+        <div class="control-group">
+            <label for="maxOffset">Offset max (px)</label>
+            <input type="range" id="maxOffset" min="5" max="80" value="30">
+            <div class="value-display" id="maxOffset-value">30</div>
+        </div>
+
+        <div class="control-group">
+            <label for="angle">Angle (°)</label>
+            <input type="range" id="angle" min="0" max="360" value="45">
+            <div class="value-display" id="angle-value">45</div>
+        </div>
+
+        <div class="control-group">
+            <label for="acceleration">Accélération (a)</label>
+            <input type="range" id="acceleration" min="1" max="10" step="0.1" value="2">
+            <div class="value-display" id="acceleration-value">2</div>
+        </div>
+
+        <div class="control-group">
+            <label for="strokeWidth">Épaisseur trait (px)</label>
+            <input type="range" id="strokeWidth" min="0.5" max="5" step="0.1" value="2">
+            <div class="value-display" id="strokeWidth-value">2</div>
+        </div>
+
+        <div class="control-group">
+            <label for="color">Couleur</label>
+            <input type="text" id="color" value="#FFFFFF">
+        </div>
+    </div>
+
+    <script src="../js/clipped-text.js"></script>
+    <script>
+        let currentSVG = null;
+
+        function updateDemo() {
+            const container = document.getElementById('demo-container');
+            if (!container) {
+                console.error('Container demo-container non trouvé!');
+                return;
+            }
+            if (typeof createClippedText === 'undefined') {
+                console.error('createClippedText n\'est pas disponible!');
+                return;
+            }
+            console.log('updateDemo() appelée');
+
+            // Supprimer l'ancien SVG
+            if (currentSVG) {
+                container.removeChild(currentSVG);
+            }
+
+            // Récupérer les valeurs
+            const text = document.getElementById('text').value || 'R.A.';
+            const fontSize = parseInt(document.getElementById('fontSize').value) || 330;
+            const maxRepetitions = parseInt(document.getElementById('maxRepetitions').value) || 25;
+            const startOffset = parseFloat(document.getElementById('startOffset').value) || 0.5;
+            const maxOffset = parseFloat(document.getElementById('maxOffset').value) || 30;
+            const angle = parseFloat(document.getElementById('angle').value) || 45;
+            const acceleration = parseFloat(document.getElementById('acceleration').value) || 2;
+            const strokeWidth = parseFloat(document.getElementById('strokeWidth').value) || 4;
+            const color = document.getElementById('color').value || '#FFFFFF';
+
+            // Créer le nouveau SVG
+            currentSVG = createClippedText(text, {
+                fontSize: fontSize,
+                fontFamily: 'Gilroy ExtraBold',
+                color: color,
+                strokeWidth: strokeWidth,
+                maxRepetitions: maxRepetitions,
+                startOffset: startOffset,
+                maxOffset: maxOffset,
+                angle: angle,
+                acceleration: acceleration
+            });
+
+            container.appendChild(currentSVG);
+        }
+
+        // Event listeners pour mise à jour en temps réel
+        ['text', 'fontSize', 'color'].forEach(id => {
+            document.getElementById(id).addEventListener('input', updateDemo);
+        });
+
+        ['maxRepetitions', 'startOffset', 'maxOffset', 'angle', 'acceleration', 'strokeWidth'].forEach(id => {
+            const input = document.getElementById(id);
+            input.addEventListener('input', function(e) {
+                document.getElementById(`${id}-value`).textContent = e.target.value;
+                updateDemo();
+            });
+        });
+
+        // Fonction locale pour charger la police depuis real/clipped.html
+        function loadLocalFont() {
+            return new Promise((resolve, reject) => {
+                const font = new FontFace('Gilroy ExtraBold', 'url(../fonts/Gilroy-ExtraBold.otf)');
+                font.load().then(function(loadedFont) {
+                    document.fonts.add(loadedFont);
+                    console.log('Police Gilroy ExtraBold chargée avec succès');
+                    resolve();
+                }).catch(function(error) {
+                    console.error('Erreur lors du chargement de la police:', error);
+                    reject(error);
+                });
+            });
+        }
+
+        // Initialiser après le chargement
+        function initDemo() {
+            // Attendre que createClippedText soit disponible
+            if (typeof createClippedText === 'undefined') {
+                console.log('Attente de createClippedText...');
+                setTimeout(initDemo, 100);
+                return;
+            }
+
+            console.log('createClippedText disponible, chargement de la police...');
+
+            // Charger la police avec le bon chemin relatif
+            loadLocalFont().then(function() {
+                console.log('Police chargée, création du texte...');
+                // Attendre un peu pour que la police soit vraiment prête dans le DOM
+                setTimeout(function() {
+                    updateDemo();
+                }, 400);
+            }).catch(function(error) {
+                console.error('Erreur chargement police:', error);
+                // Essayer quand même après un délai plus long
+                setTimeout(function() {
+                    console.log('Tentative de création sans police chargée...');
+                    updateDemo();
+                }, 1000);
+            });
+        }
+
+        // Démarrer l'initialisation après le chargement de la page
+        window.addEventListener('load', function() {
+            console.log('Page chargée, démarrage de l\'initialisation...');
+            setTimeout(initDemo, 300);
+        });
+
+        // Gestion du bouton de copie d'intégration
+        const copyIntegrationBtn = document.getElementById('copy-integration-btn');
+        // Construire l'URL complète avec l'origine du site
+        const baseUrl = window.location.origin;
+        const integrationCode = '<script src="' + baseUrl + '/js/clipped-text.js"><\/script>';
+        
+        // Mettre à jour l'affichage du code d'intégration
+        const integrationCodeText = document.getElementById('integration-code-text');
+        if (integrationCodeText) {
+            // textContent échappe automatiquement les caractères HTML
+            integrationCodeText.textContent = integrationCode;
+        }
+        
+        if (copyIntegrationBtn) {
+            copyIntegrationBtn.addEventListener('click', async function() {
+                try {
+                    await navigator.clipboard.writeText(integrationCode);
+                    copyIntegrationBtn.textContent = 'Copié !';
+                    copyIntegrationBtn.classList.add('copied');
+                    
+                    setTimeout(() => {
+                        copyIntegrationBtn.textContent = 'Copier le code';
+                        copyIntegrationBtn.classList.remove('copied');
+                    }, 2000);
+                } catch (error) {
+                    // Fallback pour les navigateurs qui ne supportent pas l'API Clipboard
+                    const textArea = document.createElement('textarea');
+                    textArea.value = integrationCode;
+                    textArea.style.position = 'fixed';
+                    textArea.style.opacity = '0';
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    
+                    copyIntegrationBtn.textContent = 'Copié !';
+                    copyIntegrationBtn.classList.add('copied');
+                    setTimeout(() => {
+                        copyIntegrationBtn.textContent = 'Copier le code';
+                        copyIntegrationBtn.classList.remove('copied');
+                    }, 2000);
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>
