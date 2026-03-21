@@ -28,12 +28,12 @@ services:
       - brightshell_app
 
   brightshell_db:
-    image: mysql:8.0
+    image: mariadb:11.4
     container_name: brightshell_db
     restart: unless-stopped
     environment:
-      MYSQL_DATABASE: brightshell
-      MYSQL_ROOT_PASSWORD: "${DB_PASSWORD:-brightshell_secret}"
+      MARIADB_DATABASE: brightshell
+      MARIADB_ROOT_PASSWORD: "${DB_PASSWORD:-brightshell_secret}"
     volumes:
       - brightshell_db_data:/var/lib/mysql
     networks:
