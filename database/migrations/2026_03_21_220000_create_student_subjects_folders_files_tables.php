@@ -30,7 +30,10 @@ return new class extends Migration
                 $table->unsignedSmallInteger('sort_order')->default(0);
                 $table->timestamps();
 
-                $table->index(['student_subject_id', 'parent_id', 'sort_order']);
+                $table->index(
+                    ['student_subject_id', 'parent_id', 'sort_order'],
+                    'ssf_subject_parent_sort_idx'
+                );
             });
         }
 
