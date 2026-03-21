@@ -17,6 +17,14 @@ final class PublicApiCors
         'Access-Control-Max-Age' => '86400',
     ];
 
+    /**
+     * @return array<string, string>
+     */
+    public static function headerSummary(): array
+    {
+        return self::HEADERS;
+    }
+
     public function handle(Request $request, Closure $next): Response
     {
         if ($request->isMethod('OPTIONS')) {

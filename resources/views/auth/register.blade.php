@@ -4,7 +4,7 @@
 
 @section('content')
     <a
-        href="{{ url('/') }}"
+        href="{{ \App\Support\BrightshellDomain::publicSiteUrl() }}"
         class="mb-6 inline-flex text-sm font-medium text-zinc-500 transition hover:text-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
     >
         ← Retour au site

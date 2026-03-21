@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Account\HomeController as AccountHomeController;
+use App\Http\Controllers\Admin\ApiManagerController;
 use App\Http\Controllers\Admin\CompaniesController;
 use App\Http\Controllers\Admin\CvAdminController;
 use App\Http\Controllers\Admin\DashboardController;
@@ -154,6 +155,8 @@ $registerAdminRoutes = function (): void {
     Route::get('/declarations/entreprise', [DeclarationsController::class, 'editBusiness'])->name('admin.declarations.business.edit');
     Route::put('/declarations/entreprise', [DeclarationsController::class, 'updateBusiness'])->name('admin.declarations.business.update');
     Route::redirect('/urssaf', '/declarations/urssaf')->name('admin.urssaf.index');
+
+    Route::get('/api-publique', [ApiManagerController::class, 'index'])->name('admin.api-manager.index');
 
     // Réalisations
     Route::get('/realisations', [RealisationsAdminController::class, 'index'])->name('admin.realisations.index');

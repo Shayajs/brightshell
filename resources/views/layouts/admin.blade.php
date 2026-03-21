@@ -1,4 +1,5 @@
 @php
+    use App\Support\BrightshellDomain;
     use App\Support\PortalUrls;
     use Illuminate\Support\Str;
 
@@ -92,7 +93,7 @@
             <div class="portal-sidebar-box-brand relative z-10 shrink-0 px-3 pb-2 pt-3">
                 <div class="rounded-xl border border-zinc-800/90 bg-zinc-950/70 p-1 shadow-sm ring-1 ring-white/5">
                     <a
-                        href="{{ url('/') }}"
+                        href="{{ BrightshellDomain::publicSiteUrl() }}"
                         class="flex items-center gap-3 rounded-lg px-2.5 py-2 transition hover:bg-zinc-800/50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                     >
                         <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-indigo-500/15 text-xs font-bold tracking-wider text-indigo-400 ring-1 ring-indigo-500/30 font-display">BS</span>
@@ -175,6 +176,12 @@
                             ])
 
                             @include('layouts.partials.nav-section', ['label' => 'Outils'])
+                            @include('layouts.partials.nav-item', [
+                                'href'   => route('admin.api-manager.index'),
+                                'active' => request()->routeIs('admin.api-manager.*'),
+                                'label'  => 'API publique',
+                                'icon'   => '<path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>',
+                            ])
                             @include('layouts.partials.nav-item', [
                                 'href'   => route('admin.realisations.index'),
                                 'active' => request()->routeIs('admin.realisations.*'),

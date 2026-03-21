@@ -33,4 +33,12 @@ final class BrightshellDomain
     {
         return parse_url((string) config('app.url'), PHP_URL_SCHEME) ?: 'https';
     }
+
+    /**
+     * Racine du site public (vitrine), toujours {@see config('app.url')} — pas l’hôte du portail courant.
+     */
+    public static function publicSiteUrl(): string
+    {
+        return rtrim((string) config('app.url'), '/');
+    }
 }

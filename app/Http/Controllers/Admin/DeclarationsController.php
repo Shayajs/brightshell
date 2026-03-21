@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\UpdateBusinessProfileRequest;
 use App\Models\BusinessProfile;
 use App\Models\Invoice;
-use App\Support\BrightshellDomain;
+use App\Support\PublicApi\PublicApiSupport;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
@@ -51,15 +51,6 @@ class DeclarationsController extends Controller
 
     private function publicApiBaseUrl(): ?string
     {
-        $host = trim((string) config('brightshell.domains.api_host', ''));
-        $root = BrightshellDomain::effectiveRoot();
-        if ($host === '' && $root !== '') {
-            $host = 'api.'.$root;
-        }
-        if ($host === '') {
-            return null;
-        }
-
-        return BrightshellDomain::urlScheme().'://'.$host.'/v1/entreprise';
+        return PublicApiSupport::namedRouteUrl('api.public.v1.entreprise');
     }
 }
