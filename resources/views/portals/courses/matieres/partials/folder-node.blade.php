@@ -25,12 +25,16 @@
                         </div>
                         <span class="shrink-0 text-[10px] text-zinc-600">{{ $file->humanSize() }}</span>
                         <div class="flex shrink-0 flex-wrap gap-2">
-                            @if ($file->isMarkdown())
-                                <a href="{{ route('portals.courses.matieres.read', $file->id) }}"
-                                   class="text-[11px] font-semibold text-emerald-400 hover:text-emerald-300">Lire</a>
+                            @if ($file->is_locked)
+                                <span class="text-[11px] font-semibold text-amber-500/90" title="Déverrouillage à venir">Verrouillé</span>
+                            @else
+                                @if ($file->isMarkdown())
+                                    <a href="{{ route('portals.courses.matieres.read', $file->id) }}"
+                                       class="text-[11px] font-semibold text-emerald-400 hover:text-emerald-300">Lire</a>
+                                @endif
+                                <a href="{{ route('portals.courses.matieres.download', $file->id) }}"
+                                   class="text-[11px] font-semibold text-violet-400 hover:text-violet-300">Télécharger</a>
                             @endif
-                            <a href="{{ route('portals.courses.matieres.download', $file->id) }}"
-                               class="text-[11px] font-semibold text-violet-400 hover:text-violet-300">Télécharger</a>
                         </div>
                     </li>
                 @endforeach

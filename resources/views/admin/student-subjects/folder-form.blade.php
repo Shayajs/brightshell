@@ -6,7 +6,7 @@
 @section('content')
 <div class="mx-auto max-w-lg space-y-8">
     <div class="flex items-center gap-4">
-        <a href="{{ route('admin.student-subjects.show', [$user, $subject]) }}"
+        <a href="{{ route('admin.student-subjects.show', [$user, $subject, 'dossier' => $folder->id]) }}"
            class="flex size-9 items-center justify-center rounded-lg border border-zinc-700 bg-zinc-800 text-zinc-400 hover:text-zinc-100">
             <svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
         </a>

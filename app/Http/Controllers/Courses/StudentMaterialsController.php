@@ -26,7 +26,15 @@ class StudentMaterialsController extends Controller
     {
         $this->authorizeSubject($studentSubject);
 
-        $allFolders = $studentSubject->folders()->with('files')->orderBy('sort_order')->orderBy('id')->get();
+        $allFolders = $studentSubject->folders()
+            ->with([
+                'files' => fn ($q) => $q->where('is_hidden_from_student', false)
+                    ->orderBy('sort_order')
+                    ->orderBy('id'),
+            ])
+            ->orderBy('sort_order')
+            ->orderBy('id')
+            ->get();
         $folderTree = $this->buildFolderTree($allFolders);
 
         return view('portals.courses.matieres.show', [
@@ -45,6 +53,8 @@ class StudentMaterialsController extends Controller
         $this->authorizeSubject($subject);
         abort_unless($studentSubjectFile->folder->student_subject_id === $subject->id, 404);
         abort_unless($studentSubjectFile->isMarkdown(), 404);
+        abort_if($studentSubjectFile->is_hidden_from_student, 404);
+        abort_unless(! $studentSubjectFile->is_locked, 403, 'Ce contenu est encore verrouillé.');
         abort_unless(Storage::disk('local')->exists($studentSubjectFile->stored_path), 404);
 
         $raw = Storage::disk('local')->get($studentSubjectFile->stored_path);
@@ -67,6 +77,8 @@ class StudentMaterialsController extends Controller
         $subject = $studentSubjectFile->folder->subject;
         $this->authorizeSubject($subject);
         abort_unless($studentSubjectFile->folder->student_subject_id === $subject->id, 404);
+        abort_if($studentSubjectFile->is_hidden_from_student, 404);
+        abort_unless(! $studentSubjectFile->is_locked, 403, 'Ce fichier est encore verrouillé.');
         abort_unless(Storage::disk('local')->exists($studentSubjectFile->stored_path), 404);
 
         return Storage::disk('local')->download($studentSubjectFile->stored_path, $studentSubjectFile->original_name);

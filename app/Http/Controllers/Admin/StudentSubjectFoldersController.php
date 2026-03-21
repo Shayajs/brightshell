@@ -30,14 +30,16 @@ class StudentSubjectFoldersController extends Controller
             ->where('parent_id', $data['parent_id'] ?? null)
             ->max('sort_order');
 
-        StudentSubjectFolder::create([
+        $folder = StudentSubjectFolder::create([
             'student_subject_id' => $studentSubject->id,
             'parent_id' => $data['parent_id'] ?? null,
             'name' => $data['name'],
             'sort_order' => $max + 1,
         ]);
 
-        return back()->with('success', 'Dossier créé.');
+        return redirect()
+            ->route('admin.student-subjects.show', [$user, $studentSubject, 'dossier' => $folder->id])
+            ->with('success', 'Dossier créé.');
     }
 
     public function edit(User $user, StudentSubject $studentSubject, int $folder): View
@@ -81,7 +83,7 @@ class StudentSubjectFoldersController extends Controller
         ]);
 
         return redirect()
-            ->route('admin.student-subjects.show', [$user, $studentSubject])
+            ->route('admin.student-subjects.show', [$user, $studentSubject, 'dossier' => $folder->id])
             ->with('success', 'Dossier mis à jour.');
     }
 

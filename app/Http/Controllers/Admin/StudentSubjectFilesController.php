@@ -8,6 +8,7 @@ use App\Models\StudentSubjectFile;
 use App\Models\StudentSubjectFolder;
 use App\Models\User;
 use App\Support\StudentMaterials\StudentMaterialsMarkdownRenderer;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -70,7 +71,11 @@ class StudentSubjectFilesController extends Controller
             $n++;
         }
 
-        return back()->with($n > 0 ? 'success' : 'error', $n > 0 ? $n.' fichier(s) importé(s).' : 'Aucun fichier valide.');
+        $folderId = (int) $request->input('student_subject_folder_id');
+
+        return redirect()
+            ->route('admin.student-subjects.show', [$user, $studentSubject, 'dossier' => $folderId])
+            ->with($n > 0 ? 'success' : 'error', $n > 0 ? $n.' fichier(s) importé(s).' : 'Aucun fichier valide.');
     }
 
     public function storeMarkdown(Request $request, User $user, StudentSubject $studentSubject): RedirectResponse
@@ -101,15 +106,110 @@ class StudentSubjectFilesController extends Controller
         Storage::disk('local')->put($path, $data['markdown_body']);
 
         $max = (int) $folder->files()->max('sort_order');
-        $folder->files()->create([
-            'original_name' => $base,
-            'stored_path' => $path,
-            'mime_type' => 'text/markdown; charset=UTF-8',
-            'size' => strlen($data['markdown_body']),
-            'sort_order' => $max + 1,
+            $folder->files()->create([
+                'original_name' => $base,
+                'stored_path' => $path,
+                'mime_type' => 'text/markdown; charset=UTF-8',
+                'size' => strlen($data['markdown_body']),
+                'sort_order' => $max + 1,
+                'is_locked' => false,
+                'is_hidden_from_student' => false,
+            ]);
+
+        return redirect()
+            ->route('admin.student-subjects.show', [$user, $studentSubject, 'dossier' => $folder->id])
+            ->with('success', 'Note Markdown enregistrée.');
+    }
+
+    public function createMarkdown(User $user, StudentSubject $studentSubject, StudentSubjectFolder $folder): View
+    {
+        $this->authorizeSubject($user, $studentSubject);
+        abort_unless($folder->student_subject_id === $studentSubject->id, 404);
+
+        return view('admin.student-subjects.markdown-editor', [
+            'user' => $user,
+            'subject' => $studentSubject,
+            'folder' => $folder,
+            'file' => null,
+            'initialTitle' => old('markdown_title', ''),
+            'initialBody' => old('markdown_body', "# Nouvelle note\n\n"),
+            'isCreate' => true,
+        ]);
+    }
+
+    public function editMarkdown(User $user, StudentSubject $studentSubject, StudentSubjectFile $file): View
+    {
+        $this->authorizeSubject($user, $studentSubject);
+        $this->assertFileInSubject($studentSubject, $file);
+        abort_unless($file->isMarkdown(), 404);
+        abort_unless(Storage::disk('local')->exists($file->stored_path), 404);
+
+        return view('admin.student-subjects.markdown-editor', [
+            'user' => $user,
+            'subject' => $studentSubject,
+            'folder' => $file->folder,
+            'file' => $file,
+            'initialTitle' => old('markdown_title', $file->original_name),
+            'initialBody' => old('markdown_body', Storage::disk('local')->get($file->stored_path)),
+            'isCreate' => false,
+        ]);
+    }
+
+    public function updateMarkdown(Request $request, User $user, StudentSubject $studentSubject, StudentSubjectFile $file): RedirectResponse
+    {
+        $this->authorizeSubject($user, $studentSubject);
+        $this->assertFileInSubject($studentSubject, $file);
+        abort_unless($file->isMarkdown(), 404);
+
+        $data = $request->validate([
+            'markdown_title' => ['required', 'string', 'max:255'],
+            'markdown_body' => ['required', 'string', 'max:2000000'],
         ]);
 
-        return back()->with('success', 'Note Markdown enregistrée.');
+        $title = trim($data['markdown_title']);
+        if ($title === '') {
+            return back()->withInput()->with('error', 'Nom de fichier invalide.');
+        }
+        if (! Str::endsWith(strtolower($title), '.md')) {
+            $title .= '.md';
+        }
+
+        Storage::disk('local')->put($file->stored_path, $data['markdown_body']);
+        $file->update([
+            'original_name' => $title,
+            'size' => strlen($data['markdown_body']),
+            'mime_type' => 'text/markdown; charset=UTF-8',
+        ]);
+
+        return redirect()
+            ->route('admin.student-subjects.show', [$user, $studentSubject, 'dossier' => $file->student_subject_folder_id])
+            ->with('success', 'Markdown enregistré.');
+    }
+
+    public function previewMarkdownJson(Request $request, StudentMaterialsMarkdownRenderer $renderer): JsonResponse
+    {
+        $data = $request->validate([
+            'markdown' => ['required', 'string', 'max:2000000'],
+        ]);
+
+        $html = $renderer->toHtml($data['markdown']);
+
+        return response()->json(['html' => $html]);
+    }
+
+    public function updateFileAccess(Request $request, User $user, StudentSubject $studentSubject, StudentSubjectFile $file): RedirectResponse
+    {
+        $this->authorizeSubject($user, $studentSubject);
+        $this->assertFileInSubject($studentSubject, $file);
+
+        $file->update([
+            'is_locked' => $request->boolean('is_locked'),
+            'is_hidden_from_student' => $request->boolean('is_hidden_from_student'),
+        ]);
+
+        return redirect()
+            ->route('admin.student-subjects.show', [$user, $studentSubject, 'dossier' => $file->student_subject_folder_id])
+            ->with('success', 'Accès élève mis à jour pour « '.$file->original_name.' ».');
     }
 
     public function previewMarkdown(int $file): View
@@ -148,9 +248,17 @@ class StudentSubjectFilesController extends Controller
             ->whereHas('folder', fn ($q) => $q->where('student_subject_id', $studentSubject->id))
             ->firstOrFail();
 
+        $folderId = $studentSubjectFile->student_subject_folder_id;
         $studentSubjectFile->delete();
 
-        return back()->with('success', 'Fichier supprimé.');
+        return redirect()
+            ->route('admin.student-subjects.show', [$user, $studentSubject, 'dossier' => $folderId])
+            ->with('success', 'Fichier supprimé.');
+    }
+
+    private function assertFileInSubject(StudentSubject $studentSubject, StudentSubjectFile $file): void
+    {
+        abort_unless($file->folder->student_subject_id === $studentSubject->id, 404);
     }
 
     private function authorizeSubject(User $user, StudentSubject $subject): void

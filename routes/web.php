@@ -25,6 +25,9 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\RealisationsController;
 use App\Http\Controllers\ServicesController;
 use App\Http\Controllers\Settings\DashboardController as SettingsDashboardController;
+use App\Http\Controllers\Settings\NotificationPreferencesController;
+use App\Http\Controllers\Settings\ProfileController as SettingsProfileController;
+use App\Http\Controllers\Settings\SecurityController as SettingsSecurityController;
 use App\Http\Controllers\Users\DashboardController as UsersDashboardController;
 use App\Http\Middleware\EnsureUserCanAccessAdminPortal;
 use App\Support\BrightshellDomain;
@@ -116,6 +119,13 @@ $registerAdminRoutes = function (): void {
 
     Route::post('/student-subjects/student/{user}/subject/{student_subject}/files', [StudentSubjectFilesController::class, 'store'])->name('admin.student-subject-files.store');
     Route::post('/student-subjects/student/{user}/subject/{student_subject}/files/markdown', [StudentSubjectFilesController::class, 'storeMarkdown'])->name('admin.student-subject-files.store-markdown');
+    Route::post('/student-subjects/markdown/apercu-json', [StudentSubjectFilesController::class, 'previewMarkdownJson'])
+        ->middleware('throttle:120,1')
+        ->name('admin.student-subject-files.markdown.preview-json');
+    Route::get('/student-subjects/student/{user}/subject/{student_subject}/folders/{folder}/markdown/nouveau', [StudentSubjectFilesController::class, 'createMarkdown'])->name('admin.student-subject-files.markdown.create');
+    Route::get('/student-subjects/student/{user}/subject/{student_subject}/files/{file}/markdown/editer', [StudentSubjectFilesController::class, 'editMarkdown'])->name('admin.student-subject-files.markdown.edit');
+    Route::put('/student-subjects/student/{user}/subject/{student_subject}/files/{file}/markdown', [StudentSubjectFilesController::class, 'updateMarkdown'])->name('admin.student-subject-files.markdown.update');
+    Route::patch('/student-subjects/student/{user}/subject/{student_subject}/files/{file}/acces', [StudentSubjectFilesController::class, 'updateFileAccess'])->name('admin.student-subject-files.update-access');
     Route::get('/student-subjects/files/{file}/download', [StudentSubjectFilesController::class, 'download'])->name('admin.student-subject-files.download');
     Route::get('/student-subjects/files/{file}/apercu', [StudentSubjectFilesController::class, 'previewMarkdown'])->name('admin.student-subject-files.preview');
     Route::delete('/student-subjects/student/{user}/subject/{student_subject}/files/{file}', [StudentSubjectFilesController::class, 'destroy'])->name('admin.student-subject-files.destroy');
@@ -266,7 +276,18 @@ if ($settingsHost !== '') {
     Route::domain($settingsHost)
         ->middleware('auth')
         ->group(function (): void {
-            Route::get('/', SettingsDashboardController::class)->name('portals.settings');
+            Route::get('/', [SettingsDashboardController::class, 'index'])->name('portals.settings');
+
+            Route::get('/profil', [SettingsProfileController::class, 'edit'])->name('portals.settings.profile.edit');
+            Route::put('/profil', [SettingsProfileController::class, 'update'])->name('portals.settings.profile.update');
+
+            Route::get('/notifications', [NotificationPreferencesController::class, 'edit'])->name('portals.settings.notifications.edit');
+            Route::put('/notifications', [NotificationPreferencesController::class, 'update'])->name('portals.settings.notifications.update');
+            Route::post('/notifications/lues', [NotificationPreferencesController::class, 'markAllRead'])->name('portals.settings.notifications.read-all');
+
+            Route::get('/securite', [SettingsSecurityController::class, 'edit'])->name('portals.settings.security.edit');
+            Route::put('/securite/mot-de-passe', [SettingsSecurityController::class, 'updatePassword'])->name('portals.settings.security.password');
+            Route::delete('/securite/autres-sessions', [SettingsSecurityController::class, 'destroyOtherSessions'])->name('portals.settings.security.sessions.destroy-others');
         });
 }
 

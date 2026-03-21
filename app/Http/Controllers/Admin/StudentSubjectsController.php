@@ -33,18 +33,20 @@ class StudentSubjectsController extends Controller
         return view('admin.student-subjects.student', compact('user', 'subjects'));
     }
 
-    public function show(User $user, StudentSubject $studentSubject): View
+    public function show(Request $request, User $user, StudentSubject $studentSubject): View
     {
         $this->ensureStudent($user);
         abort_unless($studentSubject->user_id === $user->id, 404);
 
         $allFolders = $studentSubject->folders()->with('files')->orderBy('sort_order')->orderBy('id')->get();
+        $activeFolder = $this->resolveActiveFolder($studentSubject, $request->integer('dossier'), $allFolders);
         $folderTree = $this->buildFolderTree($allFolders);
 
         return view('admin.student-subjects.show', [
             'user' => $user,
             'subject' => $studentSubject,
             'folderTree' => $folderTree,
+            'activeFolder' => $activeFolder,
         ]);
     }
 
@@ -123,6 +125,28 @@ class StudentSubjectsController extends Controller
                 'folder' => $folder,
                 'children' => $this->buildFolderTree($all, $folder->id),
             ]);
+    }
+
+    /**
+     * @param  Collection<int, StudentSubjectFolder>  $allFolders
+     */
+    private function resolveActiveFolder(StudentSubject $subject, int $requestedFolderId, Collection $allFolders): ?StudentSubjectFolder
+    {
+        if ($allFolders->isEmpty()) {
+            return null;
+        }
+
+        if ($requestedFolderId > 0) {
+            $match = $allFolders->firstWhere('id', $requestedFolderId);
+            if ($match !== null && (int) $match->student_subject_id === (int) $subject->id) {
+                return $match;
+            }
+        }
+
+        return $allFolders
+            ->filter(fn (StudentSubjectFolder $f) => $f->parent_id === null)
+            ->sortBy(fn (StudentSubjectFolder $f) => sprintf('%05d-%010d', $f->sort_order, $f->id))
+            ->first();
     }
 
     private function ensureStudent(User $user): void

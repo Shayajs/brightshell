@@ -36,7 +36,15 @@ class LoginController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(RoleResolver::defaultPortalUrl(Auth::user()));
+        $user = Auth::user();
+        $user->forceFill([
+            'previous_login_at' => $user->current_login_at,
+            'previous_login_ip' => $user->current_login_ip,
+            'current_login_at' => now(),
+            'current_login_ip' => $request->ip(),
+        ])->save();
+
+        return redirect()->intended(RoleResolver::defaultPortalUrl($user));
     }
 
     public function destroy(Request $request): RedirectResponse

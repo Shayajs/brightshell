@@ -15,7 +15,17 @@ class StudentSubjectFile extends Model
         'mime_type',
         'size',
         'sort_order',
+        'is_locked',
+        'is_hidden_from_student',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'is_locked' => 'boolean',
+            'is_hidden_from_student' => 'boolean',
+        ];
+    }
 
     protected static function booted(): void
     {

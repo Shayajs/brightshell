@@ -51,6 +51,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Portail') — BrightShell</title>
     <link rel="icon" href="{{ asset('img/etoile_sans_fond_contours_fin.png') }}" type="image/png">
     <link rel="preload" href="{{ asset('fonts/Gilroy-ExtraBold.otf') }}" as="font" type="font/otf" crossorigin>
@@ -322,7 +323,7 @@
                 </span>
             </header>
 
-            <main class="portal-main mx-auto w-full max-w-7xl flex-1 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+            <main class="portal-main mx-auto w-full flex-1 px-4 py-6 sm:px-6 lg:px-8 lg:py-8 @yield('portal_main_max', 'max-w-7xl')">
                 @yield('content')
             </main>
         </div>
