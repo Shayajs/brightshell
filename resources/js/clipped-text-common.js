@@ -4,10 +4,26 @@
  * Utilise SVG natif pour le masquage - Fonctionne du tonnerre !
  */
 
+/** URL absolue ou chemin : injectée par layouts/app.blade.php, sinon fallback /fonts/… */
+function resolveGilroyFontHref() {
+    if (typeof window === 'undefined') {
+        return '/fonts/Gilroy-ExtraBold.otf';
+    }
+    const u = window.__BRIGHTSHELL_FONT_URL;
+    if (u && typeof u === 'string') {
+        if (/^https?:\/\//i.test(u) || u.startsWith('//')) {
+            return u;
+        }
+        return new URL(u, window.location.origin).href;
+    }
+    return new URL('/fonts/Gilroy-ExtraBold.otf', window.location.origin).href;
+}
+
 // Précharger la police explicitement
-function loadFont() {
+export function loadFont() {
     return new Promise((resolve, reject) => {
-        const font = new FontFace('Gilroy ExtraBold', 'url(./fonts/Gilroy-ExtraBold.otf)');
+        const fontUrl = resolveGilroyFontHref();
+        const font = new FontFace('Gilroy ExtraBold', `url(${fontUrl})`);
         
         font.load().then(function(loadedFont) {
             document.fonts.add(loadedFont);
@@ -35,7 +51,7 @@ function loadFont() {
  * @param {number} options.acceleration - Exposant d'accélération (défaut: 2 pour easeInQuad)
  * @returns {HTMLElement} L'élément SVG avec l'effet
  */
-function createClippedText(text, options = {}) {
+export function createClippedText(text, options = {}) {
     const fontSize = options.fontSize || 200;
     const fontFamily = options.fontFamily || 'Gilroy ExtraBold';
     const color = options.color || '#FFFFFF';
@@ -205,7 +221,7 @@ function createClippedText(text, options = {}) {
  * @param {Object} options - Paramètres optionnels qui override les valeurs par défaut
  * @returns {HTMLElement|null} L'élément SVG créé ou null en cas d'erreur
  */
-function replaceElementWithClippedText(element, options = {}) {
+export function replaceElementWithClippedText(element, options = {}) {
     // Récupérer l'élément si c'est un ID
     if (typeof element === 'string') {
         element = document.getElementById(element);
@@ -213,11 +229,6 @@ function replaceElementWithClippedText(element, options = {}) {
     
     if (!element) {
         console.warn('Élément non trouvé pour replaceElementWithClippedText');
-        return null;
-    }
-
-    if (typeof createClippedText === 'undefined') {
-        console.warn('createClippedText n\'est pas disponible');
         return null;
     }
 
@@ -294,11 +305,19 @@ function replaceElementWithClippedText(element, options = {}) {
 }
 
 // Attendre que la police soit chargée
-window.addEventListener('load', function() {
-    loadFont().then(function() {
-        console.log('Clipped Text prêt');
-    }).catch(function() {
-        console.warn('Erreur chargement police');
-    });
+window.addEventListener('load', function () {
+    loadFont()
+        .then(function () {
+            console.log('Clipped Text prêt');
+        })
+        .catch(function () {
+            console.warn('Erreur chargement police');
+        });
 });
+
+// Compat : démos statiques (public/js/clipped-text.js) et intégrations tierces
+if (typeof window !== 'undefined') {
+    window.createClippedText = createClippedText;
+    window.replaceElementWithClippedText = replaceElementWithClippedText;
+}
 

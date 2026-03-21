@@ -1,4 +1,5 @@
 // Smooth animations and interactions
+import { createClippedText } from './clipped-text-common.js';
 
 // Curseur personnalisé : rond avec un point au centre
 const customCursor = document.createElement('div');
@@ -87,8 +88,8 @@ contextMenu.innerHTML = `
         <span>Accueil</span>
     </div>
     <div class="context-menu-separator"></div>
-    <div class="context-menu-item" data-action="services">
-        <span>Services</span>
+    <div class="context-menu-item" data-action="account">
+        <span class="context-menu-account-label">Connexion · Inscription</span>
     </div>
     <div class="context-menu-item" data-action="realisations">
         <span>Réalisations</span>
@@ -107,6 +108,15 @@ document.body.appendChild(contextMenu);
 // Gérer l'affichage du menu contextuel
 document.addEventListener('contextmenu', (e) => {
     e.preventDefault();
+
+    const labelEl = contextMenu.querySelector('.context-menu-account-label');
+    if (labelEl && document.body) {
+        const authed = document.body.dataset.brightshellAuthed === '1';
+        const userName = document.body.dataset.brightshellUserName || '';
+        labelEl.textContent = authed && userName
+            ? userName
+            : 'Connexion · Inscription';
+    }
     
     const x = e.clientX;
     const y = e.clientY;
@@ -145,9 +155,13 @@ contextMenu.addEventListener('click', (e) => {
             case 'home':
                 window.location.href = '/';
                 break;
-            case 'services':
-                window.location.href = '/services';
+            case 'account': {
+                const authed = document.body?.dataset.brightshellAuthed === '1';
+                const loginUrl = document.body?.dataset.brightshellLoginUrl || '/login';
+                const spaceUrl = document.body?.dataset.brightshellSpaceUrl || '/';
+                window.location.href = authed ? spaceUrl : loginUrl;
                 break;
+            }
             case 'realisations':
                 window.location.href = '/realisations';
                 break;
@@ -293,11 +307,6 @@ window.addEventListener('load', () => {
 
 // Fonction pour transformer un H1 en texte clippé
 function transformH1ToClippedText(h1) {
-    if (typeof createClippedText === 'undefined') {
-        console.warn('createClippedText n\'est pas disponible');
-        return;
-    }
-
     // Vérifier si ce H1 a déjà été transformé (pour éviter les doublons)
     if (h1.dataset.clipped === 'true') {
         return;
@@ -375,11 +384,6 @@ function setupH1Observer() {
 // Remplacer l'image BRIGHTSHELL par le texte clippé
 function replaceBrandNameWithClippedText() {
     console.log('replaceBrandNameWithClippedText appelée');
-    
-    if (typeof createClippedText === 'undefined') {
-        console.error('createClippedText n\'est pas disponible');
-        return;
-    }
 
     const brandNameContainer = document.getElementById('brand-name-clipped');
     if (!brandNameContainer) {

@@ -29,10 +29,6 @@
     <link rel="canonical" href="{{ route('realisations') }}">
 @endpush
 
-@push('styles')
-    @vite(['resources/css/pages/realisations.css'])
-@endpush
-
 @push('vite')
     @vite(['resources/js/realisations.js'])
 @endpush
@@ -40,13 +36,13 @@
 @push('schema')
     <script type="application/ld+json">
     {
-      "@context": "https://schema.org",
-      "@type": "ItemList",
+      "@@context": "https://schema.org",
+      "@@type": "ItemList",
       "name": "Portfolio et Réalisations BrightShell",
       "description": "Portfolio des réalisations web développées par BrightShell : applications web complètes, systèmes de gestion, et projets personnels.",
       "itemListElement": [
         {
-          "@type": "SoftwareApplication",
+          "@@type": "SoftwareApplication",
           "name": "AlloTata",
           "url": "https://allotata.fr",
           "applicationCategory": "BusinessApplication",
@@ -54,7 +50,7 @@
           "operatingSystem": "Web"
         },
         {
-          "@type": "SoftwareApplication",
+          "@@type": "SoftwareApplication",
           "name": "Takeoff",
           "url": "https://takeoff.aeroclubmarcillacestuaire.fr",
           "applicationCategory": "BusinessApplication",
@@ -62,7 +58,7 @@
           "operatingSystem": "Web"
         },
         {
-          "@type": "SoftwareApplication",
+          "@@type": "SoftwareApplication",
           "name": "Lotixam",
           "url": "https://lotixam.fr",
           "applicationCategory": "BusinessApplication",
@@ -71,10 +67,10 @@
         }
       ],
       "creator": {
-        "@type": "Person",
+        "@@type": "Person",
         "name": "Lucas ESPINAR",
         "worksFor": {
-          "@type": "Organization",
+          "@@type": "Organization",
           "name": "BrightShell"
         }
       }
@@ -103,79 +99,58 @@
         <!-- Websites Tab -->
         <div id="websites-tab" class="tab-pane active">
             <div class="projects-grid">
-                <!-- AlloTata -->
+                @foreach ($websites as $project)
                 <div class="project-card">
-                    <div class="project-screenshot" data-url="https://allotata.fr">
-                        <div class="screenshot-placeholder">
-                            <span>Chargement...</span>
+                    @if (!empty($project['image']))
+                        <div class="project-screenshot" style="background-image:url('{{ asset($project['image']) }}');background-size:cover;background-position:center top;">
                         </div>
-                    </div>
+                    @else
+                        <div class="project-screenshot" data-url="{{ $project['url'] ?? '' }}">
+                            <div class="screenshot-placeholder">
+                                <span>Chargement...</span>
+                            </div>
+                        </div>
+                    @endif
                     <div class="project-info">
-                        <h2 class="project-title">allotata.fr</h2>
-                        <p class="project-description">
-                            Allo Tata est la plateforme tout-en-un pour gérer votre agenda, votre clientèle, vos finances et bien plus encore. Conçue spécialement pour les micro-entreprises.
-                        </p>
-                        <a href="https://allotata.fr" target="_blank" class="project-link">Visiter le site →</a>
+                        <h2 class="project-title">{{ $project['title'] }}</h2>
+                        <p class="project-description">{{ $project['description'] }}</p>
+                        @if (!empty($project['url']))
+                            <a href="{{ $project['url'] }}" target="_blank" rel="noopener" class="project-link">Visiter le site →</a>
+                        @endif
                     </div>
                 </div>
-
-                <!-- Takeoff -->
-                <div class="project-card">
-                    <div class="project-screenshot" data-url="https://takeoff.aeroclubmarcillacestuaire.fr">
-                        <div class="screenshot-placeholder">
-                            <span>Chargement...</span>
-                        </div>
-                    </div>
-                    <div class="project-info">
-                        <h2 class="project-title">takeoff.aeroclubmarcillacestuaire.fr</h2>
-                        <p class="project-description">
-                            Gérer toute une flotte d'avions, de rendez-vous, de cours, de ressources, de l'aéroclub en gros.
-                        </p>
-                        <a href="https://takeoff.aeroclubmarcillacestuaire.fr" target="_blank" class="project-link">Visiter le site →</a>
-                    </div>
-                </div>
-
-                <!-- Lotixam -->
-                <div class="project-card">
-                    <div class="project-screenshot" data-url="https://lotixam.fr">
-                        <div class="screenshot-placeholder">
-                            <span>Chargement...</span>
-                        </div>
-                    </div>
-                    <div class="project-info">
-                        <h2 class="project-title">Lotixam</h2>
-                        <p class="project-description">
-                            Site de relation client entre Lotixam SAS et les clients, ce n'est pas juste un site vitrine, c'est une plateforme entière de gestion de bien.
-                        </p>
-                        <a href="https://lotixam.fr" target="_blank" class="project-link">Visiter le site →</a>
-                    </div>
-                </div>
+                @endforeach
             </div>
         </div>
 
         <!-- Personal Projects Tab -->
         <div id="personal-tab" class="tab-pane">
             <div class="personal-projects-grid">
-                <!-- Clipped Text -->
+                @foreach ($personal as $project)
                 <div class="personal-project-card">
                     <div class="personal-project-preview">
-                        <div class="preview-container" id="clipped-preview"></div>
+                        @if (!empty($project['image']))
+                            <img src="{{ asset($project['image']) }}" alt="{{ $project['title'] }}" class="w-full h-full object-cover rounded">
+                        @elseif (!empty($project['preview_id']))
+                            <div class="preview-container" id="{{ $project['preview_id'] }}"></div>
+                        @endif
                     </div>
                     <div class="personal-project-info">
-                        <h2 class="personal-project-title">Clipped Text</h2>
-                        <p class="personal-project-description">
-                            Effet de texte clippé avec répétitions stratifiées utilisant SVG. Création d'un texte avec effet de profondeur visuel.
-                        </p>
+                        <h2 class="personal-project-title">{{ $project['title'] }}</h2>
+                        <p class="personal-project-description">{{ $project['description'] }}</p>
+                        @if (!empty($project['demo_url']))
                         <div class="personal-project-actions">
-                            <a href="{{ asset('real/clipped.html') }}" target="_blank" class="test-link">Tester →</a>
-                            <button class="copy-link-btn" data-copy-url="{{ asset('real/clipped.html') }}">Copier le lien</button>
+                            <a href="{{ asset(ltrim($project['demo_url'], '/')) }}" target="_blank" class="test-link">Tester →</a>
+                            <button class="copy-link-btn" data-copy-url="{{ asset(ltrim($project['demo_url'], '/')) }}">Copier le lien</button>
                         </div>
                         <div class="copy-area" style="display: none;">
-                            <input type="text" readonly value="{{ asset('real/clipped.html') }}" class="copy-input">
+                            <input type="text" readonly value="{{ asset(ltrim($project['demo_url'], '/')) }}" class="copy-input">
                             <button class="copy-btn">Copier</button>
                         </div>
+                        @endif
                     </div>
                 </div>
+                @endforeach
             </div>
         </div>
     </div>

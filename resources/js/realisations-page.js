@@ -2,6 +2,7 @@
  * BRIGHTSHELL - Réalisations Page Logic
  * Gère les onglets, les captures d'écran et les interactions
  */
+import { createClippedText, replaceElementWithClippedText } from './clipped-text-common.js';
 
 document.addEventListener('DOMContentLoaded', function() {
     const tabButtons = document.querySelectorAll('.tab-button');
@@ -28,11 +29,6 @@ function initRealisationsTitle() {
     let currentSVG = null;
 
     function createRealisationsClippedText() {
-        if (typeof createClippedText === 'undefined' || typeof replaceElementWithClippedText === 'undefined') {
-            setTimeout(createRealisationsClippedText, 100);
-            return;
-        }
-
         const titleElement = document.querySelector('.realisations-title.clipped');
         if (!titleElement) return;
 
@@ -130,10 +126,6 @@ function initClippedTextPreview() {
     if (!previewContainer) return;
 
     function createPreview() {
-        if (typeof createClippedText === 'undefined') {
-            setTimeout(createPreview, 100);
-            return;
-        }
         try {
             previewContainer.innerHTML = '';
             const svg = createClippedText('BrightShell', {

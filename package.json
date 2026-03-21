@@ -2,8 +2,13 @@
     "$schema": "https://www.schemastore.org/package.json",
     "private": true,
     "type": "module",
+    "engines": {
+        "node": ">=20.19.0"
+    },
     "scripts": {
         "build": "vite build",
+        "build:docker": "docker run --rm -v \"$PWD\":/app -w /app node:22-alpine sh -c \"npm ci && npm run build\"",
+        "build:docker:quick": "docker run --rm -v \"$PWD\":/app -w /app node:22-alpine sh -c \"npm run build\"",
         "dev": "vite"
     },
     "devDependencies": {

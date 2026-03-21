@@ -28,34 +28,25 @@
     
     <!-- Canonical URL -->
     <link rel="canonical" href="{{ url('/') }}">
-    
-    <style>
-        @font-face {
-            font-family: 'Gilroy ExtraBold';
-            src: url('{{ asset('fonts/Gilroy-ExtraBold.otf') }}') format('opentype');
-            font-weight: 800;
-            font-style: normal;
-        }
-    </style>
 @endpush
 
 @push('schema')
     <script type="application/ld+json">
     {
-      "@context": "https://schema.org",
-      "@type": "LocalBusiness",
+      "@@context": "https://schema.org",
+      "@@type": "LocalBusiness",
       "name": "BrightShell",
       "description": "Solutions de développement web full stack sur mesure. Applications web modernes, systèmes de gestion, bases de données et interfaces utilisateur innovantes.",
       "url": "{{ url('/') }}",
       "logo": "{{ asset('img/logo_sans_fond_contours_epais.webp') }}",
       "image": "{{ asset('img/logo_sans_fond_contours_epais.webp') }}",
       "address": {
-        "@type": "PostalAddress",
+        "@@type": "PostalAddress",
         "addressLocality": "Bussac-Forêt",
         "addressCountry": "FR"
       },
       "founder": {
-        "@type": "Person",
+        "@@type": "Person",
         "name": "Lucas ESPINAR"
       },
       "areaServed": "FR",

@@ -29,26 +29,27 @@
     <link rel="canonical" href="{{ route('services') }}">
 @endpush
 
+{{-- Clé manifest : resources/css/pages/services.css (entrée dans vite.config.js) --}}
 @push('styles')
-    @vite(['resources/css/pages/services.css'])
+    @vite(['resources/css/app.css', 'resources/css/pages/services.css'])
 @endpush
 
 @push('vite')
-    @vite(['resources/js/app.js'])
+    @vite(['resources/js/services.js'])
 @endpush
 
 @push('schema')
     <script type="application/ld+json">
     {
-      "@context": "https://schema.org",
-      "@type": "Service",
+      "@@context": "https://schema.org",
+      "@@type": "Service",
       "serviceType": "Développement Web Full Stack",
       "provider": {
-        "@type": "LocalBusiness",
+        "@@type": "LocalBusiness",
         "name": "BrightShell",
         "url": "{{ url('/') }}",
         "address": {
-          "@type": "PostalAddress",
+          "@@type": "PostalAddress",
           "addressLocality": "Bussac-Forêt",
           "addressCountry": "FR"
         }
@@ -56,61 +57,61 @@
       "areaServed": "FR",
       "description": "Services complets de développement web : développement full stack PHP/Symfony/Laravel, systèmes de gestion sur mesure, bases de données PostgreSQL/MySQL, design UI/UX moderne, DevOps Docker, optimisation SEO et maintenance.",
       "hasOfferCatalog": {
-        "@type": "OfferCatalog",
+        "@@type": "OfferCatalog",
         "name": "Services de Développement Web",
         "itemListElement": [
           {
-            "@type": "Offer",
+            "@@type": "Offer",
             "itemOffered": {
-              "@type": "Service",
+              "@@type": "Service",
               "name": "Développement Web Full Stack",
               "description": "Applications web sur mesure avec PHP/Symfony, Laravel, JavaScript, TypeScript"
             }
           },
           {
-            "@type": "Offer",
+            "@@type": "Offer",
             "itemOffered": {
-              "@type": "Service",
+              "@@type": "Service",
               "name": "Systèmes de Gestion",
               "description": "Applications de gestion sur mesure pour automatiser vos processus métier"
             }
           },
           {
-            "@type": "Offer",
+            "@@type": "Offer",
             "itemOffered": {
-              "@type": "Service",
+              "@@type": "Service",
               "name": "Bases de Données & Backend",
               "description": "Conception et optimisation de bases de données robustes avec PostgreSQL, MySQL"
             }
           },
           {
-            "@type": "Offer",
+            "@@type": "Offer",
             "itemOffered": {
-              "@type": "Service",
+              "@@type": "Service",
               "name": "Design & Interface Utilisateur",
               "description": "Design moderne et intuitif pour une expérience utilisateur exceptionnelle"
             }
           },
           {
-            "@type": "Offer",
+            "@@type": "Offer",
             "itemOffered": {
-              "@type": "Service",
+              "@@type": "Service",
               "name": "Intégration & DevOps",
               "description": "Configuration Docker, intégration d'outils CRM, mise en place d'environnements"
             }
           },
           {
-            "@type": "Offer",
+            "@@type": "Offer",
             "itemOffered": {
-              "@type": "Service",
+              "@@type": "Service",
               "name": "SEO & Optimisation",
               "description": "Optimisation pour les moteurs de recherche et amélioration des performances"
             }
           },
           {
-            "@type": "Offer",
+            "@@type": "Offer",
             "itemOffered": {
-              "@type": "Service",
+              "@@type": "Service",
               "name": "Maintenance & Support",
               "description": "Accompagnement continu pour maintenir et faire évoluer vos applications"
             }

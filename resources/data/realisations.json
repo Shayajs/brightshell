@@ -1,0 +1,47 @@
+{
+    "websites": [
+        {
+            "id": "allotata",
+            "title": "allotata.fr",
+            "url": "https://allotata.fr",
+            "description": "Allo Tata est la plateforme tout-en-un pour gérer votre agenda, votre clientèle, vos finances et bien plus encore. Conçue spécialement pour les micro-entreprises.",
+            "image": null,
+            "tags": ["PHP", "Laravel", "Gestion"],
+            "published": true,
+            "order": 1
+        },
+        {
+            "id": "takeoff",
+            "title": "takeoff.aeroclubmarcillacestuaire.fr",
+            "url": "https://takeoff.aeroclubmarcillacestuaire.fr",
+            "description": "Gérer toute une flotte d'avions, de rendez-vous, de cours, de ressources, de l'aéroclub en gros.",
+            "image": null,
+            "tags": ["PHP", "JavaScript", "MySQL"],
+            "published": true,
+            "order": 2
+        },
+        {
+            "id": "lotixam",
+            "title": "Lotixam",
+            "url": "https://lotixam.fr",
+            "description": "Site de relation client entre Lotixam SAS et les clients, ce n'est pas juste un site vitrine, c'est une plateforme entière de gestion de bien.",
+            "image": null,
+            "tags": ["PHP", "Symfony", "PostgreSQL"],
+            "published": true,
+            "order": 3
+        }
+    ],
+    "personal": [
+        {
+            "id": "clipped",
+            "title": "Clipped Text",
+            "description": "Effet de texte clippé avec répétitions stratifiées utilisant SVG. Création d'un texte avec effet de profondeur visuel.",
+            "demo_url": "/real/clipped.html",
+            "preview_id": "clipped-preview",
+            "image": null,
+            "tags": ["CSS", "SVG", "Expérimental"],
+            "published": true,
+            "order": 1
+        }
+    ]
+}

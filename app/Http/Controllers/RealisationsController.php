@@ -2,12 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Support\RealisationsRepository;
 
 class RealisationsController extends Controller
 {
+    public function __construct(protected RealisationsRepository $repo) {}
+
     public function index()
     {
-        return view('pages.realisations');
+        return view('pages.realisations', [
+            'websites' => $this->repo->websites(),
+            'personal' => $this->repo->personal(),
+        ]);
     }
 }

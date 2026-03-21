@@ -1,7 +1,10 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+@import "tailwindcss";
+
+@source "../views/**/*.blade.php";
+@source "../js/**/*.js";
+
+@theme {
+    --font-display: "Gilroy ExtraBold", ui-sans-serif, system-ui, sans-serif;
 }
 
 :root {
@@ -13,6 +16,17 @@
     --accent-light: #d0dff0;
 }
 
+/* Vitrine : curseur custom — portails / auth (.auth-body) = curseur normal */
+body:not(.auth-body),
+body:not(.auth-body) * {
+    cursor: none;
+}
+
+body.auth-body,
+body.auth-body * {
+    cursor: auto;
+}
+
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
     background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-darker) 100%);
@@ -20,12 +34,6 @@ body {
     min-height: 100vh;
     overflow-x: hidden;
     position: relative;
-    cursor: none; /* Cacher le curseur par défaut */
-}
-
-/* Curseur personnalisé : rond avec un point au centre */
-body * {
-    cursor: none;
 }
 
 /* Créer le curseur personnalisé avec SVG */
@@ -265,8 +273,8 @@ body * {
     }
 }
 
-/* Navigation */
-nav {
+/* Navigation vitrine uniquement — ne pas cibler <nav> globalement (portails admin/auth utilisent .portal-nav) */
+.site-top-nav {
     position: fixed;
     top: 0;
     left: 0;
@@ -280,6 +288,7 @@ nav {
 }
 
 .nav-logo {
+    font-family: 'Gilroy ExtraBold', -apple-system, BlinkMacSystemFont, sans-serif;
     font-size: 0.9rem;
     font-weight: 500;
     letter-spacing: 3px;
@@ -299,6 +308,7 @@ nav {
 }
 
 .nav-links a {
+    font-family: 'Gilroy ExtraBold', -apple-system, BlinkMacSystemFont, sans-serif;
     color: var(--text-light);
     text-decoration: none;
     font-size: 0.85rem;
@@ -325,6 +335,29 @@ nav {
 }
 
 .nav-links a:hover {
+    letter-spacing: 4px;
+}
+
+.nav-links .nav-logout-form {
+    display: inline;
+    margin: 0;
+}
+
+.nav-links .nav-logout-form button {
+    font-family: 'Gilroy ExtraBold', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: var(--text-light);
+    background: none;
+    border: none;
+    font-size: 0.85rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 0;
+    cursor: pointer;
+    transition: letter-spacing 0.3s ease;
+    font-weight: 300;
+}
+
+.nav-links .nav-logout-form button:hover {
     letter-spacing: 4px;
 }
 
@@ -478,6 +511,7 @@ main {
 }
 
 .bottom-link {
+    font-family: 'Gilroy ExtraBold', -apple-system, BlinkMacSystemFont, sans-serif;
     color: var(--text-light);
     text-decoration: none;
     font-size: 0.85rem;
@@ -545,7 +579,7 @@ main {
         display: none;
     }
 
-    nav {
+    .site-top-nav {
         padding: 1rem 1.5rem;
     }
 
@@ -619,7 +653,7 @@ main {
 }
 
 @media (max-width: 480px) {
-    nav {
+    .site-top-nav {
         padding: 0.75rem 1rem;
     }
 
@@ -694,4 +728,176 @@ main {
     bottom: 25%;
     right: 8%;
     transform: rotate(30deg);
+}
+
+/* ——— Matières : rendu Markdown (élève + aperçu admin) ——— */
+.student-md-content {
+    font-size: 0.95rem;
+    line-height: 1.65;
+    color: rgb(212 212 216);
+}
+
+.student-md-content h1,
+.student-md-content h2,
+.student-md-content h3,
+.student-md-content h4 {
+    font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+    font-weight: 800;
+    color: rgb(250 250 250);
+    margin-top: 1.75rem;
+    margin-bottom: 0.65rem;
+    line-height: 1.25;
+}
+
+.student-md-content h1 {
+    font-size: 1.75rem;
+}
+.student-md-content h2 {
+    font-size: 1.35rem;
+    border-bottom: 1px solid rgb(39 39 42);
+    padding-bottom: 0.35rem;
+}
+.student-md-content h3 {
+    font-size: 1.15rem;
+}
+.student-md-content p {
+    margin: 0.65rem 0;
+}
+.student-md-content ul,
+.student-md-content ol {
+    margin: 0.65rem 0;
+    padding-left: 1.35rem;
+}
+.student-md-content li {
+    margin: 0.25rem 0;
+}
+.student-md-content a {
+    color: rgb(167 139 250);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+.student-md-content a:hover {
+    color: rgb(196 181 253);
+}
+.student-md-content blockquote {
+    border-left: 3px solid rgb(99 102 241 / 0.5);
+    margin: 1rem 0;
+    padding: 0.35rem 0 0.35rem 1rem;
+    color: rgb(161 161 170);
+    background: rgb(24 24 27 / 0.5);
+    border-radius: 0 0.5rem 0.5rem 0;
+}
+.student-md-content code {
+    font-size: 0.85em;
+    padding: 0.15rem 0.4rem;
+    border-radius: 0.25rem;
+    background: rgb(39 39 42);
+    color: rgb(244 244 245);
+}
+.student-md-content pre {
+    margin: 1rem 0;
+    padding: 1rem;
+    overflow-x: auto;
+    border-radius: 0.75rem;
+    border: 1px solid rgb(39 39 42);
+    background: rgb(9 9 11 / 0.85);
+    font-size: 0.8rem;
+    line-height: 1.5;
+}
+.student-md-content pre code {
+    padding: 0;
+    background: transparent;
+    font-size: inherit;
+}
+.student-md-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    font-size: 0.875rem;
+}
+.student-md-content th,
+.student-md-content td {
+    border: 1px solid rgb(63 63 70);
+    padding: 0.45rem 0.65rem;
+    text-align: left;
+}
+.student-md-content th {
+    background: rgb(39 39 42);
+    color: rgb(250 250 250);
+}
+.student-md-content hr {
+    border: 0;
+    border-top: 1px solid rgb(63 63 70);
+    margin: 1.5rem 0;
+}
+.student-md-content input[type="checkbox"] {
+    margin-right: 0.35rem;
+    accent-color: rgb(99 102 241);
+}
+
+/* Callouts Obsidian (> [!type]) */
+.callout {
+    margin: 1.15rem 0;
+    padding: 0.85rem 1rem 1rem;
+    border-radius: 0.65rem;
+    border: 1px solid rgb(63 63 70);
+    border-left-width: 4px;
+    background: rgb(24 24 27 / 0.75);
+}
+.callout-title {
+    font-weight: 700;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin: 0 0 0.5rem;
+    color: rgb(228 228 231);
+}
+.callout-body > *:first-child {
+    margin-top: 0;
+}
+.callout-body > *:last-child {
+    margin-bottom: 0;
+}
+.callout-note {
+    border-left-color: rgb(99 102 241);
+}
+.callout-abstract,
+.callout-summary,
+.callout-tldr {
+    border-left-color: rgb(56 189 248);
+}
+.callout-info,
+.callout-todo {
+    border-left-color: rgb(59 130 246);
+}
+.callout-tip,
+.callout-hint,
+.callout-important {
+    border-left-color: rgb(52 211 153);
+}
+.callout-success,
+.callout-check,
+.callout-done {
+    border-left-color: rgb(34 197 94);
+}
+.callout-question,
+.callout-help,
+.callout-faq {
+    border-left-color: rgb(168 85 247);
+}
+.callout-warning,
+.callout-caution,
+.callout-attention {
+    border-left-color: rgb(251 191 36);
+}
+.callout-failure,
+.callout-error,
+.callout-danger,
+.callout-bug {
+    border-left-color: rgb(248 113 113);
+}
+.callout-example,
+.callout-quote,
+.callout-cite {
+    border-left-color: rgb(161 161 170);
 }

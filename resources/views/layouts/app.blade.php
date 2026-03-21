@@ -5,6 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     @stack('head')
+
+    {{-- Gilroy : URL réelle (APP_URL, sous-dossier) pour CSS + FontFace dans le JS --}}
+    <link rel="preload" href="{{ asset('fonts/Gilroy-ExtraBold.otf') }}" as="font" type="font/otf" crossorigin>
+    <script>
+        window.__BRIGHTSHELL_FONT_URL = @json(asset('fonts/Gilroy-ExtraBold.otf'));
+    </script>
+    <style>
+        @font-face {
+            font-family: 'Gilroy ExtraBold';
+            font-style: normal;
+            font-weight: 800;
+            font-display: block;
+            src: url('{{ asset("fonts/Gilroy-ExtraBold.otf") }}') format('opentype');
+        }
+    </style>
     
     <link rel="icon" href="{{ asset('img/etoile_sans_fond_contours_fin.png') }}" type="image/png">
     
@@ -14,7 +29,12 @@
     
     @stack('schema')
 </head>
-<body>
+<body
+    data-brightshell-authed="{{ auth()->check() ? '1' : '0' }}"
+    data-brightshell-user-name="{{ auth()->check() ? e(auth()->user()->name) : '' }}"
+    data-brightshell-login-url="{{ $brightshellLoginUrl }}"
+    data-brightshell-space-url="{{ $brightshellSpaceUrl }}"
+>
     @if(isset($backgroundMinimal) && $backgroundMinimal)
         <!-- Background minimal -->
         <div class="background-decoration-minimal">
@@ -39,14 +59,30 @@
         </div>
     @endif
 
-    <!-- Top Navigation -->
-    <nav>
+    <!-- Top Navigation (classe dédiée : évite d’écraser .portal-nav dans app.css) -->
+    <nav class="site-top-nav" aria-label="Navigation principale">
         <div class="nav-logo">
             <a href="{{ route('home') }}" style="color: inherit; text-decoration: none;">BRIGHTSHELL</a>
         </div>
         @if(isset($showNavLinks) && $showNavLinks)
         <ul class="nav-links">
-            <li><a href="{{ route('services') }}">Services</a></li>
+            @auth
+                <li>
+                    <a href="{{ $brightshellSpaceUrl }}">
+                        {{ \Illuminate\Support\Str::before(trim(auth()->user()->name), ' ') ?: auth()->user()->name }}
+                    </a>
+                </li>
+                <li>
+                    <form class="nav-logout-form" method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit">Déconnexion</button>
+                    </form>
+                </li>
+            @else
+                <li>
+                    <a href="{{ $brightshellLoginUrl }}">Connexion · Inscription</a>
+                </li>
+            @endauth
         </ul>
         @endif
     </nav>

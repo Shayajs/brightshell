@@ -1,6 +1,5 @@
 // Import CSS principal
 import '../css/app.css';
 
-// Import JS commun (curseur personnalisé, animations)
+// main-common importe clipped-text-common (police + createClippedText)
 import './main-common.js';
-import './clipped-text-common.js';

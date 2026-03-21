@@ -2,6 +2,20 @@
 
 use Illuminate\Support\Str;
 
+$sharedSessionDomain = env('SESSION_DOMAIN');
+
+if ($sharedSessionDomain === null || $sharedSessionDomain === '' || strtolower((string) $sharedSessionDomain) === 'null') {
+    $root = trim((string) env('BRIGHTSHELL_ROOT_DOMAIN', ''));
+    $host = parse_url((string) env('APP_URL', ''), PHP_URL_HOST);
+    $baseHost = $root !== '' ? $root : (is_string($host) ? preg_replace('/^www\./i', '', $host) : '');
+
+    if (is_string($baseHost) && $baseHost !== '' && $baseHost !== 'localhost' && ! str_starts_with($baseHost, '127.')) {
+        $sharedSessionDomain = '.'.ltrim($baseHost, '.');
+    } else {
+        $sharedSessionDomain = null;
+    }
+}
+
 return [
 
     /*
@@ -156,7 +170,7 @@ return [
     |
     */
 
-    'domain' => env('SESSION_DOMAIN'),
+    'domain' => $sharedSessionDomain,
 
     /*
     |--------------------------------------------------------------------------

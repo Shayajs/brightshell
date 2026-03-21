@@ -2,8 +2,8 @@
 
 namespace App\Support;
 
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\File;
 
 class CvDataRepository
 {
@@ -89,13 +89,23 @@ class CvDataRepository
     }
 
     /**
+     * Sauvegarde un fichier JSON et invalide le cache.
+     */
+    public function save(string $filename, array $data): void
+    {
+        $filePath = $this->dataPath.'/'.$filename;
+        File::put($filePath, json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+        Cache::forget('cv_data_all');
+    }
+
+    /**
      * Charge un fichier JSON depuis resources/data
      */
     protected function loadJson(string $filename): array
     {
-        $filePath = $this->dataPath . '/' . $filename;
-        
-        if (!File::exists($filePath)) {
+        $filePath = $this->dataPath.'/'.$filename;
+
+        if (! File::exists($filePath)) {
             return [];
         }
 
@@ -103,7 +113,8 @@ class CvDataRepository
         $data = json_decode($content, true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
-            \Log::warning("Erreur de décodage JSON pour {$filename}: " . json_last_error_msg());
+            \Log::warning("Erreur de décodage JSON pour {$filename}: ".json_last_error_msg());
+
             return [];
         }
 

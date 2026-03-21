@@ -13,7 +13,7 @@
     <meta property="og:url" content="{{ route('cv') }}">
     <meta property="og:title" content="CV & Contact | Lucas ESPINAR - Développeur Full Stack BrightShell">
     <meta property="og:description" content="Créateur de site web ou de solutions web, créateur de logiciels, venez visiter notre site internet si vous souhaitez découvrir nos solutions et nos prestations !">
-    <meta property="og:image" content="{{ asset('image/cv.jpg') }}">
+    <meta property="og:image" content="{{ $cvPhotoUrl }}">
     <meta property="og:locale" content="fr_FR">
     <meta property="og:site_name" content="BrightShell">
     <meta property="profile:first_name" content="Lucas">
@@ -24,15 +24,13 @@
     <meta property="twitter:url" content="{{ route('cv') }}">
     <meta property="twitter:title" content="CV & Contact | Lucas ESPINAR - Développeur Full Stack BrightShell">
     <meta property="twitter:description" content="Créateur de site web ou de solutions web, créateur de logiciels, venez visiter notre site internet si vous souhaitez découvrir nos solutions et nos prestations !">
-    <meta property="twitter:image" content="{{ asset('image/cv.jpg') }}">
+    <meta property="twitter:image" content="{{ $cvPhotoUrl }}">
     <meta property="twitter:creator" content="@lucas_shaya">
     
     <!-- Canonical URL -->
     <link rel="canonical" href="{{ route('cv') }}">
-@endpush
 
-@push('styles')
-    @vite(['resources/css/pages/cv.css'])
+    <link rel="preload" href="{{ $cvPhotoUrl }}" as="image">
 @endpush
 
 @push('vite')
@@ -42,12 +40,13 @@
 @push('schema')
     <script type="application/ld+json">
     {
-      "@context": "https://schema.org",
-      "@type": "Person",
+      "@@context": "https://schema.org",
+      "@@type": "Person",
       "name": "Lucas ESPINAR",
+      "image": @json($cvPhotoUrl),
       "jobTitle": "Développeur Full Stack",
       "worksFor": {
-        "@type": "Organization",
+        "@@type": "Organization",
         "name": "BrightShell"
       },
       "email": "{{ $contact['etat_civil']['email'] ?? '' }}",
@@ -59,7 +58,7 @@
         "https://twitter.com/{{ ltrim($contact['reseaux_sociaux']['twitter_x'] ?? '', '@') }}"
       ],
       "address": {
-        "@type": "PostalAddress",
+        "@@type": "PostalAddress",
         "addressLocality": "{{ $contact['etat_civil']['localisation'] ?? 'Bussac-Forêt' }}",
         "addressCountry": "FR"
       },
@@ -102,7 +101,13 @@
     <!-- Photo Section -->
     <section class="cv-photo-section">
         <div class="cv-photo-container">
-            <img src="{{ asset('image/cv.jpg') }}" alt="Lucas ESPINAR - Développeur Full Stack BrightShell - Photo de profil professionnel" class="cv-photo">
+            <img src="{{ $cvPhotoUrl }}"
+                 alt="Lucas ESPINAR - Développeur Full Stack BrightShell - Photo de profil professionnel"
+                 class="cv-photo"
+                 width="440"
+                 height="440"
+                 decoding="async"
+                 fetchpriority="high">
         </div>
     </section>
 

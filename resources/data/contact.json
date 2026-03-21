@@ -1,5 +1,6 @@
 {
   "etat_civil": {
+    "photo": "img/cv.png",
     "prenom": "Lucas",
     "nom": "ESPINAR",
     "titre": "Développeur Full Stack",
