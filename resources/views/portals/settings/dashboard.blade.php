@@ -1,11 +1,9 @@
 @extends('layouts.admin')
 
 @section('title', 'Réglages — Tableau de bord')
-@section('topbar_label', 'Réglages')
+@section('topbar_label', 'Tableau de bord')
 
 @section('content')
-    @include('portals.settings.partials.subnav', ['current' => 'dashboard'])
-
     <div class="space-y-8">
         <header class="space-y-2">
             <p class="text-[10px] font-semibold uppercase tracking-[0.2em] text-indigo-400/90">Vue d’ensemble</p>

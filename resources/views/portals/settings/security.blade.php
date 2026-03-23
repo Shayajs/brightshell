@@ -1,11 +1,9 @@
 @extends('layouts.admin')
 
 @section('title', 'Réglages — Sécurité')
-@section('topbar_label', 'Réglages')
+@section('topbar_label', 'Sécurité')
 
 @section('content')
-    @include('portals.settings.partials.subnav', ['current' => 'security'])
-
     <div class="mx-auto max-w-2xl space-y-10">
         <header class="space-y-2">
             <p class="text-[10px] font-semibold uppercase tracking-[0.2em] text-indigo-400/90">Protection du compte</p>

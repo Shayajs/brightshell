@@ -1,11 +1,9 @@
 @extends('layouts.admin')
 
 @section('title', 'Réglages — Profil')
-@section('topbar_label', 'Réglages')
+@section('topbar_label', 'Profil')
 
 @section('content')
-    @include('portals.settings.partials.subnav', ['current' => 'profile'])
-
     <div class="mx-auto max-w-2xl space-y-8">
         <header class="space-y-2">
             <p class="text-[10px] font-semibold uppercase tracking-[0.2em] text-indigo-400/90">Identité</p>

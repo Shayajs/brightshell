@@ -123,12 +123,44 @@
                             };
                         @endphp
 
+                        @php
+                            $dashboardRouteActive = match ($portalKey) {
+                                'admin' => request()->routeIs('admin.dashboard'),
+                                'settings' => request()->routeIs('portals.settings'),
+                                'courses' => request()->routeIs('portals.courses'),
+                                'collabs' => request()->routeIs('portals.collabs'),
+                                'users' => request()->routeIs('portals.users'),
+                                default => request()->routeIs($portalKey.'.dashboard'),
+                            };
+                        @endphp
                         @include('layouts.partials.nav-item', [
                             'href'   => $accessiblePortals[$portalKey]['href'] ?? '#',
-                            'active' => request()->routeIs($portalKey.'.dashboard'),
+                            'active' => $dashboardRouteActive,
                             'label'  => 'Tableau de bord',
                             'icon'   => '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',
                         ])
+
+                        @if ($portalKey === 'settings')
+                            @include('layouts.partials.nav-section', ['label' => 'Réglages'])
+                            @include('layouts.partials.nav-item', [
+                                'href'   => route('portals.settings.profile.edit'),
+                                'active' => request()->routeIs('portals.settings.profile.*'),
+                                'label'  => 'Profil',
+                                'icon'   => '<circle cx="12" cy="8" r="4"/><path d="M4 20v-1a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v1"/>',
+                            ])
+                            @include('layouts.partials.nav-item', [
+                                'href'   => route('portals.settings.notifications.edit'),
+                                'active' => request()->routeIs('portals.settings.notifications.*'),
+                                'label'  => 'Notifications',
+                                'icon'   => '<path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>',
+                            ])
+                            @include('layouts.partials.nav-item', [
+                                'href'   => route('portals.settings.security.edit'),
+                                'active' => request()->routeIs('portals.settings.security.*'),
+                                'label'  => 'Sécurité',
+                                'icon'   => '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
+                            ])
+                        @endif
 
                         @if ($portalKey === 'admin')
                             @include('layouts.partials.nav-section', ['label' => 'Membres'])

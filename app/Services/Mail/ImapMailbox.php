@@ -38,6 +38,9 @@ class ImapMailbox
         }
     }
 
+    /**
+     * @return resource|\IMAP\Connection
+     */
     private function openStream()
     {
         if (! extension_loaded('imap')) {

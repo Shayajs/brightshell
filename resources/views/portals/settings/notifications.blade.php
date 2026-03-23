@@ -1,11 +1,9 @@
 @extends('layouts.admin')
 
 @section('title', 'Réglages — Notifications')
-@section('topbar_label', 'Réglages')
+@section('topbar_label', 'Notifications')
 
 @section('content')
-    @include('portals.settings.partials.subnav', ['current' => 'notifications'])
-
     <div class="space-y-10">
         <header class="space-y-2">
             <p class="text-[10px] font-semibold uppercase tracking-[0.2em] text-indigo-400/90">Alertes</p>
