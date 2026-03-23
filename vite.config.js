@@ -11,6 +11,7 @@ export default defineConfig({
                 // Entrée dédiée : évite ViteException si une vue utilise encore @vite(['resources/css/pages/services.css'])
                 'resources/css/pages/services.css',
                 'resources/js/portal-shell.js',
+                'resources/js/collabs-team-messages.js',
                 'resources/js/app.js',
                 'resources/js/cv.js',
                 'resources/js/realisations.js',

@@ -26,12 +26,17 @@ use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\SupportTicketFromVerificationController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\Collabs\DashboardController as CollabsDashboardController;
+use App\Http\Controllers\Collabs\TeamMembersController as CollabsTeamMembersController;
+use App\Http\Controllers\Collabs\TeamMessagesController as CollabsTeamMessagesController;
+use App\Http\Controllers\Collabs\TeamPermissionsController as CollabsTeamPermissionsController;
+use App\Http\Controllers\Collabs\TeamsController as CollabsTeamsController;
 use App\Http\Controllers\Courses\DashboardController as CoursesDashboardController;
 use App\Http\Controllers\Courses\StudentCourseQuizController;
 use App\Http\Controllers\Courses\StudentMaterialsController;
 use App\Http\Controllers\CvController;
 use App\Http\Controllers\Docs\DashboardController as DocsDashboardController;
 use App\Http\Controllers\Docs\PageController as DocsPageController;
+use App\Http\Controllers\Home\DashboardController as HomePortalDashboardController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\RealisationsController;
 use App\Http\Controllers\ServicesController;
@@ -95,6 +100,23 @@ if ($accountHost !== '') {
 
 /*
 |--------------------------------------------------------------------------
+| Hub portail connecté (home.*) — sans nav latérale, switcher dans l’entête
+|--------------------------------------------------------------------------
+*/
+$homeHost = (string) config('brightshell.domains.home_host', '');
+if ($homeHost === '' && $inferredRoot !== '') {
+    $homeHost = 'home.'.$inferredRoot;
+}
+if ($homeHost !== '') {
+    Route::domain($homeHost)
+        ->middleware(['auth', 'verified'])
+        ->group(function (): void {
+            Route::get('/', HomePortalDashboardController::class)->name('portals.home');
+        });
+}
+
+/*
+|--------------------------------------------------------------------------
 | Portail administration (sous-domaine admin.*)
 |--------------------------------------------------------------------------
 */
@@ -112,6 +134,7 @@ $registerAdminRoutes = function (): void {
     Route::get('/members/{member}', [MembersController::class, 'show'])->name('admin.members.show');
     Route::post('/members/{member}/verify-email', [MembersController::class, 'verifyEmail'])->name('admin.members.verify-email');
     Route::post('/members/{member}/roles', [MembersController::class, 'updateRoles'])->name('admin.members.roles');
+    Route::post('/members/{member}/collaborateur-acces', [MembersController::class, 'updateCollaboratorAccess'])->name('admin.members.collaborator-access');
 
     // Cours par élève (indépendants par utilisateur)
     Route::get('/student-courses', [StudentCoursesController::class, 'index'])->name('admin.student-courses.index');
@@ -270,6 +293,18 @@ if ($collabsHost !== '') {
         ->middleware(['auth', 'verified', 'roles.any:collaborator'])
         ->group(function (): void {
             Route::get('/', CollabsDashboardController::class)->name('portals.collabs');
+            Route::get('/equipes', [CollabsTeamsController::class, 'index'])->name('portals.collabs.teams.index');
+            Route::get('/equipes/{collab_team}', [CollabsTeamsController::class, 'show'])->name('portals.collabs.teams.show');
+            Route::post('/equipes/{collab_team}/membres', [CollabsTeamMembersController::class, 'store'])->name('portals.collabs.teams.members.store');
+            Route::delete('/equipes/{collab_team}/membres/{user}', [CollabsTeamMembersController::class, 'destroy'])
+                ->name('portals.collabs.teams.members.destroy');
+            Route::patch('/equipes/{collab_team}/membres/{user}/gerant', [CollabsTeamMembersController::class, 'updateManager'])
+                ->name('portals.collabs.teams.members.manager');
+            Route::get('/equipes/{collab_team}/permissions', [CollabsTeamPermissionsController::class, 'edit'])->name('portals.collabs.teams.permissions.edit');
+            Route::put('/equipes/{collab_team}/permissions', [CollabsTeamPermissionsController::class, 'update'])->name('portals.collabs.teams.permissions.update');
+            Route::get('/equipes/{collab_team}/messages', [CollabsTeamMessagesController::class, 'index'])->name('portals.collabs.teams.messages');
+            Route::get('/equipes/{collab_team}/messages/api', [CollabsTeamMessagesController::class, 'poll'])->name('portals.collabs.teams.messages.poll');
+            Route::post('/equipes/{collab_team}/messages/api', [CollabsTeamMessagesController::class, 'store'])->name('portals.collabs.teams.messages.store');
         });
 }
 
@@ -401,7 +436,7 @@ if (is_string($rootDomain) && $rootDomain !== '' && is_array($vitrineSubs) && $v
 */
 if (is_string($rootDomain) && $rootDomain !== '') {
     $reservedSubs = array_values(array_unique(array_filter(array_merge(
-        ['account', 'admin', 'api', 'collabs', 'users', 'courses', 'settings', 'docs'],
+        ['account', 'admin', 'api', 'collabs', 'users', 'courses', 'settings', 'docs', 'home'],
         is_array($vitrineSubs) ? $vitrineSubs : []
     ))));
 

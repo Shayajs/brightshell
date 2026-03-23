@@ -15,20 +15,20 @@
         </header>
 
         <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            <a href="{{ route('portals.collabs.teams.index') }}" class="group rounded-2xl border border-zinc-800 bg-zinc-900/50 p-5 ring-1 ring-white/5 transition hover:border-indigo-500/30 hover:ring-indigo-500/10">
+                <p class="text-[11px] font-semibold uppercase tracking-wide text-zinc-500">Équipes</p>
+                <p class="mt-2 font-display text-2xl font-bold text-white">Accès</p>
+                <p class="mt-1 text-xs text-zinc-500 group-hover:text-indigo-300/90">Membres, droits et messagerie par équipe →</p>
+            </a>
             <article class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-5 ring-1 ring-white/5 transition hover:border-zinc-700">
                 <p class="text-[11px] font-semibold uppercase tracking-wide text-zinc-500">Missions</p>
                 <p class="mt-2 font-display text-2xl font-bold text-white">0</p>
                 <p class="mt-1 text-xs text-zinc-500">À connecter à la base projets</p>
             </article>
-            <article class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-5 ring-1 ring-white/5 transition hover:border-zinc-700">
+            <article class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-5 ring-1 ring-white/5 transition hover:border-zinc-700 sm:col-span-2 xl:col-span-1">
                 <p class="text-[11px] font-semibold uppercase tracking-wide text-zinc-500">Tâches</p>
                 <p class="mt-2 font-display text-2xl font-bold text-white">0</p>
                 <p class="mt-1 text-xs text-zinc-500">Kanban &amp; deadlines à venir</p>
-            </article>
-            <article class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-5 ring-1 ring-white/5 transition hover:border-zinc-700 sm:col-span-2 xl:col-span-1">
-                <p class="text-[11px] font-semibold uppercase tracking-wide text-zinc-500">Équipe</p>
-                <p class="mt-2 font-display text-2xl font-bold text-white">BS</p>
-                <p class="mt-1 text-xs text-zinc-500">Permissions par rôle</p>
             </article>
         </div>
 

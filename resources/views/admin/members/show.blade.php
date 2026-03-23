@@ -176,6 +176,64 @@
         </div>
     </div>
 
+    <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 ring-1 ring-white/5">
+        <h2 class="font-display text-sm font-bold uppercase tracking-wide text-white">Collaborateurs — équipes</h2>
+        <p class="mt-1 text-xs text-zinc-500">
+            Affectation aux équipes du portail collaborateur. Le rôle <strong class="text-zinc-400">collaborator</strong> ou le statut admin est requis pour rester dans des équipes.
+            Le <strong class="text-zinc-400">coordinateur collaborateurs</strong> peut nommer ou retirer les <strong class="text-zinc-400">gérants</strong> d’équipe (pas les membres ordinaires).
+        </p>
+
+        @if ($member->trashed())
+            <p class="mt-4 text-sm text-zinc-500">Compte archivé — modification impossible.</p>
+        @else
+            @php
+                $selectedTeamIds = old('collaborator_team_ids', $member->collaboratorTeams->pluck('id')->all());
+                $selectedTeamIds = is_array($selectedTeamIds) ? array_map('intval', $selectedTeamIds) : [];
+            @endphp
+            <form method="POST" action="{{ route('admin.members.collaborator-access', $member) }}" class="mt-5 space-y-5">
+                @csrf
+                <input type="hidden" name="can_manage_collaborator_team_managers" value="0">
+                <label class="flex cursor-pointer items-center gap-3 rounded-xl border border-zinc-800 bg-zinc-950/50 px-4 py-3 transition hover:border-zinc-700 has-[:checked]:border-violet-500/40">
+                    <input type="checkbox" name="can_manage_collaborator_team_managers" value="1"
+                           @checked(old('can_manage_collaborator_team_managers') !== null ? old('can_manage_collaborator_team_managers') === '1' : $member->can_manage_collaborator_team_managers)
+                           class="h-4 w-4 rounded border-zinc-600 bg-zinc-950 text-violet-500 focus:ring-violet-500/40">
+                    <div>
+                        <p class="text-sm font-medium text-zinc-100">Coordinateur collaborateurs</p>
+                        <p class="text-[11px] text-zinc-500">Peut désigner les gérants sur les équipes (pas les permissions d’équipe).</p>
+                    </div>
+                </label>
+
+                <fieldset class="space-y-2">
+                    <legend class="text-[11px] font-semibold uppercase tracking-wide text-zinc-500">Équipes</legend>
+                    @if ($collaboratorTeams->isEmpty())
+                        <p class="text-sm text-zinc-500">Aucune équipe en base — exécutez les migrations.</p>
+                    @endif
+                    <div class="grid gap-2 sm:grid-cols-2">
+                        @foreach ($collaboratorTeams as $t)
+                            <label class="flex cursor-pointer items-center gap-3 rounded-xl border border-zinc-800 bg-zinc-950/50 px-4 py-3 transition hover:border-zinc-700 has-[:checked]:border-indigo-500/40">
+                                <input type="checkbox" name="collaborator_team_ids[]" value="{{ $t->id }}"
+                                       @checked(in_array($t->id, $selectedTeamIds, true))
+                                       class="h-4 w-4 rounded border-zinc-600 bg-zinc-950 text-indigo-500 focus:ring-indigo-500/40">
+                                <div>
+                                    <p class="text-sm font-medium text-zinc-100">{{ $t->name }}</p>
+                                    @if ($t->is_admin_team)
+                                        <p class="text-[10px] font-semibold uppercase text-amber-400/90">Équipe administration</p>
+                                    @endif
+                                </div>
+                            </label>
+                        @endforeach
+                    </div>
+                </fieldset>
+
+                <div class="flex justify-end">
+                    <button type="submit" class="rounded-lg border border-indigo-500/40 bg-indigo-600/90 px-5 py-2.5 text-sm font-semibold text-white hover:bg-indigo-500">
+                        Enregistrer équipes &amp; coordinateur
+                    </button>
+                </div>
+            </form>
+        @endif
+    </div>
+
     @if ($member->id !== auth()->id())
         <div class="rounded-2xl border border-red-900/40 bg-red-950/20 p-6 ring-1 ring-red-500/10">
             <h2 class="font-display text-sm font-bold uppercase tracking-wide text-red-300">Suppression définitive (RGPD)</h2>

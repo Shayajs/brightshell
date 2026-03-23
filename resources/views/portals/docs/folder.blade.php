@@ -1,10 +1,12 @@
 @extends('layouts.admin')
 
+@section('portal_main_max', 'max-w-none w-full')
+
 @section('title', $node->title.' — Documentation')
 @section('topbar_label', $node->title)
 
 @section('content')
-    <div class="docs-page mx-auto max-w-4xl px-1 sm:px-0">
+    <div class="docs-page w-full min-w-0 px-0 sm:px-2 lg:px-4 xl:px-6 2xl:px-10">
         @include('portals.docs.partials.breadcrumbs', ['node' => $node])
 
         <header class="docs-hero relative mb-10 overflow-hidden rounded-3xl border border-amber-500/15 bg-gradient-to-br from-amber-950/40 via-zinc-900/90 to-zinc-950/90 p-8 ring-1 ring-white/10 sm:p-9">
@@ -23,7 +25,7 @@
             </div>
         </header>
 
-        <ul class="grid gap-3 sm:grid-cols-2">
+        <ul class="grid gap-3 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
             @forelse ($children as $child)
                 <li>
                     <a

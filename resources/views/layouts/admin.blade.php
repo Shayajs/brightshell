@@ -1,52 +1,27 @@
 @php
     use App\Support\BrightshellBrand;
     use App\Support\BrightshellDomain;
-    use App\Support\PortalUrls;
-    use Illuminate\Support\Str;
+    use App\Support\PortalNavigation;
 
     $host = strtolower((string) request()->getHost());
     $labels = explode('.', $host);
     $portalKey = 'admin';
     if (count($labels) >= 3) {
         $portalKey = match ($labels[0]) {
-            'admin', 'collabs', 'users', 'courses', 'settings', 'docs' => $labels[0],
+            'admin', 'collabs', 'users', 'courses', 'settings', 'docs', 'home' => $labels[0],
             default => 'admin',
         };
     } elseif (count($labels) === 2 && str_ends_with($host, '.localhost')) {
         $portalKey = match ($labels[0]) {
-            'admin', 'collabs', 'users', 'courses', 'settings', 'docs' => $labels[0],
+            'admin', 'collabs', 'users', 'courses', 'settings', 'docs', 'home' => $labels[0],
             default => 'admin',
         };
     }
 
     $u = auth()->user();
 
-    // Portails accessibles selon les rôles de l'utilisateur
-    $allPortals = [
-        'admin'    => ['label' => 'Administration',  'href' => PortalUrls::forRoleSlug('admin'),        'role' => 'admin'],
-        'collabs'  => ['label' => 'Collaborateurs',  'href' => PortalUrls::forRoleSlug('collaborator'), 'role' => 'collaborator'],
-        'users'    => ['label' => 'Espace client',   'href' => PortalUrls::forRoleSlug('client'),       'role' => 'client'],
-        'courses'  => ['label' => 'Cours',           'href' => PortalUrls::forRoleSlug('student'),      'role' => 'student'],
-        'settings' => ['label' => 'Réglages',        'href' => PortalUrls::settingsUrl(),               'role' => null],
-        'docs'     => ['label' => 'Documentation',   'href' => PortalUrls::docsUrl(),                  'role' => null],
-    ];
-
-    $isAdmin = $u && ($u->isAdmin() || $u->hasRole('admin'));
-
-    $accessiblePortals = collect($allPortals)->filter(function ($portal) use ($u, $isAdmin) {
-        if ($portal['role'] === null) return true; // settings = tout le monde
-        if ($isAdmin) return true;
-        return $u && $u->hasRole($portal['role']);
-    })->all();
-
-    $portalIcons = [
-        'admin'    => '<path d="M12 3l7 4v10l-7 4-7-4V7l7-4z" stroke-linejoin="round"/><path d="M12 12l7-4M12 12v10M12 12L5 8"/>',
-        'collabs'  => '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>',
-        'users'    => '<rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>',
-        'courses'  => '<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>',
-        'settings' => '<circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>',
-        'docs' => '<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 7h8M8 11h6"/>',
-    ];
+    $allPortals = PortalNavigation::allPortals();
+    $accessiblePortals = PortalNavigation::accessiblePortals($u);
 
     $currentPortalLabel = $allPortals[$portalKey]['label'] ?? 'Portail';
 @endphp
@@ -69,6 +44,7 @@
         }
     </style>
     @vite(['resources/css/app.css', 'resources/js/portal-shell.js'])
+    @stack('vite')
     @stack('styles')
 </head>
 <body class="auth-body min-h-full bg-zinc-950 text-zinc-100 antialiased">
@@ -78,6 +54,7 @@
         class="portal-shell group relative z-10 flex min-h-screen w-full items-start"
         data-portal="{{ $portalKey }}"
     >
+        @unless ($portalKey === 'home')
         {{-- Backdrop mobile --}}
         <div
             class="portal-sidebar-backdrop fixed inset-0 z-[35] hidden bg-black/60 backdrop-blur-sm group-[.portal-sidebar-open]:block lg:!hidden"
@@ -92,7 +69,7 @@
                 'border-zinc-800' => $portalKey !== 'docs',
                 'border-indigo-500/15 bg-gradient-to-b from-zinc-900/98 to-zinc-950/98 ring-1 ring-inset ring-indigo-500/10' => $portalKey === 'docs',
                 'lg:w-64' => $portalKey !== 'docs',
-                'lg:w-[min(22rem,calc(100vw-2rem))] xl:w-[23rem]' => $portalKey === 'docs',
+                'lg:w-[min(22rem,calc(100vw-2rem))] xl:w-[23rem] 2xl:w-[min(28rem,calc(100vw-3rem))]' => $portalKey === 'docs',
             ])
             aria-label="Navigation {{ $currentPortalLabel }}"
         >
@@ -134,11 +111,12 @@
 
                         @php
                             $dashboardRouteActive = match ($portalKey) {
+                                'home' => request()->routeIs('portals.home'),
                                 'admin' => request()->routeIs('admin.dashboard'),
                                 'settings' => request()->routeIs('portals.settings'),
                                 'docs' => request()->routeIs('portals.docs'),
                                 'courses' => request()->routeIs('portals.courses'),
-                                'collabs' => request()->routeIs('portals.collabs'),
+                                'collabs' => request()->routeIs('portals.collabs*'),
                                 'users' => request()->routeIs('portals.users') && ! request()->routeIs('portals.users.companies.*'),
                                 default => request()->routeIs($portalKey.'.dashboard'),
                             };
@@ -297,6 +275,16 @@
                             ])
                         @endif
 
+                        @if ($portalKey === 'collabs')
+                            @include('layouts.partials.nav-section', ['label' => 'Équipes'])
+                            @include('layouts.partials.nav-item', [
+                                'href'   => route('portals.collabs.teams.index'),
+                                'active' => request()->routeIs('portals.collabs.teams.*'),
+                                'label'  => 'Équipes & accès',
+                                'icon'   => '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>',
+                            ])
+                        @endif
+
                         @if ($portalKey === 'users')
                             @include('layouts.partials.nav-section', ['label' => 'Entreprise'])
                             @include('layouts.partials.nav-item', [
@@ -341,6 +329,7 @@
                 </div>
             @endif
         </aside>
+        @endunless
 
         {{-- ===================== CONTENU ===================== --}}
         <div class="portal-wrap flex min-h-screen min-w-0 flex-1 flex-col overflow-x-hidden">
@@ -348,6 +337,7 @@
             {{-- Topbar --}}
             <header class="portal-topbar sticky top-0 z-20 flex min-w-0 shrink-0 flex-wrap items-center gap-x-3 gap-y-2 border-b border-zinc-800 bg-zinc-950/80 px-3 py-2.5 backdrop-blur-md sm:flex-nowrap sm:gap-y-0 sm:px-4 sm:py-3">
 
+                @unless ($portalKey === 'home')
                 {{-- Burger mobile --}}
                 <button
                     type="button"
@@ -358,9 +348,25 @@
                 >
                     <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
                 </button>
+                @endunless
 
                 {{-- Label page --}}
                 <span class="truncate text-xs font-semibold uppercase tracking-[0.12em] text-zinc-400 font-display lg:block">@yield('topbar_label', 'Tableau de bord')</span>
+
+                @if ($portalKey === 'home' && $u)
+                    <div class="flex shrink-0 items-center gap-2 sm:gap-3">
+                        @include('partials.user-avatar', ['user' => $u])
+                        <form method="POST" action="{{ route('logout') }}" class="shrink-0">
+                            @csrf
+                            <button
+                                type="submit"
+                                class="rounded-lg border border-zinc-700 bg-zinc-900 px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-zinc-400 transition hover:border-red-500/40 hover:bg-red-500/10 hover:text-red-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-500"
+                            >
+                                Déconnexion
+                            </button>
+                        </form>
+                    </div>
+                @endif
 
                 <div class="min-w-0 flex-1" aria-hidden="true"></div>
 
@@ -372,17 +378,15 @@
                     <div class="relative" data-portal-switcher>
                         <button
                             type="button"
-                            class="flex items-center gap-2 rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-xs font-semibold text-zinc-200 transition hover:border-indigo-500/50 hover:bg-zinc-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                            class="flex h-9 shrink-0 items-center gap-2 rounded-lg border border-zinc-700 bg-zinc-900/80 px-3 py-0 text-sm font-semibold leading-none text-zinc-200 transition hover:border-indigo-500/50 hover:bg-zinc-800/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                             data-portal-switcher-btn
                             aria-haspopup="true"
                             aria-expanded="false"
                             aria-label="Changer de portail"
                         >
-                            <svg class="h-4 w-4 shrink-0 opacity-70" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-                                {!! $portalIcons[$portalKey] ?? $portalIcons['settings'] !!}
-                            </svg>
-                            <span class="hidden sm:inline">{{ $currentPortalLabel }}</span>
-                            <svg class="h-3.5 w-3.5 shrink-0 opacity-50 transition-transform duration-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true" data-portal-switcher-chevron><path d="M6 9l6 6 6-6"/></svg>
+                            @include('layouts.partials.portal-icon-mark', ['key' => $portalKey, 'frame' => 'xs'])
+                            <span class="hidden max-w-[10rem] truncate sm:inline">{{ $currentPortalLabel }}</span>
+                            <svg class="h-4 w-4 shrink-0 opacity-50 transition-transform duration-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true" data-portal-switcher-chevron><path d="M6 9l6 6 6-6"/></svg>
                         </button>
 
                         <div
@@ -390,25 +394,23 @@
                             data-portal-switcher-menu
                             role="menu"
                         >
-                            <p class="border-b border-zinc-800 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-500">Mes portails</p>
-                            <ul class="p-1.5 space-y-0.5">
+                            <p class="border-b border-zinc-800 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-500">Mes portails</p>
+                            <ul class="space-y-0.5 p-1.5">
                                 @foreach ($accessiblePortals as $key => $portal)
                                     <li role="none">
                                         <a
                                             href="{{ $portal['href'] }}"
                                             role="menuitem"
                                             @class([
-                                                'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition',
+                                                'flex h-9 items-center gap-2 rounded-lg px-3 py-0 text-sm leading-none transition',
                                                 'bg-indigo-500/10 text-white ring-1 ring-inset ring-indigo-500/20' => $key === $portalKey,
                                                 'text-zinc-300 hover:bg-zinc-800 hover:text-white' => $key !== $portalKey,
                                             ])
                                         >
-                                            <svg class="h-4 w-4 shrink-0 opacity-75" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-                                                {!! $portalIcons[$key] ?? $portalIcons['settings'] !!}
-                                            </svg>
-                                            <span class="flex-1">{{ $portal['label'] }}</span>
+                                            @include('layouts.partials.portal-icon-mark', ['key' => $key, 'frame' => 'xs'])
+                                            <span class="min-w-0 flex-1">{{ $portal['label'] }}</span>
                                             @if ($key === $portalKey)
-                                                <svg class="h-3.5 w-3.5 shrink-0 text-indigo-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+                                                <svg class="h-4 w-4 shrink-0 text-indigo-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
                                             @endif
                                         </a>
                                     </li>
@@ -428,7 +430,7 @@
                 </span>
             </header>
 
-            <main class="portal-main mx-auto w-full min-w-0 flex-1 px-4 py-6 sm:px-6 lg:px-8 lg:py-8 @yield('portal_main_max', 'max-w-7xl')">
+            <main class="portal-main portal-main-scale mx-auto w-full min-w-0 flex-1 px-4 py-6 sm:px-6 lg:px-8 lg:py-8 @yield('portal_main_max', 'max-w-7xl') @yield('portal_main_class')">
                 @yield('content')
             </main>
         </div>

@@ -24,6 +24,7 @@ use Laravel\Sanctum\HasApiTokens;
     'email',
     'password',
     'is_admin',
+    'can_manage_collaborator_team_managers',
     'phone',
     'avatar_path',
     'profile_notes',
@@ -84,6 +85,7 @@ class User extends Authenticatable implements MustVerifyEmailContract
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_admin' => 'boolean',
+            'can_manage_collaborator_team_managers' => 'boolean',
             'browser_notifications_enabled' => 'boolean',
             'current_login_at' => 'datetime',
             'previous_login_at' => 'datetime',
@@ -108,6 +110,16 @@ class User extends Authenticatable implements MustVerifyEmailContract
     {
         return $this->belongsToMany(Company::class)
             ->withPivot('can_manage_company')
+            ->withTimestamps();
+    }
+
+    /**
+     * @return BelongsToMany<CollaboratorTeam, $this>
+     */
+    public function collaboratorTeams(): BelongsToMany
+    {
+        return $this->belongsToMany(CollaboratorTeam::class, 'collaborator_team_user')
+            ->withPivot('is_team_manager')
             ->withTimestamps();
     }
 
@@ -159,6 +171,43 @@ class User extends Authenticatable implements MustVerifyEmailContract
     public function hasRole(string $slug): bool
     {
         return $this->roles()->where('slug', $slug)->exists();
+    }
+
+    public function isCollaboratorPortalUser(): bool
+    {
+        return $this->isAdmin() || $this->hasRole('admin') || $this->hasRole('collaborator');
+    }
+
+    public function canAssignCollaboratorTeamManagers(): bool
+    {
+        return $this->isAdmin() || (bool) $this->can_manage_collaborator_team_managers;
+    }
+
+    public function belongsToAdminCollaboratorTeam(): bool
+    {
+        return $this->collaboratorTeams()->where('collaborator_teams.is_admin_team', true)->exists();
+    }
+
+    public function hasCollaboratorCapability(string $slug): bool
+    {
+        if ($this->isAdmin()) {
+            return true;
+        }
+
+        return $this->collaboratorTeams()
+            ->whereHas('capabilities', fn ($q) => $q->where('slug', $slug))
+            ->exists();
+    }
+
+    public function managesCollaboratorTeam(CollaboratorTeam $team): bool
+    {
+        if ($this->isAdmin()) {
+            return true;
+        }
+
+        $row = $this->collaboratorTeams()->where('collaborator_teams.id', $team->id)->first();
+
+        return $row !== null && (bool) ($row->pivot->is_team_manager ?? false);
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\CollaboratorTeam;
 use App\Models\Role;
 use App\Models\User;
 use App\Support\AdminEmailVerification;
@@ -129,10 +130,11 @@ class MembersController extends Controller
 
     public function show(User $member): View
     {
-        $member->load('roles', 'companies');
+        $member->load('roles', 'companies', 'collaboratorTeams');
         $allRoles = Role::orderBy('priority', 'desc')->get();
+        $collaboratorTeams = CollaboratorTeam::query()->orderBy('name')->get();
 
-        return view('admin.members.show', compact('member', 'allRoles'));
+        return view('admin.members.show', compact('member', 'allRoles', 'collaboratorTeams'));
     }
 
     public function updateRoles(Request $request, User $member): RedirectResponse
@@ -157,6 +159,50 @@ class MembersController extends Controller
         AdminEmailVerification::ensureVerifiedIfAdmin($member);
 
         return back()->with('success', 'Rôles mis à jour.');
+    }
+
+    public function updateCollaboratorAccess(Request $request, User $member): RedirectResponse
+    {
+        if (! $request->user()?->isAdmin()) {
+            abort(403);
+        }
+
+        if ($member->trashed()) {
+            return back()->with('error', 'Compte archivé — impossible de modifier l’accès collaborateurs.');
+        }
+
+        $request->validate([
+            'can_manage_collaborator_team_managers' => ['nullable', 'boolean'],
+            'collaborator_team_ids' => ['nullable', 'array'],
+            'collaborator_team_ids.*' => ['integer', 'exists:collaborator_teams,id'],
+        ]);
+
+        $member->update([
+            'can_manage_collaborator_team_managers' => $request->boolean('can_manage_collaborator_team_managers'),
+        ]);
+
+        if (! $member->isCollaboratorPortalUser()) {
+            $member->collaboratorTeams()->detach();
+
+            return back()->with('success', 'Accès coordinateur mis à jour. Équipes collaborateur vidées (compte sans rôle collaborateur / admin).');
+        }
+
+        $ids = array_map('intval', $request->input('collaborator_team_ids', []));
+        $ids = array_values(array_unique(array_filter($ids)));
+
+        $pivot = [];
+        $existing = $member->collaboratorTeams()->get()->keyBy('id');
+
+        foreach ($ids as $teamId) {
+            $team = $existing->get($teamId);
+            $pivot[$teamId] = [
+                'is_team_manager' => $team ? (bool) ($team->pivot->is_team_manager ?? false) : false,
+            ];
+        }
+
+        $member->collaboratorTeams()->sync($pivot);
+
+        return back()->with('success', 'Équipes collaborateur et coordinateur mis à jour.');
     }
 
     public function archive(User $member): RedirectResponse

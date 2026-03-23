@@ -1,10 +1,12 @@
 @extends('layouts.admin')
 
+@section('portal_main_max', 'max-w-none w-full')
+
 @section('title', 'Documentation')
 @section('topbar_label', 'Sommaire')
 
 @section('content')
-    <div class="docs-page mx-auto max-w-4xl px-1 sm:px-0">
+    <div class="docs-page w-full min-w-0 px-0 sm:px-2 lg:px-4 xl:px-6 2xl:px-10">
         @include('portals.docs.partials.breadcrumbs', ['node' => null])
 
         <header class="docs-hero relative mb-12 overflow-hidden rounded-3xl border border-indigo-500/20 bg-gradient-to-br from-indigo-950/80 via-zinc-900/90 to-violet-950/50 p-8 shadow-[0_0_60px_-12px_rgba(99,102,241,0.35)] ring-1 ring-white/10 sm:p-10">
@@ -19,7 +21,7 @@
 
         <section aria-labelledby="docs-root-heading">
             <h2 id="docs-root-heading" class="sr-only">Pages à la racine</h2>
-            <ul class="grid gap-4 sm:grid-cols-2">
+            <ul class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
                 @forelse ($roots as $node)
                     <li>
                         <a

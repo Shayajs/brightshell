@@ -10,7 +10,7 @@
 
 @push('topbar_extra')
     <div
-        class="hidden items-center gap-2 rounded-lg border border-zinc-700 bg-zinc-900/80 px-3 py-2 text-sm text-zinc-500 sm:flex"
+        class="hidden h-9 shrink-0 items-center gap-2 rounded-lg border border-zinc-700 bg-zinc-900/80 px-3 py-0 text-sm leading-none text-zinc-500 sm:flex"
         role="search"
         aria-label="Recherche à venir"
     >

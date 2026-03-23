@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\CollaboratorTeam;
 use App\Models\User;
 use App\Support\BrightshellAccount;
 use App\Support\BrightshellSession;
@@ -59,6 +60,10 @@ class AppServiceProvider extends ServiceProvider
 
         Route::bind('member', function (string $value): User {
             return User::withTrashed()->whereKey($value)->firstOrFail();
+        });
+
+        Route::bind('collab_team', function (string $value): CollaboratorTeam {
+            return CollaboratorTeam::query()->whereKey($value)->firstOrFail();
         });
 
         View::composer('layouts.app', function ($view): void {

@@ -19,6 +19,11 @@ final class RoleResolver
             return $forced;
         }
 
+        $home = PortalUrls::homeUrl();
+        if ($home !== '') {
+            return $home;
+        }
+
         $role = $user->highestRole();
 
         if ($role === null) {

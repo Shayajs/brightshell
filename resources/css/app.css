@@ -1707,7 +1707,7 @@ html:has(body.brightshell-vitrine)::-webkit-scrollbar-thumb:hover {
     background: rgba(99, 102, 241, 0.06);
 }
 
-/* Arborescence latérale : scroll confortable */
+/* Arborescence latérale : scroll (hauteur de base, surchargée sur grands écrans ci-dessous) */
 .portal-sidebar .docs-nav-tree-root {
     max-height: min(52vh, 28rem);
     overflow-y: auto;
@@ -1732,4 +1732,105 @@ html:has(body.brightshell-vitrine)::-webkit-scrollbar-thumb:hover {
 .portal-sidebar .docs-nav-tree-root::-webkit-scrollbar-track {
     background: var(--bs-scrollbar-track);
     border-radius: 999px;
+}
+
+/* Documentation — grands écrans : plus de place pour le texte et les tableaux */
+@media (min-width: 1280px) {
+    .docs-prose {
+        font-size: 1.08rem;
+        line-height: 1.78;
+    }
+
+    .docs-prose pre {
+        padding: 1.2rem 1.45rem;
+    }
+
+    .docs-prose table {
+        font-size: 0.96rem;
+    }
+
+    .portal-sidebar .docs-nav-tree-root {
+        max-height: min(58vh, 36rem);
+    }
+}
+
+@media (min-width: 1536px) {
+    .docs-prose {
+        font-size: 1.11rem;
+        line-height: 1.82;
+    }
+
+    .docs-prose h2 {
+        font-size: 1.5rem;
+    }
+
+    .docs-prose h3 {
+        font-size: 1.22rem;
+    }
+
+    .portal-sidebar .docs-nav-tree-root {
+        max-height: min(62vh, 42rem);
+    }
+}
+
+@media (min-width: 1920px) {
+    .docs-prose {
+        font-size: 1.13rem;
+        line-height: 1.84;
+    }
+}
+
+/* Portail : typo plus lisible dans la zone <main class="portal-main"> */
+@layer components {
+    main.portal-main-scale {
+        font-size: 1.0625rem;
+        line-height: 1.65;
+    }
+
+    @media (min-width: 640px) {
+        main.portal-main-scale {
+            font-size: 1.125rem;
+        }
+    }
+
+    @media (min-width: 1024px) {
+        main.portal-main-scale {
+            font-size: 1.1875rem;
+        }
+    }
+
+    /* Remonte d’un cran les utilitaires Tailwind les plus utilisés dans les vues portail */
+    main.portal-main-scale :where(.text-xs) {
+        font-size: 0.875rem !important;
+        line-height: 1.5 !important;
+    }
+
+    main.portal-main-scale :where(.text-sm) {
+        font-size: 1rem !important;
+        line-height: 1.55 !important;
+    }
+
+    main.portal-main-scale :where(.text-base) {
+        font-size: 1.0625rem !important;
+    }
+
+    main.portal-main-scale :where(.text-lg) {
+        font-size: 1.25rem !important;
+    }
+
+    main.portal-main-scale :where(.text-xl) {
+        font-size: 1.375rem !important;
+    }
+
+    main.portal-main-scale :where(.text-2xl) {
+        font-size: 1.625rem !important;
+    }
+
+    main.portal-main-scale :where(.text-3xl) {
+        font-size: 2rem !important;
+    }
+
+    main.portal-main-scale :where(.text-4xl) {
+        font-size: 2.375rem !important;
+    }
 }

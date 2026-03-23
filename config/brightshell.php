@@ -32,6 +32,8 @@ return [
         'settings_host' => env('BRIGHTSHELL_SETTINGS_HOST'),
         /** Documentation interne — vide = docs.{root} */
         'docs_host' => env('BRIGHTSHELL_DOCS_HOST'),
+        /** Hub portail connecté — vide = home.{root} */
+        'home_host' => env('BRIGHTSHELL_HOME_HOST'),
         /** API publique lecture seule — vide = api.{root} */
         'api_host' => env('BRIGHTSHELL_API_HOST'),
         /** Sous-domaines qui servent la même vitrine que le site principal (ex. www) */
@@ -50,6 +52,7 @@ return [
         'courses_url' => rtrim((string) env('BRIGHTSHELL_PORTAL_COURSES_URL', ''), '/'),
         'settings_url' => rtrim((string) env('BRIGHTSHELL_PORTAL_SETTINGS_URL', ''), '/'),
         'docs_url' => rtrim((string) env('BRIGHTSHELL_PORTAL_DOCS_URL', ''), '/'),
+        'home_url' => rtrim((string) env('BRIGHTSHELL_PORTAL_HOME_URL', ''), '/'),
     ],
 
     /*
