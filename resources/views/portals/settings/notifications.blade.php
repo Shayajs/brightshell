@@ -8,7 +8,7 @@
         <header class="space-y-2">
             <p class="text-[10px] font-semibold uppercase tracking-[0.2em] text-indigo-400/90">Alertes</p>
             <h1 class="font-display text-2xl font-bold tracking-tight text-white sm:text-3xl">Notifications</h1>
-            <p class="max-w-2xl text-sm text-zinc-400">
+            <p class="max-w-none text-sm text-zinc-400">
                 Prépare les <strong class="text-zinc-300">notifications du navigateur</strong> (base pour une future web app / PWA).
                 L’historique ci-dessous utilise les notifications enregistrées en base Laravel.
             </p>
@@ -18,7 +18,7 @@
 
         <section class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 ring-1 ring-white/5">
             <h2 class="font-display text-sm font-bold uppercase tracking-wide text-white">Navigateur</h2>
-            <p class="mt-2 text-sm text-zinc-500">Demande l’autorisation à ton navigateur. Tu pourras affiner les types d’alertes quand la web app sera branchée.</p>
+            <p class="mt-2 text-sm text-zinc-500">Demandez l’autorisation à votre navigateur. Vous pourrez affiner les types d’alertes quand la web app sera branchée.</p>
 
             <div class="mt-6 flex flex-wrap items-center gap-3">
                 <button type="button" id="browser-notif-request"
@@ -37,7 +37,7 @@
                            class="mt-1 rounded border-zinc-600 bg-zinc-800 text-indigo-500">
                     <span>
                         <span class="font-medium">J’accepte les notifications navigateur BrightShell</span>
-                        <span class="mt-0.5 block text-xs font-normal text-zinc-500">Enregistre ta préférence côté compte (indépendamment de l’autorisation du navigateur).</span>
+                        <span class="mt-0.5 block text-xs font-normal text-zinc-500">Enregistrez votre préférence côté compte (indépendamment de l’autorisation du navigateur).</span>
                     </span>
                 </label>
                 <button type="submit" class="rounded-lg border border-zinc-600 px-4 py-2 text-xs font-semibold text-zinc-200 hover:bg-zinc-800">
@@ -71,7 +71,7 @@
                                 @if ($body !== '')
                                     <p class="mt-1 text-xs text-zinc-500">{{ $body }}</p>
                                 @endif
-                                <p class="mt-2 text-[10px] text-zinc-600">{{ $n->created_at?->timezone(config('app.timezone'))->translatedFormat('d MMM Y, H:i') }}</p>
+                                <p class="mt-2 text-[10px] text-zinc-600">{{ $n->created_at?->timezone(config('app.timezone'))->translatedFormat('j M Y, H:i') }}</p>
                             </div>
                         </div>
                     </li>

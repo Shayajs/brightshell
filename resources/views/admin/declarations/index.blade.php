@@ -8,7 +8,7 @@
         <p class="text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald-400/90">Fiscal &amp; entreprise</p>
         <h1 class="font-display text-2xl font-bold text-white sm:text-3xl">Déclarations</h1>
         <p class="mt-2 max-w-2xl text-sm text-zinc-400">
-            Espace pensé pour l’<strong class="text-zinc-300">auto-entreprise</strong> (sans TVA aujourd’hui). Tu pourras adapter le statut et la TVA plus tard (ex. passage en EI).
+            Espace pensé pour l’<strong class="text-zinc-300">auto-entreprise</strong> (sans TVA aujourd’hui). Vous pourrez adapter le statut et la TVA plus tard (ex. passage en EI).
         </p>
     </div>
 
@@ -36,7 +36,7 @@
         <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 ring-1 ring-white/5 md:col-span-2 xl:col-span-1">
             <p class="text-[11px] font-semibold uppercase tracking-wide text-sky-400">API publique (lecture)</p>
             <p class="mt-2 font-display text-lg font-bold text-white">Infos entreprise en direct</p>
-            <p class="mt-2 text-sm text-zinc-500">Un simple <code class="rounded bg-zinc-950 px-1 py-0.5 text-xs text-zinc-300">GET</code> sur le sous-domaine <strong class="text-zinc-400">api</strong> : données volontairement limitées (pas de notes internes, adresse complète et SIRET seulement si tu les actives).</p>
+            <p class="mt-2 text-sm text-zinc-500">Un simple <code class="rounded bg-zinc-950 px-1 py-0.5 text-xs text-zinc-300">GET</code> sur le sous-domaine <strong class="text-zinc-400">api</strong> : données volontairement limitées (pas de notes internes, adresse complète et SIRET seulement si vous les activez).</p>
             @if ($apiBaseUrl)
                 <p class="mt-4 break-all rounded-lg border border-zinc-700 bg-zinc-950/80 px-3 py-2 font-mono text-xs text-sky-300">{{ $apiBaseUrl }}</p>
             @else

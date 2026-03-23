@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Str;
+
 return [
 
     /*
@@ -39,7 +41,24 @@ return [
 
         'smtp' => [
             'transport' => 'smtp',
-            'scheme' => env('MAIL_SCHEME'),
+            /*
+             * Symfony Mailer n’accepte que les schémas « smtp » ou « smtps ».
+             * L’ancien réglage MAIL_ENCRYPTION=tls se traduisait parfois par MAIL_SCHEME=tls, ce qui provoque
+             * UnsupportedSchemeException. Port 587 + STARTTLS : laisser vide → « smtp » + TLS auto.
+             * Port 465 : laisser vide → « smtps », ou forcer MAIL_SCHEME=smtps.
+             */
+            'scheme' => value(function (): ?string {
+                $raw = env('MAIL_SCHEME');
+                if (blank($raw) || $raw === 'null') {
+                    return null;
+                }
+                $lower = Str::lower((string) $raw);
+                if (in_array($lower, ['tls', 'starttls'], true)) {
+                    return null;
+                }
+
+                return (string) $raw;
+            }),
             'url' => env('MAIL_URL'),
             'host' => env('MAIL_HOST', '127.0.0.1'),
             'port' => env('MAIL_PORT', 2525),

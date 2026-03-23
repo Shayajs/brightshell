@@ -10,7 +10,7 @@
                 <p class="text-[10px] font-semibold uppercase tracking-[0.2em] text-violet-400/90">Ressources</p>
                 <h1 class="font-display text-2xl font-bold tracking-tight text-white sm:text-3xl">Matières &amp; fichiers</h1>
                 <p class="mt-2 max-w-xl text-sm text-zinc-400">
-                    Tes matières et dossiers sont créés par l’équipe : ouvre une matière pour voir les fichiers et les télécharger.
+                    Vos matières et dossiers sont créés par l’équipe : ouvrez une matière pour voir les fichiers et les télécharger.
                 </p>
             </div>
             <a href="{{ route('portals.courses') }}"

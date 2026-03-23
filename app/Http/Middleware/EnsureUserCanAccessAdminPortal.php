@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Support\AdminEmailVerification;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,6 +19,8 @@ class EnsureUserCanAccessAdminPortal
         if ($user === null || (! $user->hasRole('admin') && ! $user->isAdmin())) {
             abort(Response::HTTP_FORBIDDEN, 'Accès administration refusé.');
         }
+
+        AdminEmailVerification::ensureVerifiedIfAdmin($user);
 
         return $next($request);
     }

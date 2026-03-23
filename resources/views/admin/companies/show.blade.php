@@ -23,7 +23,16 @@
     <div class="grid gap-6 lg:grid-cols-3">
         {{-- Infos société --}}
         <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 ring-1 ring-white/5 space-y-4">
-            <h2 class="font-display text-lg font-bold text-white">{{ $company->name }}</h2>
+            <div class="flex flex-wrap items-start gap-4">
+                @if ($company->logoUrl())
+                    <img src="{{ $company->logoUrl() }}" alt="" class="h-16 w-16 shrink-0 rounded-xl border border-zinc-800 object-contain bg-zinc-950 p-1">
+                @else
+                    <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl border border-zinc-800 bg-zinc-950 text-lg font-bold text-zinc-600 font-display" aria-hidden="true">
+                        {{ strtoupper(substr($company->name, 0, 1)) }}
+                    </div>
+                @endif
+                <h2 class="font-display text-lg font-bold text-white">{{ $company->name }}</h2>
+            </div>
             <dl class="space-y-3 text-sm">
                 @if ($company->siret)
                 <div class="flex justify-between">
@@ -67,8 +76,11 @@
                     @foreach ($company->users as $u)
                         <a href="{{ route('admin.members.show', $u) }}"
                             class="flex items-center gap-2 rounded-lg border border-zinc-700 px-2.5 py-1.5 text-xs font-medium text-zinc-300 transition hover:border-indigo-500/40 hover:text-indigo-300">
-                            <span class="flex h-5 w-5 items-center justify-center rounded-full bg-indigo-500/20 text-[10px] font-bold text-indigo-400">{{ strtoupper(substr($u->name, 0, 1)) }}</span>
-                            {{ $u->name }}
+                            @include('partials.user-avatar', ['user' => $u, 'size' => 'h-6 w-6', 'textSize' => 'text-[10px]'])
+                            <span>{{ $u->name }}</span>
+                            @if ($u->hasRole('client') && $u->pivot->can_manage_company)
+                                <span class="rounded border border-amber-500/30 bg-amber-500/10 px-1 py-px text-[9px] font-semibold uppercase tracking-wide text-amber-300">Responsable</span>
+                            @endif
                         </a>
                     @endforeach
                 </div>

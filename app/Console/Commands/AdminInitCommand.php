@@ -25,7 +25,7 @@ class AdminInitCommand extends Command
     /**
      * @var string
      */
-    protected $description = 'Crée ou met à jour un compte administrateur (is_admin), sans passer par l’inscription publique';
+    protected $description = 'Créer ou mettre à jour un compte administrateur (is_admin), sans passer par l’inscription publique';
 
     public function handle(): int
     {
@@ -105,6 +105,7 @@ class AdminInitCommand extends Command
             $user->name = $name;
             $user->password = $plain;
             $user->is_admin = true;
+            $user->email_verified_at = $user->email_verified_at ?? now();
             $user->save();
             $this->components->info("Compte mis à jour : {$email} (administrateur).");
         } else {
@@ -113,6 +114,7 @@ class AdminInitCommand extends Command
                 'email' => $email,
                 'password' => $plain,
                 'is_admin' => true,
+                'email_verified_at' => now(),
             ]);
             $this->components->info("Compte administrateur créé : {$email}");
         }

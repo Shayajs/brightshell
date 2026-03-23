@@ -11,7 +11,7 @@
             <p class="max-w-3xl text-sm leading-relaxed text-zinc-400">
                 Endpoints <strong class="text-zinc-300">lecture seule</strong> exposés sur le sous-domaine dédié
                 (<code class="rounded bg-zinc-900 px-1 py-0.5 text-xs text-sky-300">api.{domaine}</code>).
-                Les URLs complètes et exemples se mettent à jour selon ton <code class="text-zinc-500">.env</code>.
+                Les URLs complètes et exemples se mettent à jour selon votre <code class="text-zinc-500">.env</code>.
             </p>
         </header>
 
@@ -49,7 +49,7 @@
 
             @if ($endpoints->isEmpty())
                 <p class="px-5 py-10 text-center text-sm text-zinc-500">
-                    Aucune route API publique chargée. Vérifie la configuration du domaine API ou ajoute des routes dans
+                    Aucune route API publique chargée. Vérifiez la configuration du domaine API ou ajoutez des routes dans
                     <code class="rounded bg-zinc-950 px-1 text-zinc-400">routes/api-public.php</code>.
                 </p>
             @else
@@ -114,7 +114,7 @@
         <section class="rounded-2xl border border-zinc-800 border-dashed bg-zinc-950/30 p-5 ring-1 ring-white/5">
             <h2 class="font-display text-xs font-bold uppercase tracking-wide text-zinc-500">Étendre l’API</h2>
             <ol class="mt-3 list-decimal space-y-2 pl-5 text-sm text-zinc-400">
-                <li>Ajoute la route dans <code class="rounded bg-zinc-900 px-1 text-xs">routes/api-public.php</code> avec un nom <code class="text-zinc-500">api.public.*</code>.</li>
+                <li>Ajoutez la route dans <code class="rounded bg-zinc-900 px-1 text-xs">routes/api-public.php</code> avec un nom <code class="text-zinc-500">api.public.*</code>.</li>
                 <li>Décris-la dans <code class="rounded bg-zinc-900 px-1 text-xs">config/brightshell-api.php</code> (titre, résumé, format).</li>
                 <li>Si besoin CORS au-delà de GET/OPTIONS, adapte <code class="text-zinc-500">PublicApiCors</code>.</li>
             </ol>

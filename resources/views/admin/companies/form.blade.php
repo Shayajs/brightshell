@@ -55,20 +55,38 @@
             <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 ring-1 ring-white/5 space-y-4">
                 <div>
                     <h2 class="font-display text-sm font-bold uppercase tracking-wide text-white">Membres liés</h2>
-                    <p class="mt-1 text-xs text-zinc-500">Optionnel — sert uniquement aux statistiques.</p>
+                    <p class="mt-1 text-xs text-zinc-500">Accès portail client et facturation. Pour les comptes <span class="text-zinc-400">client</span>, vous pouvez désigner qui peut modifier la fiche société dans l’espace client.</p>
                 </div>
-                <div class="grid gap-2 sm:grid-cols-2">
+                <div class="space-y-2">
                     @foreach ($members as $m)
-                        <label class="flex cursor-pointer items-center gap-3 rounded-lg border border-zinc-800 bg-zinc-950/50 px-3 py-2.5 transition hover:border-zinc-700 has-[:checked]:border-indigo-500/30 has-[:checked]:bg-indigo-500/8">
-                            <input
-                                type="checkbox"
-                                name="user_ids[]"
-                                value="{{ $m->id }}"
-                                @checked($company && $company->users->contains($m))
-                                class="h-4 w-4 rounded border-zinc-600 bg-zinc-950 text-indigo-500 focus:ring-indigo-500/40"
-                            >
-                            <span class="text-sm text-zinc-300">{{ $m->name }}</span>
-                        </label>
+                        @php
+                            $attached = $company && $company->users->contains($m);
+                            $canManage = $attached && (bool) optional($company->users->firstWhere('id', $m->id))->pivot?->can_manage_company;
+                        @endphp
+                        <div class="flex flex-col gap-2 rounded-lg border border-zinc-800 bg-zinc-950/50 px-3 py-2.5 sm:flex-row sm:items-center sm:justify-between">
+                            <label class="flex cursor-pointer items-center gap-3">
+                                <input
+                                    type="checkbox"
+                                    name="user_ids[]"
+                                    value="{{ $m->id }}"
+                                    @checked($attached)
+                                    class="h-4 w-4 rounded border-zinc-600 bg-zinc-950 text-indigo-500 focus:ring-indigo-500/40"
+                                >
+                                <span class="text-sm text-zinc-300">{{ $m->name }}</span>
+                            </label>
+                            @if ($m->hasRole('client'))
+                                <label class="flex cursor-pointer items-center gap-2 sm:ml-auto">
+                                    <input
+                                        type="checkbox"
+                                        name="manage_user_ids[]"
+                                        value="{{ $m->id }}"
+                                        @checked($canManage)
+                                        class="h-4 w-4 rounded border-zinc-600 bg-zinc-950 text-amber-500 focus:ring-amber-500/40"
+                                    >
+                                    <span class="text-[11px] text-zinc-500">Autorisé à modifier la société</span>
+                                </label>
+                            @endif
+                        </div>
                     @endforeach
                 </div>
             </div>

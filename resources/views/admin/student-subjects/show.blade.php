@@ -45,13 +45,13 @@
     @if ($folderTree->isEmpty())
         <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-5 ring-1 ring-white/5">
             <h2 class="font-display text-xs font-bold uppercase tracking-wide text-zinc-400">Dossiers &amp; fichiers</h2>
-            <p class="mt-4 text-sm text-zinc-500">Aucun dossier. Crée un dossier racine ci-dessus, puis clique sur un dossier pour gérer fichiers et accès élève (panneau de droite sur grand écran).</p>
+            <p class="mt-4 text-sm text-zinc-500">Aucun dossier. Créez un dossier racine ci-dessus, puis cliquez sur un dossier pour gérer fichiers et accès élève (panneau de droite sur grand écran).</p>
         </div>
     @else
         <div class="flex flex-col gap-8 xl:grid xl:grid-cols-2 xl:items-start xl:gap-8">
             <div class="min-w-0 rounded-2xl border border-zinc-800 bg-zinc-900/50 p-5 ring-1 ring-white/5">
                 <h2 class="font-display text-xs font-bold uppercase tracking-wide text-zinc-400">Dossiers &amp; fichiers</h2>
-                <p class="mt-2 text-[11px] text-zinc-600">Clique sur un dossier pour le sélectionner. Les actions (import, Créer MD, verrouillage) sont dans le panneau de droite sur écran large ; en dessous sur mobile.</p>
+                <p class="mt-2 text-[11px] text-zinc-600">Cliquez sur un dossier pour le sélectionner. Les actions (import, Créer MD, verrouillage) sont dans le panneau de droite sur écran large ; en dessous sur mobile.</p>
                 <div class="mt-4 space-y-2">
                     @foreach ($folderTree as $node)
                         @include('admin.student-subjects.partials.folder-node', ['node' => $node, 'user' => $user, 'subject' => $subject, 'depth' => 0, 'activeFolder' => $activeFolder])

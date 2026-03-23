@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Support\AdminEmailVerification;
 use App\Support\BrightshellAccount;
 use App\Support\RoleResolver;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -43,6 +45,13 @@ class LoginController extends Controller
             'current_login_at' => now(),
             'current_login_ip' => $request->ip(),
         ])->save();
+
+        AdminEmailVerification::ensureVerifiedIfAdmin($user);
+        $user->refresh();
+
+        if ($user instanceof MustVerifyEmail && ! $user->hasVerifiedEmail()) {
+            return redirect()->intended(route('verification.notice'));
+        }
 
         return redirect()->intended(RoleResolver::defaultPortalUrl($user));
     }

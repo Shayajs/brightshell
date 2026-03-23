@@ -2,9 +2,10 @@
 
 @section('title', 'Edition template mail')
 @section('topbar_label', 'Templates mail')
+@section('portal_main_max', 'max-w-none w-full')
 
 @section('content')
-    <div class="space-y-8" id="mail-template-editor"
+    <div class="space-y-6 pb-4" id="mail-template-editor"
          data-template-key="{{ $template['key'] }}"
          data-update-url="{{ route('admin.mail-templates.update', $template['key']) }}"
          data-preview-url="{{ route('admin.mail-templates.preview', $template['key']) }}">
@@ -16,8 +17,10 @@
 
         @include('layouts.partials.flash')
 
-        <div class="grid gap-6 lg:grid-cols-2">
-            <section class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-5 ring-1 ring-white/5">
+        {{-- Sort du padding du main pour gagner toute la largeur utile du portail --}}
+        <div class="-mx-4 w-[calc(100%+2rem)] sm:-mx-6 sm:w-[calc(100%+3rem)] lg:-mx-8 lg:w-[calc(100%+4rem)]">
+        <div class="grid gap-6 lg:grid-cols-2 lg:gap-8 xl:grid-cols-[minmax(0,1.72fr)_minmax(0,1fr)] 2xl:grid-cols-[minmax(0,1.82fr)_minmax(0,1fr)] 2xl:gap-10">
+            <section class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-5 ring-1 ring-white/5 sm:p-6">
                 <h2 class="mb-4 text-sm font-bold uppercase tracking-wide text-white">Edition JSON</h2>
                 <form id="template-form" class="space-y-4">
                     @csrf
@@ -44,15 +47,15 @@
                     </div>
                     <div>
                         <label class="mb-1 block text-xs text-zinc-400">Layout JSON</label>
-                        <textarea name="layout_json" rows="10" class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 font-mono text-xs text-zinc-100">{{ json_encode($template['layout_json'], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) }}</textarea>
+                        <textarea name="layout_json" rows="14" class="mail-template-code min-h-[min(30vh,24rem)] w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2.5 font-mono text-[13px] leading-relaxed text-zinc-100 sm:min-h-[min(34vh,28rem)] lg:min-h-[min(38vh,30rem)]">{{ json_encode($template['layout_json'], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) }}</textarea>
                     </div>
                     <div>
                         <label class="mb-1 block text-xs text-zinc-400">Content JSON</label>
-                        <textarea name="content_json" rows="16" class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 font-mono text-xs text-zinc-100">{{ json_encode($template['content_json'], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) }}</textarea>
+                        <textarea name="content_json" rows="20" class="mail-template-code min-h-[min(42vh,32rem)] w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2.5 font-mono text-[13px] leading-relaxed text-zinc-100 sm:min-h-[min(46vh,36rem)] lg:min-h-[min(52vh,40rem)]">{{ json_encode($template['content_json'], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) }}</textarea>
                     </div>
                     <div>
                         <label class="mb-1 block text-xs text-zinc-400">Variables JSON</label>
-                        <textarea name="variables_json" rows="6" class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 font-mono text-xs text-zinc-100">{{ json_encode($template['variables_json'], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) }}</textarea>
+                        <textarea name="variables_json" rows="10" class="mail-template-code min-h-[min(20vh,14rem)] w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2.5 font-mono text-[13px] leading-relaxed text-zinc-100">{{ json_encode($template['variables_json'], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) }}</textarea>
                     </div>
                     <div class="flex flex-wrap items-center gap-3">
                         <button type="button" id="btn-save" class="rounded-lg bg-indigo-600 px-4 py-2 text-xs font-semibold text-white hover:bg-indigo-500">Sauvegarder</button>
@@ -63,10 +66,11 @@
                 </form>
             </section>
 
-            <section class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-5 ring-1 ring-white/5">
+            <section class="mail-template-preview-panel flex flex-col rounded-2xl border border-zinc-800 bg-zinc-900/50 p-5 ring-1 ring-white/5 sm:p-6 xl:sticky xl:top-24 xl:max-h-[calc(100dvh-5.5rem)] xl:overflow-y-auto xl:overscroll-y-contain">
                 <h2 class="mb-4 text-sm font-bold uppercase tracking-wide text-white">Preview temps reel</h2>
                 @include('admin.mail-templates.preview')
             </section>
+        </div>
         </div>
     </div>
 @endsection

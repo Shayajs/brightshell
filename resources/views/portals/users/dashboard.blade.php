@@ -8,8 +8,8 @@
         <header class="space-y-2">
             <p class="text-[10px] font-semibold uppercase tracking-[0.2em] text-indigo-400/90">Votre espace</p>
             <h1 class="font-display text-2xl font-bold tracking-tight text-white sm:text-3xl">Suivi &amp; documents</h1>
-            <p class="max-w-2xl text-sm leading-relaxed text-zinc-400">
-                Bienvenue <strong class="font-medium text-zinc-200">{{ $user->name }}</strong>. Ce portail deviendra votre point d’entrée pour les projets,
+            <p class="max-w-none text-sm leading-relaxed text-zinc-400">
+                Bienvenue <strong class="font-medium text-zinc-200">{{ $user->greetingFirstName() ?: $user->name }}</strong>. Ce portail deviendra votre point d’entrée pour les projets,
                 contrats, factures et échanges avec BrightShell.
             </p>
         </header>

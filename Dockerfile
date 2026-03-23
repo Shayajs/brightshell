@@ -46,4 +46,6 @@ RUN apk del --purge \
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
+COPY docker/php/uploads.ini /usr/local/etc/php/conf.d/uploads.ini
+
 WORKDIR /var/www/html

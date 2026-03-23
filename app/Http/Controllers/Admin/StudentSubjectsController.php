@@ -18,7 +18,8 @@ class StudentSubjectsController extends Controller
         $students = User::query()
             ->whereHas('roles', fn ($q) => $q->where('slug', 'student'))
             ->withCount('studentSubjects')
-            ->orderBy('name')
+            ->orderBy('last_name')
+            ->orderBy('first_name')
             ->paginate(30);
 
         return view('admin.student-subjects.index', compact('students'));

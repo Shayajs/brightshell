@@ -1,3 +1,5 @@
+@use('App\Support\BrightshellBrand')
+
 @push('head')
     <!-- Primary Meta Tags -->
     <title>BrightShell - Développement Web Full Stack | Solutions Innovantes</title>
@@ -14,7 +16,7 @@
     <meta property="og:url" content="{{ url('/') }}">
     <meta property="og:title" content="BrightShell - Développement Web Full Stack | Solutions Innovantes">
     <meta property="og:description" content="Créateur de site web ou de solutions web, créateur de logiciels, venez visiter notre site internet si vous souhaitez découvrir nos solutions et nos prestations !">
-    <meta property="og:image" content="{{ asset('img/logo_sans_fond_contours_epais.webp') }}">
+    <meta property="og:image" content="{{ BrightshellBrand::siteLogoUrl() }}">
     <meta property="og:locale" content="fr_FR">
     <meta property="og:site_name" content="BrightShell">
     
@@ -23,7 +25,7 @@
     <meta property="twitter:url" content="{{ url('/') }}">
     <meta property="twitter:title" content="BrightShell - Développement Web Full Stack | Solutions Innovantes">
     <meta property="twitter:description" content="Créateur de site web ou de solutions web, créateur de logiciels, venez visiter notre site internet si vous souhaitez découvrir nos solutions et nos prestations !">
-    <meta property="twitter:image" content="{{ asset('img/logo_sans_fond_contours_epais.webp') }}">
+    <meta property="twitter:image" content="{{ BrightshellBrand::siteLogoUrl() }}">
     <meta property="twitter:creator" content="@lucas_shaya">
     
     <!-- Canonical URL -->
@@ -38,8 +40,8 @@
       "name": "BrightShell",
       "description": "Solutions de développement web full stack sur mesure. Applications web modernes, systèmes de gestion, bases de données et interfaces utilisateur innovantes.",
       "url": "{{ url('/') }}",
-      "logo": "{{ asset('img/logo_sans_fond_contours_epais.webp') }}",
-      "image": "{{ asset('img/logo_sans_fond_contours_epais.webp') }}",
+      "logo": "{{ BrightshellBrand::siteLogoUrl() }}",
+      "image": "{{ BrightshellBrand::siteLogoUrl() }}",
       "address": {
         "@@type": "PostalAddress",
         "addressLocality": "Bussac-Forêt",
@@ -61,7 +63,7 @@
 @section('content')
     <!-- Logo -->
     <div class="logo-container">
-        <img src="{{ asset('img/logo_sans_fond_contours_epais.webp') }}" alt="Logo BrightShell - Développement Web Full Stack - Solutions innovantes" class="main-logo">
+        <img src="{{ BrightshellBrand::siteLogoUrl() }}" alt="Logo BrightShell - Développement Web Full Stack - Solutions innovantes" class="main-logo">
     </div>
 
     <!-- Brand Name with wireframe typography -->

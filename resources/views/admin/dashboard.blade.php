@@ -22,9 +22,9 @@
 @section('content')
     <div class="space-y-8">
         <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-            <div>
+            <div class="min-w-0">
                 <h1 class="font-display text-2xl font-bold tracking-tight text-white sm:text-3xl">
-                    Bonjour, {{ \Illuminate\Support\Str::before(trim($user->name), ' ') ?: $user->name }}
+                    Bonjour, {{ $user->greetingFirstName() ?: $user->name }}
                 </h1>
                 <p class="mt-2 max-w-xl text-sm leading-relaxed text-zinc-400">
                     Indicateurs issus de la base : sessions, inscriptions, factures payées et activité quiz.
@@ -32,11 +32,11 @@
                 @if (! $dashboard['uses_database_sessions'])
                     <p class="mt-2 max-w-xl rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-200/90">
                         <strong class="font-semibold">Sessions hors base</strong> — le graphique « membres actifs distincts » reste à 0.
-                        Mets <code class="rounded bg-zinc-950 px-1 py-0.5 text-[10px]">SESSION_DRIVER=database</code> pour l’historique réel.
+                        Mettez <code class="rounded bg-zinc-950 px-1 py-0.5 text-[10px]">SESSION_DRIVER=database</code> pour l’historique réel.
                     </p>
                 @endif
             </div>
-            <div class="flex flex-wrap gap-1.5 rounded-xl border border-zinc-800 bg-zinc-900/60 p-1" role="group" aria-label="Période" id="period-tabs">
+            <div class="flex w-full flex-shrink-0 flex-wrap gap-1.5 rounded-xl border border-zinc-800 bg-zinc-900/60 p-1 sm:w-auto" role="group" aria-label="Période" id="period-tabs">
                 <button type="button" data-period="30j"
                     class="period-tab rounded-lg px-3.5 py-1.5 text-xs font-semibold transition bg-indigo-600 text-white shadow-sm"
                     aria-pressed="true">30 jours</button>
@@ -49,8 +49,8 @@
             </div>
         </div>
 
-        <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="Indicateurs clés">
-            <article class="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-5 shadow-sm ring-1 ring-white/5 transition hover:border-zinc-700 hover:ring-indigo-500/10">
+        <section class="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-4 xl:grid-cols-4 xl:gap-4" aria-label="Indicateurs clés">
+            <article class="flex min-h-0 min-w-0 flex-col rounded-2xl border border-zinc-800 bg-zinc-900/60 p-5 shadow-sm ring-1 ring-white/5 transition hover:border-zinc-700 hover:ring-indigo-500/10">
                 <div class="flex items-start justify-between gap-3">
                     <p class="text-xs font-semibold uppercase tracking-wide text-zinc-500">CA encaissé (période)</p>
                     <span class="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-500/15 text-indigo-400 ring-1 ring-indigo-500/25" aria-hidden="true">
@@ -66,7 +66,7 @@
                     @endif
                 </p>
             </article>
-            <article class="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-5 shadow-sm ring-1 ring-white/5 transition hover:border-zinc-700 hover:ring-indigo-500/10">
+            <article class="flex min-h-0 min-w-0 flex-col rounded-2xl border border-zinc-800 bg-zinc-900/60 p-5 shadow-sm ring-1 ring-white/5 transition hover:border-zinc-700 hover:ring-indigo-500/10">
                 <div class="flex items-start justify-between gap-3">
                     <p class="text-xs font-semibold uppercase tracking-wide text-zinc-500">Cours suivis</p>
                     <span class="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-500/15 text-indigo-400 ring-1 ring-indigo-500/25" aria-hidden="true">
@@ -76,7 +76,7 @@
                 <p class="mt-3 font-display text-2xl font-bold text-white" data-kpi="active_courses">{{ $k0['active_courses'] }}</p>
                 <p class="mt-1 text-xs text-zinc-500"><span data-kpi="completed_courses">{{ $k0['completed_courses'] }}</span> terminés au total</p>
             </article>
-            <article class="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-5 shadow-sm ring-1 ring-white/5 transition hover:border-zinc-700 hover:ring-indigo-500/10">
+            <article class="flex min-h-0 min-w-0 flex-col rounded-2xl border border-zinc-800 bg-zinc-900/60 p-5 shadow-sm ring-1 ring-white/5 transition hover:border-zinc-700 hover:ring-indigo-500/10">
                 <div class="flex items-start justify-between gap-3">
                     <p class="text-xs font-semibold uppercase tracking-wide text-zinc-500">Comptes</p>
                     <span class="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-500/15 text-indigo-400 ring-1 ring-indigo-500/25" aria-hidden="true">
@@ -87,7 +87,7 @@
                 <p class="mt-1 text-xs text-zinc-500"><span data-kpi="portal_users">{{ $k0['portal_users'] }}</span> client·s / élève·s (rôles)</p>
                 <p class="mt-1 text-[11px] font-medium text-indigo-300/90"><span data-kpi="new_users_period">{{ $k0['new_users_period'] }}</span> nouvelle·aux inscriptions sur la période sélectionnée</p>
             </article>
-            <article class="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-5 shadow-sm ring-1 ring-white/5 transition hover:border-zinc-700 hover:ring-indigo-500/10">
+            <article class="flex min-h-0 min-w-0 flex-col rounded-2xl border border-zinc-800 bg-zinc-900/60 p-5 shadow-sm ring-1 ring-white/5 transition hover:border-zinc-700 hover:ring-indigo-500/10">
                 <div class="flex items-start justify-between gap-3">
                     <p class="text-xs font-semibold uppercase tracking-wide text-zinc-500">Environnement</p>
                     <span class="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-500/15 text-indigo-400 ring-1 ring-indigo-500/25" aria-hidden="true">
@@ -114,7 +114,7 @@
             <div class="grid gap-4 sm:gap-5 lg:grid-cols-2">
                 @foreach (['visitors' => 'from-indigo-600 to-indigo-400', 'signups' => 'from-emerald-600 to-emerald-400', 'revenue' => 'from-amber-600 to-amber-400', 'quiz' => 'from-violet-600 to-violet-400'] as $chartKey => $gradient)
                     <article
-                        class="flex flex-col rounded-2xl border border-zinc-800 bg-zinc-900/60 p-5 shadow-sm ring-1 ring-white/5 transition hover:border-zinc-700 hover:ring-indigo-500/10"
+                        class="flex min-h-0 min-w-0 flex-col rounded-2xl border border-zinc-800 bg-zinc-900/60 p-5 shadow-sm ring-1 ring-white/5 transition hover:border-zinc-700 hover:ring-indigo-500/10"
                     >
                         <div class="flex flex-wrap items-start justify-between gap-3">
                             <div class="flex min-w-0 gap-3">
@@ -136,9 +136,9 @@
                         <div
                             class="mt-4 flex min-h-0 flex-1 flex-col rounded-xl border border-zinc-800/80 bg-zinc-950/45 p-4 ring-1 ring-inset ring-white/[0.04] sm:p-5"
                         >
-                            <div
-                                class="relative flex min-h-[10.5rem] flex-1 flex-row flex-nowrap items-stretch justify-between gap-0.5 overflow-x-auto rounded-lg bg-[linear-gradient(to_top,rgba(39,39,42,0.45)_1px,transparent_1px)] bg-[length:100%_2.25rem] bg-bottom pb-1 sm:gap-1 [scrollbar-width:thin]"
-                                role="img"
+                        <div
+                            class="relative flex min-h-[10.5rem] w-full min-w-0 flex-1 flex-row flex-nowrap items-stretch justify-between gap-0.5 overflow-x-auto overscroll-x-contain rounded-lg bg-[linear-gradient(to_top,rgba(39,39,42,0.45)_1px,transparent_1px)] bg-[length:100%_2.25rem] bg-bottom pb-1 sm:gap-1 [scrollbar-width:thin]"
+                            role="img"
                                 aria-label="{{ $p30['charts'][$chartKey]['title'] }}"
                                 data-chart-bars="{{ $chartKey }}"
                             ></div>
@@ -245,7 +245,7 @@
                 '<div class="w-full rounded-t-md bg-gradient-to-t ' + gradients[key] + ' opacity-90 transition-all duration-300 hover:opacity-100" ' +
                 'style="min-height:4px;height:' + pct + '%;" title="' + title.replace(/"/g, '&quot;') + '"></div>' +
                 '</div>' +
-                '<span class="block shrink-0 whitespace-nowrap text-center text-[9px] font-medium uppercase leading-tight text-zinc-600 sm:text-[10px]">' + l + '</span>' +
+                '<span class="block min-w-0 shrink break-words text-center text-[9px] font-medium uppercase leading-tight text-zinc-600 sm:text-[10px]">' + l + '</span>' +
                 '</div>'
             );
         }).join('');

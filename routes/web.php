@@ -6,30 +6,42 @@ use App\Http\Controllers\Admin\CompaniesController;
 use App\Http\Controllers\Admin\CvAdminController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DeclarationsController;
+use App\Http\Controllers\Admin\DocNodesController;
 use App\Http\Controllers\Admin\InvoicesController;
-use App\Http\Controllers\Admin\MembersController;
 use App\Http\Controllers\Admin\MailTemplatesController;
+use App\Http\Controllers\Admin\MembersController;
 use App\Http\Controllers\Admin\RealisationsAdminController;
+use App\Http\Controllers\Admin\SiteAppearanceController;
 use App\Http\Controllers\Admin\StudentCourseQuizQuestionsController;
 use App\Http\Controllers\Admin\StudentCourseQuizzesController;
 use App\Http\Controllers\Admin\StudentCoursesController;
 use App\Http\Controllers\Admin\StudentSubjectFilesController;
 use App\Http\Controllers\Admin\StudentSubjectFoldersController;
 use App\Http\Controllers\Admin\StudentSubjectsController;
+use App\Http\Controllers\Admin\SupportTicketsController;
+use App\Http\Controllers\Auth\EmailVerificationNotificationController;
+use App\Http\Controllers\Auth\EmailVerificationPromptController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\Auth\SupportTicketFromVerificationController;
+use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\Collabs\DashboardController as CollabsDashboardController;
 use App\Http\Controllers\Courses\DashboardController as CoursesDashboardController;
 use App\Http\Controllers\Courses\StudentCourseQuizController;
 use App\Http\Controllers\Courses\StudentMaterialsController;
 use App\Http\Controllers\CvController;
+use App\Http\Controllers\Docs\DashboardController as DocsDashboardController;
+use App\Http\Controllers\Docs\PageController as DocsPageController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\RealisationsController;
 use App\Http\Controllers\ServicesController;
+use App\Http\Controllers\Settings\AccountClosureController;
+use App\Http\Controllers\Settings\ApiTokensController;
 use App\Http\Controllers\Settings\DashboardController as SettingsDashboardController;
 use App\Http\Controllers\Settings\NotificationPreferencesController;
 use App\Http\Controllers\Settings\ProfileController as SettingsProfileController;
 use App\Http\Controllers\Settings\SecurityController as SettingsSecurityController;
+use App\Http\Controllers\Users\CompaniesController as UsersCompaniesController;
 use App\Http\Controllers\Users\DashboardController as UsersDashboardController;
 use App\Http\Middleware\EnsureUserCanAccessAdminPortal;
 use App\Support\BrightshellDomain;
@@ -50,6 +62,17 @@ $registerAuthRoutes = function (): void {
         }
     });
     Route::post('/logout', [LoginController::class, 'destroy'])->middleware('auth')->name('logout');
+
+    Route::middleware('auth')->group(function (): void {
+        Route::get('/email/verify', [EmailVerificationPromptController::class, 'show'])->name('verification.notice');
+        Route::get('/email/verify/{id}/{hash}', VerifyEmailController::class)->middleware('signed')->name('verification.verify');
+        Route::post('/email/verification-notification', [EmailVerificationNotificationController::class, 'store'])
+            ->middleware('throttle:6,1')
+            ->name('verification.send');
+        Route::post('/email/verify/support-ticket', [SupportTicketFromVerificationController::class, 'store'])
+            ->middleware('throttle:10,1')
+            ->name('verification.support-ticket');
+    });
 };
 
 /**
@@ -82,7 +105,12 @@ $registerAdminRoutes = function (): void {
     Route::get('/members', [MembersController::class, 'index'])->name('admin.members.index');
     Route::get('/members/create', [MembersController::class, 'create'])->name('admin.members.create');
     Route::post('/members', [MembersController::class, 'store'])->name('admin.members.store');
+    Route::post('/members/{member}/archive', [MembersController::class, 'archive'])->name('admin.members.archive');
+    Route::post('/members/{member}/restore', [MembersController::class, 'restore'])->name('admin.members.restore');
+    Route::delete('/members/{member}/supprimer-definitif', [MembersController::class, 'forceDestroy'])->name('admin.members.force-destroy');
+
     Route::get('/members/{member}', [MembersController::class, 'show'])->name('admin.members.show');
+    Route::post('/members/{member}/verify-email', [MembersController::class, 'verifyEmail'])->name('admin.members.verify-email');
     Route::post('/members/{member}/roles', [MembersController::class, 'updateRoles'])->name('admin.members.roles');
 
     // Cours par élève (indépendants par utilisateur)
@@ -157,11 +185,27 @@ $registerAdminRoutes = function (): void {
     Route::put('/declarations/entreprise', [DeclarationsController::class, 'updateBusiness'])->name('admin.declarations.business.update');
     Route::redirect('/urssaf', '/declarations/urssaf')->name('admin.urssaf.index');
 
+    Route::get('/support-tickets', [SupportTicketsController::class, 'index'])->name('admin.support-tickets.index');
+    Route::get('/support-tickets/{ticket}', [SupportTicketsController::class, 'show'])->name('admin.support-tickets.show');
+    Route::patch('/support-tickets/{ticket}', [SupportTicketsController::class, 'update'])->name('admin.support-tickets.update');
+    Route::post('/support-tickets/{ticket}/verify-email', [SupportTicketsController::class, 'verifyMemberEmail'])->name('admin.support-tickets.verify-email');
+
+    Route::get('/documentation', [DocNodesController::class, 'index'])->name('admin.doc-nodes.index');
+    Route::get('/documentation/creer', [DocNodesController::class, 'create'])->name('admin.doc-nodes.create');
+    Route::post('/documentation', [DocNodesController::class, 'store'])->name('admin.doc-nodes.store');
+    Route::get('/documentation/{docNode}/modifier', [DocNodesController::class, 'edit'])->name('admin.doc-nodes.edit');
+    Route::put('/documentation/{docNode}', [DocNodesController::class, 'update'])->name('admin.doc-nodes.update');
+    Route::delete('/documentation/{docNode}', [DocNodesController::class, 'destroy'])->name('admin.doc-nodes.destroy');
+
     Route::get('/api-publique', [ApiManagerController::class, 'index'])->name('admin.api-manager.index');
     Route::get('/mail-templates', [MailTemplatesController::class, 'index'])->name('admin.mail-templates.index');
     Route::get('/mail-templates/{key}', [MailTemplatesController::class, 'edit'])->name('admin.mail-templates.edit');
     Route::put('/mail-templates/{key}', [MailTemplatesController::class, 'update'])->name('admin.mail-templates.update');
     Route::post('/mail-templates/{key}/preview', [MailTemplatesController::class, 'preview'])->name('admin.mail-templates.preview');
+
+    Route::get('/identite-site', [SiteAppearanceController::class, 'edit'])->name('admin.site-appearance.edit');
+    Route::put('/identite-site', [SiteAppearanceController::class, 'update'])->name('admin.site-appearance.update');
+    Route::post('/identite-site/reinitialiser-theme-mail', [SiteAppearanceController::class, 'resetMailTheme'])->name('admin.site-appearance.reset-mail-theme');
 
     // Réalisations
     Route::get('/realisations', [RealisationsAdminController::class, 'index'])->name('admin.realisations.index');
@@ -193,7 +237,7 @@ if ($adminHost === '' && $inferredRoot !== '') {
 
 if ($adminHost !== '') {
     Route::domain($adminHost)
-        ->middleware(['auth', EnsureUserCanAccessAdminPortal::class])
+        ->middleware(['auth', 'verified', EnsureUserCanAccessAdminPortal::class])
         ->group($registerAdminRoutes);
 }
 
@@ -223,7 +267,7 @@ if ($collabsHost === '' && $inferredRoot !== '') {
 }
 if ($collabsHost !== '') {
     Route::domain($collabsHost)
-        ->middleware(['auth', 'roles.any:collaborator'])
+        ->middleware(['auth', 'verified', 'roles.any:collaborator'])
         ->group(function (): void {
             Route::get('/', CollabsDashboardController::class)->name('portals.collabs');
         });
@@ -240,9 +284,12 @@ if ($usersHost === '' && $inferredRoot !== '') {
 }
 if ($usersHost !== '') {
     Route::domain($usersHost)
-        ->middleware(['auth', 'roles.any:client'])
+        ->middleware(['auth', 'verified', 'roles.any:client'])
         ->group(function (): void {
             Route::get('/', UsersDashboardController::class)->name('portals.users');
+            Route::get('/societes', [UsersCompaniesController::class, 'index'])->name('portals.users.companies.index');
+            Route::get('/societes/{company}', [UsersCompaniesController::class, 'show'])->name('portals.users.companies.show');
+            Route::put('/societes/{company}', [UsersCompaniesController::class, 'update'])->name('portals.users.companies.update');
         });
 }
 
@@ -257,7 +304,7 @@ if ($coursesHost === '' && $inferredRoot !== '') {
 }
 if ($coursesHost !== '') {
     Route::domain($coursesHost)
-        ->middleware(['auth', 'roles.any:student'])
+        ->middleware(['auth', 'verified', 'roles.any:student'])
         ->group(function (): void {
             Route::get('/matieres/fichiers/{file}/lire', [StudentMaterialsController::class, 'readMarkdown'])
                 ->name('portals.courses.matieres.read');
@@ -282,7 +329,7 @@ if ($settingsHost === '' && $inferredRoot !== '') {
 }
 if ($settingsHost !== '') {
     Route::domain($settingsHost)
-        ->middleware('auth')
+        ->middleware(['auth', 'verified'])
         ->group(function (): void {
             Route::get('/', [SettingsDashboardController::class, 'index'])->name('portals.settings');
 
@@ -296,6 +343,35 @@ if ($settingsHost !== '') {
             Route::get('/securite', [SettingsSecurityController::class, 'edit'])->name('portals.settings.security.edit');
             Route::put('/securite/mot-de-passe', [SettingsSecurityController::class, 'updatePassword'])->name('portals.settings.security.password');
             Route::delete('/securite/autres-sessions', [SettingsSecurityController::class, 'destroyOtherSessions'])->name('portals.settings.security.sessions.destroy-others');
+
+            Route::get('/compte/archiver', [AccountClosureController::class, 'edit'])->name('portals.settings.account.archive');
+            Route::delete('/compte', [AccountClosureController::class, 'destroy'])->name('portals.settings.account.destroy');
+
+            Route::middleware('role.developer')->group(function (): void {
+                Route::get('/api', [ApiTokensController::class, 'index'])->name('portals.settings.api.index');
+                Route::post('/api/jetons', [ApiTokensController::class, 'store'])->name('portals.settings.api.tokens.store');
+                Route::delete('/api/jetons/{token}', [ApiTokensController::class, 'destroy'])->name('portals.settings.api.tokens.destroy');
+            });
+        });
+}
+
+/*
+|--------------------------------------------------------------------------
+| Portail documentation (docs.*)
+|--------------------------------------------------------------------------
+*/
+$docsHost = (string) config('brightshell.domains.docs_host', '');
+if ($docsHost === '' && $inferredRoot !== '') {
+    $docsHost = 'docs.'.$inferredRoot;
+}
+if ($docsHost !== '') {
+    Route::domain($docsHost)
+        ->middleware(['auth', 'verified'])
+        ->group(function (): void {
+            Route::get('/', DocsDashboardController::class)->name('portals.docs');
+            Route::get('/{path}', [DocsPageController::class, 'show'])
+                ->where('path', '.+')
+                ->name('portals.docs.show');
         });
 }
 
@@ -325,7 +401,7 @@ if (is_string($rootDomain) && $rootDomain !== '' && is_array($vitrineSubs) && $v
 */
 if (is_string($rootDomain) && $rootDomain !== '') {
     $reservedSubs = array_values(array_unique(array_filter(array_merge(
-        ['account', 'admin', 'api', 'collabs', 'users', 'courses', 'settings'],
+        ['account', 'admin', 'api', 'collabs', 'users', 'courses', 'settings', 'docs'],
         is_array($vitrineSubs) ? $vitrineSubs : []
     ))));
 

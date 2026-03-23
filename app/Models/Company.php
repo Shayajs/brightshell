@@ -7,20 +7,42 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
 
 class Company extends Model
 {
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'name', 'siret', 'address', 'city', 'country',
-        'website', 'contact_name', 'contact_email', 'notes',
+        'name',
+        'logo_path',
+        'siret',
+        'address',
+        'city',
+        'country',
+        'website',
+        'contact_name',
+        'contact_email',
+        'notes',
     ];
 
     /** @return BelongsToMany<User, $this> */
     public function users(): BelongsToMany
     {
-        return $this->belongsToMany(User::class)->withTimestamps();
+        return $this->belongsToMany(User::class)
+            ->withPivot('can_manage_company')
+            ->withTimestamps();
+    }
+
+    public function logoUrl(): ?string
+    {
+        $path = $this->logo_path;
+
+        if ($path === null || $path === '') {
+            return null;
+        }
+
+        return Storage::disk('public')->url($path);
     }
 
     /** @return HasMany<Invoice, $this> */

@@ -15,7 +15,23 @@
     <div class="flex flex-wrap items-end justify-between gap-4">
         <div>
             <h1 class="font-display text-2xl font-bold text-white">Membres</h1>
-            <p class="mt-1 text-sm text-zinc-500">{{ $members->total() }} compte(s) enregistré(s)</p>
+            <p class="mt-1 text-sm text-zinc-500">{{ $members->total() }} compte(s) —
+                @if (($status ?? 'active') === 'active')
+                    actifs
+                @elseif (($status ?? '') === 'archived')
+                    archivés
+                @else
+                    tous
+                @endif
+            </p>
+        </div>
+        <div class="flex flex-wrap gap-2">
+            <a href="{{ route('admin.members.index', ['status' => 'active']) }}"
+               class="rounded-lg border px-3 py-1.5 text-xs font-semibold transition {{ ($status ?? 'active') === 'active' ? 'border-indigo-500/50 bg-indigo-500/10 text-indigo-300' : 'border-zinc-700 text-zinc-400 hover:border-zinc-600' }}">Actifs</a>
+            <a href="{{ route('admin.members.index', ['status' => 'archived']) }}"
+               class="rounded-lg border px-3 py-1.5 text-xs font-semibold transition {{ ($status ?? '') === 'archived' ? 'border-indigo-500/50 bg-indigo-500/10 text-indigo-300' : 'border-zinc-700 text-zinc-400 hover:border-zinc-600' }}">Archivés</a>
+            <a href="{{ route('admin.members.index', ['status' => 'all']) }}"
+               class="rounded-lg border px-3 py-1.5 text-xs font-semibold transition {{ ($status ?? '') === 'all' ? 'border-indigo-500/50 bg-indigo-500/10 text-indigo-300' : 'border-zinc-700 text-zinc-400 hover:border-zinc-600' }}">Tous</a>
         </div>
     </div>
 
@@ -36,16 +52,17 @@
                 </thead>
                 <tbody class="divide-y divide-zinc-800/60">
                     @forelse ($members as $member)
-                        <tr class="transition hover:bg-zinc-800/30">
+                        <tr class="transition hover:bg-zinc-800/30 {{ $member->trashed() ? 'opacity-80' : '' }}">
                             <td class="px-5 py-3.5">
                                 <div class="flex items-center gap-3">
-                                    <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 text-xs font-bold text-white font-display">
-                                        {{ strtoupper(substr(trim($member->name), 0, 1)) }}
-                                    </div>
+                                    @include('partials.user-avatar', ['user' => $member, 'size' => 'h-8 w-8', 'textSize' => 'text-xs'])
                                     <span class="font-medium text-zinc-100">{{ $member->name }}</span>
+                                    @if ($member->trashed())
+                                        <span class="rounded-md border border-zinc-600 bg-zinc-800/80 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-zinc-500">Archivé</span>
+                                    @endif
                                 </div>
                             </td>
-                            <td class="px-5 py-3.5 text-zinc-400">{{ $member->email }}</td>
+                            <td class="px-5 py-3.5 text-zinc-400">{{ $member->archived_email ?? $member->email }}</td>
                             <td class="px-5 py-3.5">
                                 <div class="flex flex-wrap gap-1">
                                     @forelse ($member->roles as $role)

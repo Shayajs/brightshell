@@ -7,7 +7,7 @@
     <h2 class="font-display text-xs font-bold uppercase tracking-wide text-zinc-400">Dossier sélectionné</h2>
 
     @if (! $activeFolder)
-        <p class="mt-4 text-sm text-zinc-500">Crée d’abord un dossier racine, puis clique sur un dossier dans la colonne de gauche pour afficher import, Markdown et réglages d’accès élève.</p>
+        <p class="mt-4 text-sm text-zinc-500">Créez d’abord un dossier racine, puis cliquez sur un dossier dans la colonne de gauche pour afficher import, Markdown et réglages d’accès élève.</p>
     @else
         <div class="mt-3 flex flex-wrap items-start justify-between gap-3 border-b border-zinc-800/80 pb-4">
             <div class="flex min-w-0 items-center gap-2">

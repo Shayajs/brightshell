@@ -5,19 +5,33 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Role;
 use App\Models\User;
+use App\Support\AdminEmailVerification;
+use Illuminate\Auth\Events\Verified;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class MembersController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
-        $members = User::with('roles')->orderByDesc('id')->paginate(25);
+        $status = $request->query('status', 'active');
+        $query = User::with('roles')->orderByDesc('id');
 
-        return view('admin.members.index', compact('members'));
+        if ($status === 'archived') {
+            $query->onlyTrashed();
+        } elseif ($status === 'all') {
+            $query->withTrashed();
+        } else {
+            $query->withoutTrashed();
+        }
+
+        $members = $query->paginate(25)->withQueryString();
+
+        return view('admin.members.index', compact('members', 'status'));
     }
 
     public function create(): View
@@ -31,7 +45,8 @@ class MembersController extends Controller
     {
         $request->validate([
             'members' => ['required', 'array', 'min:1'],
-            'members.*.name' => ['required', 'string', 'max:255'],
+            'members.*.first_name' => ['required', 'string', 'max:255'],
+            'members.*.last_name' => ['required', 'string', 'max:255'],
             'members.*.email' => ['required', 'email', 'max:255', 'distinct'],
             'members.*.password' => ['nullable', 'string', 'min:8'],
             'members.*.password_confirmation' => ['nullable', 'string'],
@@ -62,10 +77,12 @@ class MembersController extends Controller
             }
 
             $member = User::create([
-                'name' => $m['name'],
+                'first_name' => $m['first_name'],
+                'last_name' => $m['last_name'],
                 'email' => $m['email'],
                 'password' => Hash::make($raw),
                 'is_admin' => ! empty($m['is_admin']),
+                'email_verified_at' => now(),
             ]);
 
             if (! empty($m['roles'])) {
@@ -94,6 +111,22 @@ class MembersController extends Controller
             ->with('generated_passwords', $generatedPasswords ?: null);
     }
 
+    public function verifyEmail(User $member): RedirectResponse
+    {
+        if ($member->trashed()) {
+            return back()->with('error', 'Ce compte est archivé.');
+        }
+
+        if ($member->hasVerifiedEmail()) {
+            return back()->with('success', 'Cette adresse e-mail est déjà confirmée.');
+        }
+
+        $member->markEmailAsVerified();
+        event(new Verified($member));
+
+        return back()->with('success', 'Adresse e-mail confirmée manuellement.');
+    }
+
     public function show(User $member): View
     {
         $member->load('roles', 'companies');
@@ -104,6 +137,10 @@ class MembersController extends Controller
 
     public function updateRoles(Request $request, User $member): RedirectResponse
     {
+        if ($member->trashed()) {
+            return back()->with('error', 'Les rôles d’un compte archivé ne peuvent pas être modifiés.');
+        }
+
         $request->validate([
             'roles' => ['nullable', 'array'],
             'roles.*' => ['integer', 'exists:roles,id'],
@@ -116,6 +153,60 @@ class MembersController extends Controller
             $member->update(['is_admin' => (bool) $request->input('is_admin')]);
         }
 
+        $member->refresh();
+        AdminEmailVerification::ensureVerifiedIfAdmin($member);
+
         return back()->with('success', 'Rôles mis à jour.');
+    }
+
+    public function archive(User $member): RedirectResponse
+    {
+        if ($member->trashed()) {
+            return back()->with('error', 'Ce compte est déjà archivé.');
+        }
+
+        if ($member->id === auth()->id()) {
+            return redirect()
+                ->route('portals.settings.account.archive')
+                ->with('error', 'Pour archiver votre propre compte, utilisez Réglages → Compte.');
+        }
+
+        $member->delete();
+
+        return redirect()
+            ->route('admin.members.index', ['status' => 'archived'])
+            ->with('success', 'Compte archivé (connexion désactivée, données conservées).');
+    }
+
+    public function restore(User $member): RedirectResponse
+    {
+        if (! $member->trashed()) {
+            return back()->with('error', 'Ce compte n’est pas archivé.');
+        }
+
+        $member->restore();
+
+        return redirect()
+            ->route('admin.members.show', $member)
+            ->with('success', 'Compte restauré.');
+    }
+
+    public function forceDestroy(Request $request, User $member): RedirectResponse
+    {
+        $request->validate([
+            'confirmation' => ['required', 'string', Rule::in(['SUPPRIMER'])],
+        ], [
+            'confirmation.in' => 'Tape exactement SUPPRIMER pour confirmer l’effacement définitif.',
+        ]);
+
+        if ($member->id === auth()->id()) {
+            return back()->with('error', 'Vous ne pouvez pas effacer votre propre compte depuis cette page.');
+        }
+
+        $member->forceDelete();
+
+        return redirect()
+            ->route('admin.members.index')
+            ->with('success', 'Compte et données associées supprimés définitivement (RGPD).');
     }
 }

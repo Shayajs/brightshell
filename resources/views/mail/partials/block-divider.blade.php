@@ -1,1 +1,2 @@
-<hr style="border:none;border-top:1px solid #e5e7eb;margin:16px 0;">
+@php($th = $layout['theme'] ?? [])
+<hr style="border:none;border-top:1px solid {{ $th['dividerColor'] ?? '#2a3550' }};margin:16px 0;">

@@ -12,7 +12,7 @@
         <p class="text-[10px] font-semibold uppercase tracking-[0.2em] text-violet-400/90">Paramètres</p>
         <h1 class="font-display text-2xl font-bold text-white">Mon entreprise</h1>
         <p class="mt-2 max-w-2xl text-sm text-zinc-500">
-            Ces infos sont <strong class="text-zinc-400">internes</strong> sauf ce que tu exposes via l’API publique (voir cases à cocher). Les <strong class="text-zinc-400">sociétés</strong> listées ailleurs dans l’admin sont tes <em>clients</em>, pas ton statut juridique.
+            Ces infos sont <strong class="text-zinc-400">internes</strong> sauf ce que vous exposez via l’API publique (voir cases à cocher). Les <strong class="text-zinc-400">sociétés</strong> listées ailleurs dans l’admin sont vos <em>clients</em>, pas votre statut juridique.
         </p>
     </div>
 
@@ -53,7 +53,7 @@
 
             <div class="space-y-5 rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 ring-1 ring-white/5">
                 <h2 class="font-display text-sm font-bold uppercase tracking-wide text-white">TVA (évolution)</h2>
-                <p class="text-xs text-zinc-500">Aujourd’hui en auto-entreprise sans TVA : laisse décoché. Coche si tu deviens assujetti (ex. après passage en EI).</p>
+                <p class="text-xs text-zinc-500">Aujourd’hui en auto-entreprise sans TVA : laissez décoché. Cochez si vous devenez assujetti (ex. après passage en EI).</p>
                 <label class="flex cursor-pointer items-start gap-3 rounded-xl border border-zinc-800 bg-zinc-950/50 px-4 py-3 has-[:checked]:border-violet-500/40">
                     <input type="checkbox" name="vat_registered" value="1" class="mt-1 h-4 w-4 rounded border-zinc-600 bg-zinc-950 text-violet-500"
                            @checked(old('vat_registered', $profile->vat_registered))>
@@ -100,7 +100,7 @@
 
             <div class="space-y-5 rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 ring-1 ring-white/5">
                 <h2 class="font-display text-sm font-bold uppercase tracking-wide text-white">API publique — champs sensibles</h2>
-                <p class="text-xs text-zinc-500">Par défaut l’API ne renvoie <strong class="text-zinc-400">pas</strong> l’adresse complète ni le SIRET. Coche seulement si tu veux les exposer.</p>
+                <p class="text-xs text-zinc-500">Par défaut l’API ne renvoie <strong class="text-zinc-400">pas</strong> l’adresse complète ni le SIRET. Cochez seulement si vous voulez les exposer.</p>
                 <label class="flex cursor-pointer items-start gap-3 rounded-xl border border-zinc-800 bg-zinc-950/50 px-4 py-3 has-[:checked]:border-amber-500/40">
                     <input type="checkbox" name="publish_street_on_api" value="1" class="mt-1 h-4 w-4 rounded border-zinc-600 bg-zinc-950 text-amber-500"
                            @checked(old('publish_street_on_api', $profile->publish_street_on_api))>

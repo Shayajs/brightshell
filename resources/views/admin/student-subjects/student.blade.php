@@ -34,7 +34,7 @@
 
     @if ($subjects->isEmpty())
         <div class="rounded-2xl border border-dashed border-zinc-700 bg-zinc-900/40 p-10 text-center">
-            <p class="text-sm text-zinc-400">Aucune matière. Crée la première avec un titre au choix (ex. « PHP », « Anglais », « Projet X »).</p>
+            <p class="text-sm text-zinc-400">Aucune matière. Créez la première avec un titre au choix (ex. « PHP », « Anglais », « Projet X »).</p>
             <a href="{{ route('admin.student-subjects.create', $user) }}" class="mt-3 inline-block text-sm font-medium text-violet-400 hover:underline">Nouvelle matière</a>
         </div>
     @else

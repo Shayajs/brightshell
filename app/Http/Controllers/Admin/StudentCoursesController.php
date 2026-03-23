@@ -23,7 +23,8 @@ class StudentCoursesController extends Controller
         $students = User::query()
             ->whereHas('roles', fn ($q) => $q->where('slug', 'student'))
             ->withCount(['studentCourses', 'studentSubjects'])
-            ->orderBy('name')
+            ->orderBy('last_name')
+            ->orderBy('first_name')
             ->paginate(30);
 
         return view('admin.student-courses.index', compact('students'));
@@ -187,7 +188,7 @@ class StudentCoursesController extends Controller
 
         $names = $conflicts->pluck('title')->implode(', ');
         throw ValidationException::withMessages([
-            'schedule_time_start' => 'Ce créneau chevauche un autre cours de cet élève : '.$names.'. Modifie les horaires ou le jour.',
+            'schedule_time_start' => 'Ce créneau chevauche un autre cours de cet élève : '.$names.'. Modifiez les horaires ou le jour.',
         ]);
     }
 }

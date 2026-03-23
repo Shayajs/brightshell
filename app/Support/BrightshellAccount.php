@@ -4,6 +4,33 @@ namespace App\Support;
 
 final class BrightshellAccount
 {
+    /**
+     * URL de base du portail compte (schéma + hôte), sans chemin — pour liens signés (e-mail de vérification).
+     */
+    public static function portalBaseUrl(): string
+    {
+        $base = (string) config('brightshell.account.base_url', '');
+        if ($base !== '') {
+            return rtrim($base, '/');
+        }
+
+        $accountHost = (string) config('brightshell.domains.account_host', '');
+        if ($accountHost === '') {
+            $root = BrightshellDomain::effectiveRoot();
+            if ($root !== '') {
+                $accountHost = 'account.'.$root;
+            }
+        }
+
+        if ($accountHost !== '') {
+            $scheme = parse_url((string) config('app.url'), PHP_URL_SCHEME) ?: 'https';
+
+            return $scheme.'://'.$accountHost;
+        }
+
+        return rtrim((string) config('app.url'), '/');
+    }
+
     public static function loginUrl(): string
     {
         $base = (string) config('brightshell.account.base_url', '');

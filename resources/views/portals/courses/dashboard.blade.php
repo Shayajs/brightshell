@@ -8,8 +8,8 @@
         <header class="space-y-2">
             <p class="text-[10px] font-semibold uppercase tracking-[0.2em] text-indigo-400/90">Apprentissage</p>
             <h1 class="font-display text-2xl font-bold tracking-tight text-white sm:text-3xl">Parcours &amp; modules</h1>
-            <p class="max-w-2xl text-sm leading-relaxed text-zinc-400">
-                Salut <strong class="font-medium text-zinc-200">{{ $user->name }}</strong>. Cours personnels, matières avec dossiers et fichiers partagés par l’équipe.
+            <p class="max-w-none text-sm leading-relaxed text-zinc-400">
+                Salut <strong class="font-medium text-zinc-200">{{ $user->greetingFirstName() ?: $user->name }}</strong>. Cours personnels, matières avec dossiers et fichiers partagés par l’équipe.
             </p>
             <p class="pt-2">
                 <a href="{{ route('portals.courses.matieres.index') }}"

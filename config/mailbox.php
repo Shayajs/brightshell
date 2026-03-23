@@ -21,4 +21,19 @@ return [
         'validate_cert' => filter_var(env('MAILBOX_IMAP_VALIDATE_CERT', true), FILTER_VALIDATE_BOOL),
         'mailbox' => env('MAILBOX_IMAP_MAILBOX', 'INBOX'),
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Confirmation inverse (l’utilisateur envoie un mail vers la boîte IMAP)
+    |--------------------------------------------------------------------------
+    |
+    | Si true : accepter uniquement si le sujet contient le jeton affiché sur la page.
+    | Si false (ex. dev / test) : une fois le mail IMAP lu, si l’expéditeur correspond
+    | à un compte non vérifié, le compte est validé (moins strict).
+    |
+    */
+    'verify_reverse_require_token_in_subject' => filter_var(
+        env('MAILBOX_VERIFY_REVERSE_REQUIRE_TOKEN', true),
+        FILTER_VALIDATE_BOOLEAN
+    ),
 ];

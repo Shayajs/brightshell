@@ -20,8 +20,9 @@
             src: url('{{ asset("fonts/Gilroy-ExtraBold.otf") }}') format('opentype');
         }
     </style>
-    
-    <link rel="icon" href="{{ asset('img/etoile_sans_fond_contours_fin.png') }}" type="image/png">
+
+    @use('App\Support\BrightshellBrand')
+    <link rel="icon" href="{{ BrightshellBrand::faviconUrl() }}" type="{{ BrightshellBrand::faviconMimeType() }}">
     
     @vite(['resources/css/app.css'])
     @stack('styles')
@@ -30,9 +31,9 @@
     @stack('schema')
 </head>
 <body
-    class="{{ trim($bodyClass ?? '') }}"
+    class="brightshell-vitrine {{ trim($bodyClass ?? '') }}"
     data-brightshell-authed="{{ auth()->check() ? '1' : '0' }}"
-    data-brightshell-user-name="{{ auth()->check() ? e(auth()->user()->name) : '' }}"
+    data-brightshell-user-name="{{ auth()->check() ? e(auth()->user()->greetingFirstName() ?: auth()->user()->name) : '' }}"
     data-brightshell-login-url="{{ $brightshellLoginUrl }}"
     data-brightshell-space-url="{{ $brightshellSpaceUrl }}"
 >
@@ -70,7 +71,7 @@
             @auth
                 <li>
                     <a href="{{ $brightshellSpaceUrl }}">
-                        {{ \Illuminate\Support\Str::before(trim(auth()->user()->name), ' ') ?: auth()->user()->name }}
+                        {{ auth()->user()->greetingFirstName() ?: auth()->user()->name }}
                     </a>
                 </li>
                 <li>

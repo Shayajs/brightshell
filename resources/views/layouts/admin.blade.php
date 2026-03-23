@@ -1,4 +1,5 @@
 @php
+    use App\Support\BrightshellBrand;
     use App\Support\BrightshellDomain;
     use App\Support\PortalUrls;
     use Illuminate\Support\Str;
@@ -8,12 +9,12 @@
     $portalKey = 'admin';
     if (count($labels) >= 3) {
         $portalKey = match ($labels[0]) {
-            'admin', 'collabs', 'users', 'courses', 'settings' => $labels[0],
+            'admin', 'collabs', 'users', 'courses', 'settings', 'docs' => $labels[0],
             default => 'admin',
         };
     } elseif (count($labels) === 2 && str_ends_with($host, '.localhost')) {
         $portalKey = match ($labels[0]) {
-            'admin', 'collabs', 'users', 'courses', 'settings' => $labels[0],
+            'admin', 'collabs', 'users', 'courses', 'settings', 'docs' => $labels[0],
             default => 'admin',
         };
     }
@@ -27,6 +28,7 @@
         'users'    => ['label' => 'Espace client',   'href' => PortalUrls::forRoleSlug('client'),       'role' => 'client'],
         'courses'  => ['label' => 'Cours',           'href' => PortalUrls::forRoleSlug('student'),      'role' => 'student'],
         'settings' => ['label' => 'Réglages',        'href' => PortalUrls::settingsUrl(),               'role' => null],
+        'docs'     => ['label' => 'Documentation',   'href' => PortalUrls::docsUrl(),                  'role' => null],
     ];
 
     $isAdmin = $u && ($u->isAdmin() || $u->hasRole('admin'));
@@ -43,6 +45,7 @@
         'users'    => '<rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>',
         'courses'  => '<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>',
         'settings' => '<circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>',
+        'docs' => '<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 7h8M8 11h6"/>',
     ];
 
     $currentPortalLabel = $allPortals[$portalKey]['label'] ?? 'Portail';
@@ -54,7 +57,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Portail') — BrightShell</title>
-    <link rel="icon" href="{{ asset('img/etoile_sans_fond_contours_fin.png') }}" type="image/png">
+    <link rel="icon" href="{{ BrightshellBrand::faviconUrl() }}" type="{{ BrightshellBrand::faviconMimeType() }}">
     <link rel="preload" href="{{ asset('fonts/Gilroy-ExtraBold.otf') }}" as="font" type="font/otf" crossorigin>
     <style>
         @font-face {
@@ -84,7 +87,13 @@
 
         {{-- ===================== SIDEBAR ===================== --}}
         <aside
-            class="portal-sidebar fixed inset-y-0 left-0 z-40 grid h-dvh min-h-0 w-[min(18.5rem,88vw)] max-w-full shrink-0 -translate-x-full grid-rows-[auto_minmax(0,1fr)_auto] overflow-x-hidden overflow-y-hidden border-r border-zinc-800 bg-zinc-900/95 backdrop-blur-xl transition-transform duration-300 group-[.portal-sidebar-open]:translate-x-0 lg:sticky lg:top-0 lg:z-auto lg:h-dvh lg:w-64 lg:max-w-none lg:translate-x-0"
+            @class([
+                'portal-sidebar fixed inset-y-0 left-0 z-40 grid h-dvh min-h-0 w-[min(18.5rem,88vw)] max-w-full shrink-0 -translate-x-full grid-rows-[auto_minmax(0,1fr)_auto] overflow-x-hidden overflow-y-hidden border-r bg-zinc-900/95 backdrop-blur-xl transition-transform duration-300 group-[.portal-sidebar-open]:translate-x-0 lg:sticky lg:top-0 lg:z-auto lg:h-dvh lg:max-w-none lg:translate-x-0',
+                'border-zinc-800' => $portalKey !== 'docs',
+                'border-indigo-500/15 bg-gradient-to-b from-zinc-900/98 to-zinc-950/98 ring-1 ring-inset ring-indigo-500/10' => $portalKey === 'docs',
+                'lg:w-64' => $portalKey !== 'docs',
+                'lg:w-[min(22rem,calc(100vw-2rem))] xl:w-[23rem]' => $portalKey === 'docs',
+            ])
             aria-label="Navigation {{ $currentPortalLabel }}"
         >
             {{-- ┌───────────────────────────────────────────────────────── --}}
@@ -127,9 +136,10 @@
                             $dashboardRouteActive = match ($portalKey) {
                                 'admin' => request()->routeIs('admin.dashboard'),
                                 'settings' => request()->routeIs('portals.settings'),
+                                'docs' => request()->routeIs('portals.docs'),
                                 'courses' => request()->routeIs('portals.courses'),
                                 'collabs' => request()->routeIs('portals.collabs'),
-                                'users' => request()->routeIs('portals.users'),
+                                'users' => request()->routeIs('portals.users') && ! request()->routeIs('portals.users.companies.*'),
                                 default => request()->routeIs($portalKey.'.dashboard'),
                             };
                         @endphp
@@ -160,6 +170,31 @@
                                 'label'  => 'Sécurité',
                                 'icon'   => '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
                             ])
+                            @if ($u && $u->hasRole('developer'))
+                                @include('layouts.partials.nav-item', [
+                                    'href'   => route('portals.settings.api.index'),
+                                    'active' => request()->routeIs('portals.settings.api.*'),
+                                    'label'  => 'API',
+                                    'icon'   => '<path d="M9 3h6v6H9zM9 15h6v6H9zM4 9h16v6H4z"/>',
+                                ])
+                            @endif
+                            @include('layouts.partials.nav-item', [
+                                'href'   => route('portals.settings.account.archive'),
+                                'active' => request()->routeIs('portals.settings.account.*'),
+                                'label'  => 'Compte',
+                                'icon'   => '<path d="M21 8v13H3V8M1 3h22v5H1zM10 12h4"/>',
+                            ])
+                        @endif
+
+                        @if ($portalKey === 'docs')
+                            @include('layouts.partials.nav-section', ['label' => 'Documentation'])
+                            @include('layouts.partials.nav-item', [
+                                'href'   => route('portals.docs'),
+                                'active' => request()->routeIs('portals.docs'),
+                                'label'  => 'Sommaire',
+                                'icon'   => '<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>',
+                            ])
+                            @include('portals.docs.partials.sidebar-tree')
                         @endif
 
                         @if ($portalKey === 'admin')
@@ -169,6 +204,12 @@
                                 'active' => request()->routeIs('admin.members.*'),
                                 'label'  => 'Membres',
                                 'icon'   => '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>',
+                            ])
+                            @include('layouts.partials.nav-item', [
+                                'href'   => route('admin.support-tickets.index'),
+                                'active' => request()->routeIs('admin.support-tickets.*'),
+                                'label'  => 'Tickets & demandes',
+                                'icon'   => '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
                             ])
 
                             @include('layouts.partials.nav-section', ['label' => 'Formation'])
@@ -215,10 +256,22 @@
                                 'icon'   => '<path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>',
                             ])
                             @include('layouts.partials.nav-item', [
+                                'href'   => route('admin.doc-nodes.index'),
+                                'active' => request()->routeIs('admin.doc-nodes.*'),
+                                'label'  => 'Documentation',
+                                'icon'   => '<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 7h8M8 11h6"/>',
+                            ])
+                            @include('layouts.partials.nav-item', [
                                 'href'   => route('admin.mail-templates.index'),
                                 'active' => request()->routeIs('admin.mail-templates.*'),
                                 'label'  => 'Templates mail',
                                 'icon'   => '<path d="M4 6h16v12H4z"/><path d="M4 7l8 6 8-6"/>',
+                            ])
+                            @include('layouts.partials.nav-item', [
+                                'href'   => route('admin.site-appearance.edit'),
+                                'active' => request()->routeIs('admin.site-appearance.*'),
+                                'label'  => 'Identité & mails',
+                                'icon'   => '<circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>',
                             ])
                             @include('layouts.partials.nav-item', [
                                 'href'   => route('admin.realisations.index'),
@@ -244,6 +297,16 @@
                             ])
                         @endif
 
+                        @if ($portalKey === 'users')
+                            @include('layouts.partials.nav-section', ['label' => 'Entreprise'])
+                            @include('layouts.partials.nav-item', [
+                                'href'   => route('portals.users.companies.index'),
+                                'active' => request()->routeIs('portals.users.companies.*'),
+                                'label'  => 'Mes sociétés',
+                                'icon'   => '<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>',
+                            ])
+                        @endif
+
                         @hasSection('sidebar_nav')
                             <div class="mt-2 flex flex-col gap-0.5 border-t border-zinc-800/70 pt-2">
                                 @yield('sidebar_nav')
@@ -259,10 +322,7 @@
                 <div class="portal-sidebar-box-account shrink-0 border-t border-zinc-800/90 bg-zinc-900/95 px-3 pb-3 pt-3">
                     <div class="space-y-2 rounded-xl border border-zinc-800/90 bg-zinc-950/70 p-2 shadow-sm ring-1 ring-white/5">
                         <div class="flex items-center gap-3 rounded-lg border border-zinc-800/60 bg-zinc-900/40 px-2.5 py-2">
-                            <div
-                                class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 text-sm font-bold text-white font-display"
-                                aria-hidden="true"
-                            >{{ Str::upper(Str::substr(trim($u->name), 0, 1)) }}</div>
+                            @include('partials.user-avatar', ['user' => $u])
                             <div class="min-w-0 flex-1">
                                 <p class="truncate text-sm font-medium text-zinc-100">{{ $u->name }}</p>
                                 <p class="truncate text-xs text-zinc-500">{{ $u->email }}</p>
@@ -283,10 +343,10 @@
         </aside>
 
         {{-- ===================== CONTENU ===================== --}}
-        <div class="portal-wrap flex min-h-screen min-w-0 flex-1 flex-col">
+        <div class="portal-wrap flex min-h-screen min-w-0 flex-1 flex-col overflow-x-hidden">
 
             {{-- Topbar --}}
-            <header class="portal-topbar sticky top-0 z-20 flex shrink-0 items-center gap-3 border-b border-zinc-800 bg-zinc-950/80 px-4 py-3 backdrop-blur-md">
+            <header class="portal-topbar sticky top-0 z-20 flex min-w-0 shrink-0 flex-wrap items-center gap-x-3 gap-y-2 border-b border-zinc-800 bg-zinc-950/80 px-3 py-2.5 backdrop-blur-md sm:flex-nowrap sm:gap-y-0 sm:px-4 sm:py-3">
 
                 {{-- Burger mobile --}}
                 <button
@@ -368,7 +428,7 @@
                 </span>
             </header>
 
-            <main class="portal-main mx-auto w-full flex-1 px-4 py-6 sm:px-6 lg:px-8 lg:py-8 @yield('portal_main_max', 'max-w-7xl')">
+            <main class="portal-main mx-auto w-full min-w-0 flex-1 px-4 py-6 sm:px-6 lg:px-8 lg:py-8 @yield('portal_main_max', 'max-w-7xl')">
                 @yield('content')
             </main>
         </div>

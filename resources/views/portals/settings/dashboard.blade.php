@@ -8,37 +8,37 @@
         <header class="space-y-2">
             <p class="text-[10px] font-semibold uppercase tracking-[0.2em] text-indigo-400/90">Vue d’ensemble</p>
             <h1 class="font-display text-2xl font-bold tracking-tight text-white sm:text-3xl">Tableau de bord</h1>
-            <p class="max-w-2xl text-sm leading-relaxed text-zinc-400">
-                Résumé de ton compte, connexions et alertes récentes.
+            <p class="max-w-none text-sm leading-relaxed text-zinc-400">
+                Résumé de votre compte, connexions et alertes récentes.
             </p>
         </header>
 
         @include('layouts.partials.flash')
 
-        <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            <article class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-5 ring-1 ring-white/5">
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-4 xl:grid-cols-4 xl:gap-4">
+            <article class="flex min-h-0 min-w-0 flex-col rounded-2xl border border-zinc-800 bg-zinc-900/50 p-5 ring-1 ring-white/5">
                 <p class="text-[11px] font-semibold uppercase tracking-wide text-zinc-500">Compte</p>
                 <p class="mt-2 truncate font-display text-lg font-bold text-white">{{ $user->name }}</p>
                 <p class="mt-1 truncate text-xs text-zinc-500">{{ $user->email }}</p>
             </article>
 
-            <article class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-5 ring-1 ring-white/5">
+            <article class="flex min-h-0 min-w-0 flex-col rounded-2xl border border-zinc-800 bg-zinc-900/50 p-5 ring-1 ring-white/5">
                 <p class="text-[11px] font-semibold uppercase tracking-wide text-zinc-500">Dernière connexion</p>
                 @if ($user->previous_login_at)
-                    <p class="mt-2 font-display text-lg font-bold text-white">{{ $user->previous_login_at->timezone(config('app.timezone'))->translatedFormat('d MMM Y, H:i') }}</p>
+                    <p class="mt-2 font-display text-lg font-bold text-white">{{ $user->previous_login_at->timezone(config('app.timezone'))->translatedFormat('j M Y, H:i') }}</p>
                     <p class="mt-1 text-xs text-zinc-500">IP : {{ $user->previous_login_ip ?? '—' }}</p>
                 @else
-                    <p class="mt-2 text-sm text-zinc-500">Première session enregistrée — les prochaines connexions afficheront l’historique ici.</p>
+                    <p class="mt-2 min-w-0 break-words text-sm leading-snug text-zinc-500">Première session enregistrée — les prochaines connexions afficheront l’historique ici.</p>
                 @endif
             </article>
 
-            <article class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-5 ring-1 ring-white/5">
+            <article class="flex min-h-0 min-w-0 flex-col rounded-2xl border border-zinc-800 bg-zinc-900/50 p-5 ring-1 ring-white/5">
                 <p class="text-[11px] font-semibold uppercase tracking-wide text-zinc-500">Session actuelle</p>
                 <p class="mt-2 font-display text-lg font-bold text-emerald-400/90">Active</p>
                 <p class="mt-1 text-xs text-zinc-500">IP : {{ request()->ip() }}</p>
             </article>
 
-            <article class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-5 ring-1 ring-white/5">
+            <article class="flex min-h-0 min-w-0 flex-col rounded-2xl border border-zinc-800 bg-zinc-900/50 p-5 ring-1 ring-white/5">
                 <p class="text-[11px] font-semibold uppercase tracking-wide text-zinc-500">Notifications</p>
                 <p class="mt-2 font-display text-2xl font-bold text-white">{{ $unreadNotificationsCount }}</p>
                 <p class="mt-1 text-xs text-zinc-500">Non lues (base)</p>
@@ -77,7 +77,7 @@
                             @if ($body !== '')
                                 <p class="mt-0.5 text-xs text-zinc-500">{{ \Illuminate\Support\Str::limit($body, 180) }}</p>
                             @endif
-                            <p class="mt-1 text-[10px] text-zinc-600">{{ $n->created_at?->timezone(config('app.timezone'))->translatedFormat('d MMM Y, H:i') }}</p>
+                            <p class="mt-1 text-[10px] text-zinc-600">{{ $n->created_at?->timezone(config('app.timezone'))->translatedFormat('j M Y, H:i') }}</p>
                         </div>
                     </li>
                 @empty

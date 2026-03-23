@@ -13,17 +13,30 @@
 
     <div class="grid gap-3 sm:grid-cols-2">
         <div>
-            <label class="block text-[11px] font-semibold uppercase tracking-[0.14em] text-zinc-500">Nom complet *</label>
+            <label class="block text-[11px] font-semibold uppercase tracking-[0.14em] text-zinc-500">Prénom *</label>
             <input
                 type="text"
-                name="members[{{ $i }}][name]"
-                value="{{ old("members.{$i}.name") }}"
+                name="members[{{ $i }}][first_name]"
+                value="{{ old("members.{$i}.first_name") }}"
                 required
-                placeholder="Lucas Espinar"
+                placeholder="Lucas"
+                autocomplete="given-name"
                 class="mt-1.5 w-full rounded-lg border border-zinc-700 bg-zinc-950/80 px-3.5 py-2.5 text-sm text-zinc-100 placeholder:text-zinc-600 focus:border-indigo-500/50 focus:outline-none focus:ring-2 focus:ring-indigo-500/25"
             >
         </div>
         <div>
+            <label class="block text-[11px] font-semibold uppercase tracking-[0.14em] text-zinc-500">Nom *</label>
+            <input
+                type="text"
+                name="members[{{ $i }}][last_name]"
+                value="{{ old("members.{$i}.last_name") }}"
+                required
+                placeholder="Espinar"
+                autocomplete="family-name"
+                class="mt-1.5 w-full rounded-lg border border-zinc-700 bg-zinc-950/80 px-3.5 py-2.5 text-sm text-zinc-100 placeholder:text-zinc-600 focus:border-indigo-500/50 focus:outline-none focus:ring-2 focus:ring-indigo-500/25"
+            >
+        </div>
+        <div class="sm:col-span-2">
             <label class="block text-[11px] font-semibold uppercase tracking-[0.14em] text-zinc-500">E-mail *</label>
             <input
                 type="email"

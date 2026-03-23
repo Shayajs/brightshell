@@ -30,7 +30,7 @@
 
     <div class="space-y-2 px-4 py-3">
         @if ($f->files->isEmpty())
-            <p class="text-xs text-zinc-600">Aucun fichier (utilise le panneau de droite pour importer ou créer du MD).</p>
+            <p class="text-xs text-zinc-600">Aucun fichier (utilisez le panneau de droite pour importer ou créer du MD).</p>
         @else
             <ul class="space-y-1.5">
                 @foreach ($f->files as $file)

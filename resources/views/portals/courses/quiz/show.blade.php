@@ -15,7 +15,7 @@
             <div class="rounded-xl border border-emerald-500/40 bg-emerald-500/10 px-4 py-4 text-center ring-1 ring-emerald-500/20">
                 <p class="text-sm font-medium text-emerald-200">Résultat</p>
                 <p class="mt-2 font-display text-4xl font-bold text-emerald-400">{{ session('quiz_result') }}%</p>
-                <p class="mt-2 text-xs text-zinc-500">Tentative enregistrée. Tu peux refaire le quiz pour t’entraîner.</p>
+                <p class="mt-2 text-xs text-zinc-500">Tentative enregistrée. Vous pouvez refaire le quiz pour vous entraîner.</p>
             </div>
         @endif
 

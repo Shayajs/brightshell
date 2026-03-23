@@ -14,7 +14,7 @@
 <div class="space-y-8">
     <div>
         <h1 class="font-display text-2xl font-bold text-white">Mon CV</h1>
-        <p class="mt-1 text-sm text-zinc-500">Modifie chaque section — les changements sont répercutés immédiatement sur le CV public.</p>
+        <p class="mt-1 text-sm text-zinc-500">Modifiez chaque section — les changements sont répercutés immédiatement sur le CV public.</p>
     </div>
 
     @include('layouts.partials.flash')

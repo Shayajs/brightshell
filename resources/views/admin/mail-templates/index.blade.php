@@ -2,13 +2,14 @@
 
 @section('title', 'Templates mail')
 @section('topbar_label', 'Templates mail')
+@section('portal_main_max', 'max-w-none w-full')
 
 @section('content')
     <div class="space-y-8">
         <header class="space-y-2">
             <p class="text-[10px] font-semibold uppercase tracking-[0.2em] text-indigo-400/90">Mail</p>
             <h1 class="font-display text-2xl font-bold tracking-tight text-white sm:text-3xl">Templates mail</h1>
-            <p class="max-w-3xl text-sm text-zinc-400">Gestion JSON + PHP des messages envoyes par Brightshell.</p>
+            <p class="max-w-4xl text-sm text-zinc-400 xl:max-w-5xl">Gestion JSON + PHP des messages envoyes par Brightshell.</p>
         </header>
 
         @include('layouts.partials.flash')

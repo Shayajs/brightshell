@@ -40,7 +40,7 @@
         <div class="mx-auto max-w-2xl">
             <div class="rounded-2xl border border-zinc-800 bg-zinc-900/40 px-5 py-4">
                 <p class="mb-3 text-xs text-zinc-500">
-                    Si tu ne renseignes pas de mot de passe, un mot de passe aléatoire sera généré et affiché après création.
+                    Si vous ne renseignez pas de mot de passe, un mot de passe aléatoire sera généré et affiché après création.
                 </p>
                 <div class="flex justify-end gap-3">
                     <a href="{{ route('admin.members.index') }}"

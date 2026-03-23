@@ -302,12 +302,20 @@ final class AdminDashboardAnalytics
         return User::query()
             ->latest()
             ->limit(8)
-            ->get(['name', 'email', 'created_at'])
-            ->map(fn (User $u) => [
-                'name' => $u->name,
-                'email' => $u->email,
-                'created_at' => $u->created_at?->timezone(config('app.timezone'))->translatedFormat('d MMM Y, H:i'),
-            ])
+            ->get(['id', 'first_name', 'last_name', 'email', 'created_at'])
+            ->map(function (User $u) {
+                // Ne pas utiliser $u->name ici : avec un modèle partiellement chargé, certains setups
+                // peuvent tenter de relire la colonne SQL `name` (supprimée après la migration).
+                $f = trim((string) ($u->getAttributes()['first_name'] ?? ''));
+                $l = trim((string) ($u->getAttributes()['last_name'] ?? ''));
+                $label = trim($f.' '.$l);
+
+                return [
+                    'name' => $label !== '' ? $label : '—',
+                    'email' => (string) $u->email,
+                    'created_at' => $u->created_at?->timezone(config('app.timezone'))->translatedFormat('j M Y, H:i'),
+                ];
+            })
             ->all();
     }
 
@@ -329,7 +337,7 @@ final class AdminDashboardAnalytics
                 'label' => $inv->label,
                 'status' => $inv->statusLabel(),
                 'amount_ttc' => round($inv->amountTtc(), 2),
-                'paid_at' => $inv->paid_at?->translatedFormat('d MMM Y'),
+                'paid_at' => $inv->paid_at?->translatedFormat('j M Y'),
             ])
             ->all();
     }

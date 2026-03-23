@@ -4,7 +4,7 @@
 
 @section('content')
     @php
-        $registerFieldErrors = $errors->hasAny(['name', 'password_confirmation']);
+        $registerFieldErrors = $errors->hasAny(['first_name', 'last_name', 'password_confirmation', 'member_role']);
         $oldTab = old('_auth_tab');
         $isRegisterRoute = request()->routeIs('register');
         $activeTab = ($registerFieldErrors || $oldTab === 'register' || $isRegisterRoute) ? 'register' : 'login';
@@ -16,6 +16,8 @@
     >
         ← Retour au site
     </a>
+
+    @include('layouts.partials.flash')
 
     <h1 class="auth-title">Espace compte</h1>
     <p class="auth-subtitle">Connexion rapide sur mobile, onglets dédiés sur desktop.</p>
@@ -88,20 +90,37 @@
                     @csrf
                     <input type="hidden" name="_auth_tab" value="register">
 
-                    <div>
-                        <label for="register_name" class="auth-label">Nom</label>
-                        <input
-                            id="register_name"
-                            type="text"
-                            name="name"
-                            value="{{ old('name') }}"
-                            required
-                            autocomplete="name"
-                            class="auth-input"
-                        >
-                        @error('name')
-                            <p class="auth-error">{{ $message }}</p>
-                        @enderror
+                    <div class="grid gap-3 sm:grid-cols-2">
+                        <div>
+                            <label for="register_first_name" class="auth-label">Prénom</label>
+                            <input
+                                id="register_first_name"
+                                type="text"
+                                name="first_name"
+                                value="{{ old('first_name') }}"
+                                required
+                                autocomplete="given-name"
+                                class="auth-input"
+                            >
+                            @error('first_name')
+                                <p class="auth-error">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        <div>
+                            <label for="register_last_name" class="auth-label">Nom</label>
+                            <input
+                                id="register_last_name"
+                                type="text"
+                                name="last_name"
+                                value="{{ old('last_name') }}"
+                                required
+                                autocomplete="family-name"
+                                class="auth-input"
+                            >
+                            @error('last_name')
+                                <p class="auth-error">{{ $message }}</p>
+                            @enderror
+                        </div>
                     </div>
 
                     <div>
@@ -151,6 +170,8 @@
                             <p class="auth-error">{{ $message }}</p>
                         @enderror
                     </div>
+
+                    @include('auth.partials.member-role-fields')
 
                     <button type="submit" class="auth-submit">S’inscrire</button>
                 </form>

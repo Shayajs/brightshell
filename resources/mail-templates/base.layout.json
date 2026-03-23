@@ -1,18 +1,20 @@
 {
   "brand": {
-    "name": "Brightshell",
-    "tagline": "Services numeriques"
+    "name": "BrightShell",
+    "tagline": "Développement web full stack",
+    "logoUrl": ""
   },
   "theme": {
-    "primaryColor": "#4f46e5",
-    "backgroundColor": "#f4f6fb",
-    "cardColor": "#ffffff",
-    "textColor": "#111827",
-    "mutedTextColor": "#6b7280",
-    "buttonTextColor": "#ffffff"
+    "primaryColor": "#4a6fa5",
+    "backgroundColor": "#050810",
+    "cardColor": "#0a0e1a",
+    "textColor": "#e8f0f8",
+    "mutedTextColor": "#a8b8d8",
+    "buttonTextColor": "#ffffff",
+    "dividerColor": "#2a3550"
   },
   "footer": {
-    "signature": "L'equipe Brightshell",
-    "legal": "Ce message est envoye automatiquement."
+    "signature": "L'équipe BrightShell",
+    "legal": "Ce message est envoyé automatiquement."
   }
 }

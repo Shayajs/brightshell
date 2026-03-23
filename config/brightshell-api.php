@@ -2,7 +2,7 @@
 
 /**
  * Métadonnées des endpoints publics (clé = nom de route Laravel).
- * Les routes réelles sont dans routes/api-public.php ; complète ce fichier quand tu en ajoutes.
+ * Les routes réelles sont dans routes/api-public.php ; complétez ce fichier lorsque vous en ajoutez.
  */
 return [
     'endpoints' => [

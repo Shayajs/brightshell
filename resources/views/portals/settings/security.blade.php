@@ -4,7 +4,7 @@
 @section('topbar_label', 'Sécurité')
 
 @section('content')
-    <div class="mx-auto max-w-2xl space-y-10">
+    <div class="w-full min-w-0 space-y-10">
         <header class="space-y-2">
             <p class="text-[10px] font-semibold uppercase tracking-[0.2em] text-indigo-400/90">Protection du compte</p>
             <h1 class="font-display text-2xl font-bold tracking-tight text-white sm:text-3xl">Sécurité</h1>
@@ -80,7 +80,7 @@
                                     @endif
                                 </p>
                                 <p class="mt-0.5 text-xs text-zinc-500">{{ $s->ip_address ?? '—' }} · {{ \Illuminate\Support\Str::limit($s->user_agent ?? '', 64) }}</p>
-                                <p class="mt-1 text-[10px] text-zinc-600">Dernière activité : {{ $when->translatedFormat('d MMM Y, H:i') }}</p>
+                                <p class="mt-1 text-[10px] text-zinc-600">Dernière activité : {{ $when->translatedFormat('j M Y, H:i') }}</p>
                             </div>
                         </li>
                     @empty
@@ -93,5 +93,17 @@
                 Le pilote de session n’est pas <code class="rounded bg-zinc-800 px-1">database</code> : la liste des appareils n’est pas disponible sur cette instance.
             </p>
         @endif
+
+        <section class="rounded-2xl border border-red-900/40 bg-red-950/20 p-6 ring-1 ring-red-500/10">
+            <h2 class="font-display text-sm font-bold uppercase tracking-wide text-red-300">Compte &amp; archive</h2>
+            <p class="mt-1 text-xs text-zinc-500">
+                Vous pouvez demander la <strong class="text-zinc-400">mise en archive</strong> de votre compte (déconnexion, pas de suppression immédiate des données côté admin).
+                L’adresse e-mail est libérée pour une nouvelle inscription.
+            </p>
+            <a href="{{ route('portals.settings.account.archive') }}"
+               class="mt-4 inline-flex rounded-lg border border-red-500/40 bg-red-950/40 px-4 py-2 text-sm font-semibold text-red-300 transition hover:bg-red-600/20">
+                Archiver mon compte
+            </a>
+        </section>
     </div>
 @endsection

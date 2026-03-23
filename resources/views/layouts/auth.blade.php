@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Compte') — BrightShell</title>
-    <link rel="icon" href="{{ asset('img/etoile_sans_fond_contours_fin.png') }}" type="image/png">
+    @use('App\Support\BrightshellBrand')
+    <link rel="icon" href="{{ BrightshellBrand::faviconUrl() }}" type="{{ BrightshellBrand::faviconMimeType() }}">
     <link rel="preload" href="{{ asset('fonts/Gilroy-ExtraBold.otf') }}" as="font" type="font/otf" crossorigin>
     <script>
         window.__BRIGHTSHELL_FONT_URL = @json(asset('fonts/Gilroy-ExtraBold.otf'));
@@ -29,7 +30,7 @@
     </header>
 
     <div class="auth-shell__layout">
-        <div class="auth-shell__panel">
+        <div class="auth-shell__panel @yield('auth_panel_class')">
             @yield('content')
         </div>
     </div>

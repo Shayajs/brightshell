@@ -57,6 +57,19 @@ final class PortalUrls
         );
     }
 
+    public static function docsUrl(): string
+    {
+        $root = BrightshellDomain::effectiveRoot();
+        $scheme = BrightshellDomain::urlScheme();
+
+        return self::resolve(
+            (string) config('brightshell.portals.docs_url', ''),
+            'docs',
+            $root,
+            $scheme
+        );
+    }
+
     private static function resolve(string $explicitUrl, string $subdomain, string $rootDomain, string $scheme): string
     {
         if ($explicitUrl !== '') {

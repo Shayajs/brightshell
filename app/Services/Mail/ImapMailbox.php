@@ -3,6 +3,7 @@
 namespace App\Services\Mail;
 
 use App\Services\Mail\DTO\IncomingMailHeader;
+use IMAP\Connection;
 use RuntimeException;
 
 class ImapMailbox
@@ -39,7 +40,44 @@ class ImapMailbox
     }
 
     /**
-     * @return resource|\IMAP\Connection
+     * Résumés récents pour traitement (ex. confirmation inverse).
+     *
+     * @return list<array{msg_no: int, from: string, subject: string}>
+     */
+    public function fetchRecentSummaries(int $limit = 80): array
+    {
+        $stream = $this->openStream();
+
+        try {
+            $totalMessages = imap_num_msg($stream) ?: 0;
+            $start = max(1, $totalMessages - $limit + 1);
+            $out = [];
+
+            for ($msgNo = $totalMessages; $msgNo >= $start; $msgNo--) {
+                $overview = imap_fetch_overview($stream, (string) $msgNo, 0);
+                if (! is_array($overview) || $overview === []) {
+                    continue;
+                }
+
+                $row = $overview[0];
+                $from = isset($row->from) ? imap_utf8((string) $row->from) : '';
+                $subject = isset($row->subject) ? imap_utf8((string) $row->subject) : '';
+
+                $out[] = [
+                    'msg_no' => $msgNo,
+                    'from' => $from,
+                    'subject' => $subject,
+                ];
+            }
+
+            return $out;
+        } finally {
+            imap_close($stream);
+        }
+    }
+
+    /**
+     * @return resource|Connection
      */
     private function openStream()
     {
@@ -61,7 +99,7 @@ class ImapMailbox
 
         $novalidate = $validateCert ? '' : '/novalidate-cert';
         $inner = sprintf('%s:%d/imap/%s%s', $host, $port, $encryption, $novalidate);
-        $mailboxPath = '{' . $inner . '}' . $mailbox;
+        $mailboxPath = '{'.$inner.'}'.$mailbox;
 
         $stream = imap_open($mailboxPath, $username, $password);
 

@@ -1,3 +1,5 @@
+@use('App\Support\BrightshellBrand')
+
 @push('head')
     <!-- Primary Meta Tags -->
     <title>Services de Développement Web | BrightShell - Full Stack, DevOps, SEO</title>
@@ -13,7 +15,7 @@
     <meta property="og:url" content="{{ route('services') }}">
     <meta property="og:title" content="Services de Développement Web | BrightShell - Full Stack, DevOps, SEO">
     <meta property="og:description" content="Créateur de site web ou de solutions web, créateur de logiciels, venez visiter notre site internet si vous souhaitez découvrir nos solutions et nos prestations !">
-    <meta property="og:image" content="{{ asset('img/logo_sans_fond_contours_epais.webp') }}">
+    <meta property="og:image" content="{{ BrightshellBrand::siteLogoUrl() }}">
     <meta property="og:locale" content="fr_FR">
     <meta property="og:site_name" content="BrightShell">
     
@@ -22,7 +24,7 @@
     <meta property="twitter:url" content="{{ route('services') }}">
     <meta property="twitter:title" content="Services de Développement Web | BrightShell - Full Stack, DevOps, SEO">
     <meta property="twitter:description" content="Créateur de site web ou de solutions web, créateur de logiciels, venez visiter notre site internet si vous souhaitez découvrir nos solutions et nos prestations !">
-    <meta property="twitter:image" content="{{ asset('img/logo_sans_fond_contours_epais.webp') }}">
+    <meta property="twitter:image" content="{{ BrightshellBrand::siteLogoUrl() }}">
     <meta property="twitter:creator" content="@lucas_shaya">
     
     <!-- Canonical URL -->

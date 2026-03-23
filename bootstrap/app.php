@@ -1,9 +1,16 @@
 <?php
 
+use App\Http\Middleware\DeveloperApiCors;
+use App\Http\Middleware\EnsureDeveloperApiAccess;
 use App\Http\Middleware\EnsureUserHasAnyRole;
+use App\Http\Middleware\EnsureUserHasDeveloperRole;
+use App\Http\Middleware\ForceJsonForApiRequests;
 use App\Http\Middleware\PublicApiCors;
+use App\Support\AdminEmailVerification;
 use App\Support\BrightshellDomain;
 use App\Support\RoleResolver;
+use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -29,21 +36,41 @@ return Application::configure(basePath: dirname(__DIR__))
                     'throttle:120,1',
                 ])
                 ->group(base_path('routes/api-public.php'));
+
+            Route::domain($apiHost)
+                ->middleware([
+                    ForceJsonForApiRequests::class,
+                    DeveloperApiCors::class,
+                    'throttle:60,1',
+                    'auth:sanctum',
+                    EnsureDeveloperApiAccess::class,
+                ])
+                ->prefix('v1')
+                ->group(base_path('routes/api-private.php'));
         },
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->trustProxies(at: '*');
         $middleware->alias([
             'roles.any' => EnsureUserHasAnyRole::class,
+            'role.developer' => EnsureUserHasDeveloperRole::class,
         ]);
         $middleware->redirectGuestsTo(fn () => route('login'));
         $middleware->redirectUsersTo(function () {
             $user = auth()->user();
+            if ($user === null) {
+                return url('/');
+            }
+            AdminEmailVerification::ensureVerifiedIfAdmin($user);
+            if ($user instanceof MustVerifyEmail && ! $user->hasVerifiedEmail()) {
+                return route('verification.notice');
+            }
 
-            return $user !== null
-                ? RoleResolver::defaultPortalUrl($user)
-                : url('/');
+            return RoleResolver::defaultPortalUrl($user);
         });
+    })
+    ->withSchedule(function (Schedule $schedule): void {
+        $schedule->command('mailbox:process-reverse-verification')->everyFiveMinutes();
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

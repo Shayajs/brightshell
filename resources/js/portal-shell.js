@@ -22,9 +22,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     backdrop?.addEventListener('click', close);
 
+    const isMobileSidebar = () => window.matchMedia('(max-width: 1023px)').matches;
+
     shell.querySelectorAll('.portal-nav a').forEach((link) => {
         link.addEventListener('click', () => {
-            if (window.matchMedia('(max-width: 900px)').matches) {
+            if (isMobileSidebar()) {
                 close();
             }
         });

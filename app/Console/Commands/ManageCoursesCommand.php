@@ -36,13 +36,13 @@ class ManageCoursesCommand extends Command
         $email = $this->argument('email');
 
         if (! in_array($action, ['list', 'add', 'import-quiz'], true)) {
-            $this->error('Action inconnue. Utilise : list, add, import-quiz');
+            $this->error('Action inconnue. Utilisez : list, add, import-quiz');
 
             return self::FAILURE;
         }
 
         if ($email === null || $email === '') {
-            $this->error('Indique l’e-mail de l’élève.');
+            $this->error('Indiquez l’e-mail de l’élève.');
 
             return self::FAILURE;
         }

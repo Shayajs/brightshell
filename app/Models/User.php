@@ -2,30 +2,76 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
+use Illuminate\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Auth\MustVerifyEmail as MustVerifyEmailContract;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Laravel\Sanctum\HasApiTokens;
 
 #[Fillable([
     'name',
+    'first_name',
+    'last_name',
     'email',
     'password',
     'is_admin',
     'phone',
+    'avatar_path',
     'profile_notes',
     'browser_notifications_enabled',
 ])]
-#[Hidden(['password', 'remember_token'])]
-class User extends Authenticatable
+#[Hidden(['password', 'remember_token', 'email_reverse_verification_token'])]
+class User extends Authenticatable implements MustVerifyEmailContract
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, MustVerifyEmail, Notifiable, SoftDeletes;
+
+    protected static function booted(): void
+    {
+        static::deleting(function (User $user): void {
+            if ($user->isForceDeleting()) {
+                if ($user->avatar_path) {
+                    Storage::disk('public')->delete($user->avatar_path);
+                }
+                $user->notifications()->delete();
+
+                return;
+            }
+
+            if (! str_starts_with((string) $user->email, 'archived+')) {
+                $user->archived_email = $user->email;
+            }
+
+            $user->email = 'archived+'.$user->id.'.'.time().'@archived.invalid';
+
+            if ($user->avatar_path) {
+                Storage::disk('public')->delete($user->avatar_path);
+                $user->avatar_path = null;
+            }
+
+            $user->saveQuietly();
+
+            $user->notifications()->delete();
+
+            DB::table('sessions')->where('user_id', $user->id)->delete();
+        });
+
+        static::restoring(function (User $user): void {
+            if ($user->archived_email) {
+                $user->email = $user->archived_email;
+                $user->archived_email = null;
+            }
+        });
+    }
 
     /**
      * Get the attributes that should be cast.
@@ -60,7 +106,40 @@ class User extends Authenticatable
     /** @return BelongsToMany<Company, $this> */
     public function companies(): BelongsToMany
     {
-        return $this->belongsToMany(Company::class);
+        return $this->belongsToMany(Company::class)
+            ->withPivot('can_manage_company')
+            ->withTimestamps();
+    }
+
+    public function belongsToCompany(Company $company): bool
+    {
+        return $this->companies()->where('companies.id', $company->id)->exists();
+    }
+
+    /** Client désigné comme responsable de la fiche société (plusieurs sociétés possibles). */
+    public function canManageClientCompany(Company $company): bool
+    {
+        if (! $this->hasRole('client')) {
+            return false;
+        }
+
+        $row = $this->companies()->where('companies.id', $company->id)->first();
+
+        return $row !== null && (bool) ($row->pivot->can_manage_company ?? false);
+    }
+
+    public function avatarUrl(): ?string
+    {
+        $path = $this->avatar_path;
+
+        if ($path === null || $path === '') {
+            return null;
+        }
+
+        $path = str_replace('\\', '/', ltrim($path, '/'));
+
+        // URL relative : même origine que la requête (évite APP_URL ≠ domaine gateway / sous-domaine).
+        return '/storage/'.$path;
     }
 
     /** Cours pédagogiques propres à cet utilisateur (élève). */
@@ -80,6 +159,66 @@ class User extends Authenticatable
     public function hasRole(string $slug): bool
     {
         return $this->roles()->where('slug', $slug)->exists();
+    }
+
+    /**
+     * Nom complet affiché (concaténation prénom + nom).
+     * Conservé pour l’API, l’admin et le code existant.
+     */
+    public function getNameAttribute(): string
+    {
+        return trim(trim((string) ($this->attributes['first_name'] ?? '')).' '.trim((string) ($this->attributes['last_name'] ?? '')));
+    }
+
+    /**
+     * Assignation via une seule chaîne (ex. commandes artisan, tests).
+     */
+    public function setNameAttribute(?string $value): void
+    {
+        if ($value === null || trim($value) === '') {
+            $this->attributes['first_name'] = '';
+            $this->attributes['last_name'] = '';
+
+            return;
+        }
+
+        [$first, $last] = self::splitFullName(trim($value));
+        $this->attributes['first_name'] = $first;
+        $this->attributes['last_name'] = $last;
+    }
+
+    /**
+     * Premier prénom seul (pour salutations), même si plusieurs prénoms sont stockés dans first_name.
+     */
+    public function greetingFirstName(): string
+    {
+        $raw = trim((string) ($this->attributes['first_name'] ?? ''));
+        if ($raw === '') {
+            $raw = trim((string) ($this->attributes['last_name'] ?? ''));
+        }
+        if ($raw === '') {
+            return '';
+        }
+        $normalized = preg_replace('/\s+/u', ' ', $raw) ?? $raw;
+
+        return explode(' ', $normalized, 2)[0];
+    }
+
+    /**
+     * @return array{0: string, 1: string}
+     */
+    public static function splitFullName(string $full): array
+    {
+        $full = trim($full);
+        if ($full === '') {
+            return ['', ''];
+        }
+        $p = strpos($full, ' ');
+        if ($p === false) {
+            return [$full, ''];
+        }
+
+        return [substr($full, 0, $p), trim(substr($full, $p + 1))];
     }
 
     /**

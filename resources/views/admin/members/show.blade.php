@@ -2,32 +2,73 @@
 @section('title', $member->name)
 @section('topbar_label', 'Membre')
 
+@push('topbar_extra')
+    @if ($member->trashed())
+        <form method="POST" action="{{ route('admin.members.restore', $member) }}" class="inline">
+            @csrf
+            <button type="submit" class="flex items-center gap-2 rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-3 py-2 text-xs font-semibold text-emerald-300 transition hover:bg-emerald-500/20">
+                Restaurer le compte
+            </button>
+        </form>
+    @else
+        @if ($member->id !== auth()->id())
+            <form method="POST" action="{{ route('admin.members.archive', $member) }}" class="inline" onsubmit="return confirm('Archiver ce compte ? La personne ne pourra plus se connecter.')">
+                @csrf
+                <button type="submit" class="flex items-center gap-2 rounded-lg border border-zinc-600 bg-zinc-900 px-3 py-2 text-xs font-semibold text-zinc-300 transition hover:border-amber-500/40 hover:text-amber-200">
+                    Archiver
+                </button>
+            </form>
+        @else
+            <span class="text-[11px] text-zinc-500">Votre compte → Réglages / Compte pour vous archiver.</span>
+        @endif
+    @endif
+@endpush
+
 @section('content')
 <div class="space-y-6">
     <div class="flex flex-wrap items-center gap-3">
-        <a href="{{ route('admin.members.index') }}" class="text-sm text-zinc-500 hover:text-indigo-400">← Membres</a>
+        <a href="{{ route('admin.members.index', ['status' => $member->trashed() ? 'archived' : 'active']) }}" class="text-sm text-zinc-500 hover:text-indigo-400">← Membres</a>
         <span class="text-zinc-700">/</span>
         <span class="text-sm text-zinc-300">{{ $member->name }}</span>
     </div>
 
     @include('layouts.partials.flash')
 
+    @if ($member->trashed())
+        <div class="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-200 ring-1 ring-amber-500/20" role="status">
+            Ce compte est <strong>archivé</strong> (connexion impossible). E-mail d’origine conservé pour référence : <span class="font-mono text-xs">{{ $member->archived_email ?? '—' }}</span>
+        </div>
+    @endif
+
     <div class="grid gap-6 lg:grid-cols-3">
         {{-- Profil --}}
         <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 ring-1 ring-white/5">
             <div class="flex items-center gap-4">
-                <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 text-xl font-bold text-white font-display">
-                    {{ strtoupper(substr(trim($member->name), 0, 1)) }}
-                </div>
+                @include('partials.user-avatar', ['user' => $member, 'size' => 'h-14 w-14', 'textSize' => 'text-xl'])
                 <div>
                     <p class="font-display text-lg font-bold text-white">{{ $member->name }}</p>
-                    <p class="text-sm text-zinc-400">{{ $member->email }}</p>
+                    @if ($member->trashed() && $member->archived_email)
+                        <p class="text-sm text-zinc-300">{{ $member->archived_email }}</p>
+                        <p class="text-[11px] text-zinc-600">Identifiant technique : {{ $member->email }}</p>
+                    @else
+                        <p class="text-sm text-zinc-400">{{ $member->email }}</p>
+                    @endif
                 </div>
             </div>
             <dl class="mt-5 space-y-3 border-t border-zinc-800 pt-5 text-sm">
                 <div class="flex justify-between">
                     <dt class="text-zinc-500">Inscrit le</dt>
                     <dd class="text-zinc-200">{{ $member->created_at->format('d/m/Y') }}</dd>
+                </div>
+                <div class="flex justify-between">
+                    <dt class="text-zinc-500">E-mail confirmé</dt>
+                    <dd>
+                        @if ($member->hasVerifiedEmail())
+                            <span class="rounded-md border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-xs font-semibold text-emerald-300">Oui</span>
+                        @else
+                            <span class="rounded-md border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-xs font-semibold text-amber-300">Non</span>
+                        @endif
+                    </dd>
                 </div>
                 <div class="flex justify-between">
                     <dt class="text-zinc-500">Admin système</dt>
@@ -44,13 +85,26 @@
                     <dt class="text-zinc-500">Société(s)</dt>
                     <dd class="text-right text-zinc-300">
                         @foreach ($member->companies as $c)
-                            <a href="{{ route('admin.companies.show', $c) }}" class="block hover:text-indigo-400">{{ $c->name }}</a>
+                            <span class="block">
+                                <a href="{{ route('admin.companies.show', $c) }}" class="hover:text-indigo-400">{{ $c->name }}</a>
+                                @if ($member->hasRole('client') && $c->pivot->can_manage_company)
+                                    <span class="ml-1 inline-flex rounded border border-amber-500/30 bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-amber-300">Responsable fiche</span>
+                                @endif
+                            </span>
                         @endforeach
                     </dd>
                 </div>
                 @endif
             </dl>
-            @if ($member->hasRole('student'))
+            @if (! $member->trashed() && ! $member->hasVerifiedEmail())
+                <form method="POST" action="{{ route('admin.members.verify-email', $member) }}" class="mt-5 border-t border-zinc-800 pt-5" onsubmit="return confirm('Confirmer cette adresse e-mail manuellement ?');">
+                    @csrf
+                    <button type="submit" class="inline-flex w-full items-center justify-center rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-3 py-2.5 text-sm font-semibold text-emerald-300 transition hover:bg-emerald-500/20">
+                        Confirmer l’e-mail manuellement
+                    </button>
+                </form>
+            @endif
+            @if ($member->hasRole('student') && ! $member->trashed())
                 <div class="mt-5 space-y-2 border-t border-zinc-800 pt-5">
                     <a href="{{ route('admin.student-courses.student', $member) }}"
                        class="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-indigo-500/40 bg-indigo-500/10 px-3 py-2.5 text-sm font-semibold text-indigo-300 transition hover:bg-indigo-500/20">
@@ -71,6 +125,9 @@
             <h2 class="font-display text-sm font-bold uppercase tracking-wide text-white">Rôles &amp; accès</h2>
             <p class="mt-1 text-xs text-zinc-500">Les rôles définissent les portails accessibles par ce membre.</p>
 
+            @if ($member->trashed())
+                <p class="mt-5 text-sm text-zinc-500">Compte archivé — restaure le compte pour modifier les rôles.</p>
+            @else
             <form method="POST" action="{{ route('admin.members.roles', $member) }}" class="mt-5 space-y-4">
                 @csrf
                 <div class="grid gap-3 sm:grid-cols-2">
@@ -115,7 +172,33 @@
                     </button>
                 </div>
             </form>
+            @endif
         </div>
     </div>
+
+    @if ($member->id !== auth()->id())
+        <div class="rounded-2xl border border-red-900/40 bg-red-950/20 p-6 ring-1 ring-red-500/10">
+            <h2 class="font-display text-sm font-bold uppercase tracking-wide text-red-300">Suppression définitive (RGPD)</h2>
+            <p class="mt-1 text-xs text-zinc-500">
+                Efface la ligne utilisateur et les données associées (cours, matières, pivots, etc.). Irréversible.
+                @if ($member->trashed())
+                    Vous pouvez aussi laisser le compte archivé sans le détruire.
+                @endif
+            </p>
+            <form method="POST" action="{{ route('admin.members.force-destroy', $member) }}" class="mt-4 flex flex-wrap items-end gap-3" onsubmit="return confirm('Supprimer DÉFINITIVEMENT ce compte et toutes ses données ?')">
+                @csrf
+                @method('DELETE')
+                <div class="min-w-[12rem] flex-1">
+                    <label for="confirmation" class="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-zinc-500">Tape <span class="font-mono text-zinc-400">SUPPRIMER</span></label>
+                    <input type="text" id="confirmation" name="confirmation" autocomplete="off" placeholder="SUPPRIMER"
+                           class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 placeholder-zinc-600 focus:border-red-500/50 focus:outline-none focus:ring-2 focus:ring-red-500/20">
+                    @error('confirmation')<p class="mt-1 text-xs text-red-400">{{ $message }}</p>@enderror
+                </div>
+                <button type="submit" class="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-500">
+                    Supprimer définitivement
+                </button>
+            </form>
+        </div>
+    @endif
 </div>
 @endsection
