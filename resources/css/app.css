@@ -959,6 +959,7 @@ main {
     height: 100%;
     z-index: 1;
     pointer-events: none;
+    transform: translateZ(0);
 }
 
 .auth-shell__overlay {
@@ -1005,6 +1006,7 @@ main {
 }
 
 .auth-shell__panel {
+    isolation: isolate;
     width: 100%;
     max-width: 28rem;
     border: 0;
