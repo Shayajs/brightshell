@@ -17,7 +17,7 @@ class SupportTicketsController extends Controller
         $this->authorize('viewAny', SupportTicket::class);
 
         $status = $request->query('status', 'open');
-        $query = SupportTicket::query()->with('user')->orderByDesc('id');
+        $query = SupportTicket::query()->with(['user', 'company'])->orderByDesc('id');
 
         if (in_array($status, [SupportTicket::STATUS_OPEN, SupportTicket::STATUS_IN_PROGRESS, SupportTicket::STATUS_CLOSED], true)) {
             $query->where('status', $status);
@@ -32,7 +32,7 @@ class SupportTicketsController extends Controller
     {
         $this->authorize('view', $ticket);
 
-        $ticket->load('user');
+        $ticket->load(['user', 'company']);
 
         return view('admin.support-tickets.show', compact('ticket'));
     }

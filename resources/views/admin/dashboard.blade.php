@@ -8,17 +8,6 @@
     $k0 = $p30['kpis'];
 @endphp
 
-@push('topbar_extra')
-    <div
-        class="hidden h-9 shrink-0 items-center gap-2 rounded-lg border border-zinc-700 bg-zinc-900/80 px-3 py-0 text-sm leading-none text-zinc-500 sm:flex"
-        role="search"
-        aria-label="Recherche à venir"
-    >
-        <svg class="h-4 w-4 shrink-0 opacity-60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-        <span class="truncate">Rechercher…</span>
-    </div>
-@endpush
-
 @section('content')
     <div class="space-y-8">
         <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">

@@ -7,6 +7,11 @@ use App\Models\User;
 
 class SupportTicketPolicy
 {
+    public function create(User $user): bool
+    {
+        return true;
+    }
+
     public function viewAny(User $user): bool
     {
         return $user->isAdmin() || $user->hasRole('admin');

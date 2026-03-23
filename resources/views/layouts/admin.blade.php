@@ -113,7 +113,7 @@
                             $dashboardRouteActive = match ($portalKey) {
                                 'home' => request()->routeIs('portals.home'),
                                 'admin' => request()->routeIs('admin.dashboard'),
-                                'settings' => request()->routeIs('portals.settings'),
+                                'settings' => request()->routeIs('portals.settings') && ! request()->routeIs('portals.settings.support-ticket.*'),
                                 'docs' => request()->routeIs('portals.docs'),
                                 'courses' => request()->routeIs('portals.courses'),
                                 'collabs' => request()->routeIs('portals.collabs*'),
@@ -147,6 +147,12 @@
                                 'active' => request()->routeIs('portals.settings.security.*'),
                                 'label'  => 'Sécurité',
                                 'icon'   => '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
+                            ])
+                            @include('layouts.partials.nav-item', [
+                                'href'   => route('portals.settings.support-ticket.create'),
+                                'active' => request()->routeIs('portals.settings.support-ticket.*'),
+                                'label'  => 'Demande & support',
+                                'icon'   => '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
                             ])
                             @if ($u && $u->hasRole('developer'))
                                 @include('layouts.partials.nav-item', [
@@ -227,6 +233,12 @@
                             ])
 
                             @include('layouts.partials.nav-section', ['label' => 'Outils'])
+                            @include('layouts.partials.nav-item', [
+                                'href'   => route('admin.search'),
+                                'active' => request()->routeIs('admin.search'),
+                                'label'  => 'Recherche',
+                                'icon'   => '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>',
+                            ])
                             @include('layouts.partials.nav-item', [
                                 'href'   => route('admin.api-manager.index'),
                                 'active' => request()->routeIs('admin.api-manager.*'),
@@ -369,6 +381,30 @@
                 @endif
 
                 <div class="min-w-0 flex-1" aria-hidden="true"></div>
+
+                @if ($portalKey === 'admin')
+                    <form
+                        method="GET"
+                        action="{{ route('admin.search') }}"
+                        class="hidden min-w-0 max-w-[min(100vw-12rem,18rem)] shrink sm:flex md:max-w-xs"
+                        role="search"
+                        aria-label="Recherche administration"
+                    >
+                        <label for="admin-topbar-search-q" class="sr-only">Rechercher membres, sociétés, tickets</label>
+                        <div class="flex h-9 w-full min-w-0 items-center gap-2 rounded-lg border border-zinc-700 bg-zinc-900/80 px-2.5 py-0 text-sm leading-none text-zinc-200 ring-1 ring-transparent transition focus-within:border-indigo-500/50 focus-within:ring-indigo-500/25">
+                            <svg class="h-4 w-4 shrink-0 text-zinc-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                            <input
+                                id="admin-topbar-search-q"
+                                type="search"
+                                name="q"
+                                value="{{ request()->routeIs('admin.search') ? request('q') : '' }}"
+                                placeholder="Rechercher…"
+                                autocomplete="off"
+                                class="min-w-0 flex-1 border-0 bg-transparent p-0 text-sm text-zinc-200 placeholder:text-zinc-500 focus:outline-none focus:ring-0"
+                            >
+                        </div>
+                    </form>
+                @endif
 
                 {{-- Slot extra --}}
                 <div class="flex shrink-0 items-center gap-2">@stack('topbar_extra')</div>

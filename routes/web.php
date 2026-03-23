@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\InvoicesController;
 use App\Http\Controllers\Admin\MailTemplatesController;
 use App\Http\Controllers\Admin\MembersController;
 use App\Http\Controllers\Admin\RealisationsAdminController;
+use App\Http\Controllers\Admin\SearchController;
 use App\Http\Controllers\Admin\SiteAppearanceController;
 use App\Http\Controllers\Admin\StudentCourseQuizQuestionsController;
 use App\Http\Controllers\Admin\StudentCourseQuizzesController;
@@ -46,6 +47,7 @@ use App\Http\Controllers\Settings\DashboardController as SettingsDashboardContro
 use App\Http\Controllers\Settings\NotificationPreferencesController;
 use App\Http\Controllers\Settings\ProfileController as SettingsProfileController;
 use App\Http\Controllers\Settings\SecurityController as SettingsSecurityController;
+use App\Http\Controllers\Settings\SupportTicketController as SettingsSupportTicketController;
 use App\Http\Controllers\Users\CompaniesController as UsersCompaniesController;
 use App\Http\Controllers\Users\DashboardController as UsersDashboardController;
 use App\Http\Middleware\EnsureUserCanAccessAdminPortal;
@@ -122,6 +124,7 @@ if ($homeHost !== '') {
 */
 $registerAdminRoutes = function (): void {
     Route::get('/', DashboardController::class)->name('admin.dashboard');
+    Route::get('/recherche', SearchController::class)->middleware('throttle:60,1')->name('admin.search');
 
     // Membres
     Route::get('/members', [MembersController::class, 'index'])->name('admin.members.index');
@@ -378,6 +381,11 @@ if ($settingsHost !== '') {
             Route::get('/securite', [SettingsSecurityController::class, 'edit'])->name('portals.settings.security.edit');
             Route::put('/securite/mot-de-passe', [SettingsSecurityController::class, 'updatePassword'])->name('portals.settings.security.password');
             Route::delete('/securite/autres-sessions', [SettingsSecurityController::class, 'destroyOtherSessions'])->name('portals.settings.security.sessions.destroy-others');
+
+            Route::get('/demande', [SettingsSupportTicketController::class, 'create'])->name('portals.settings.support-ticket.create');
+            Route::post('/demande', [SettingsSupportTicketController::class, 'store'])
+                ->middleware('throttle:10,1')
+                ->name('portals.settings.support-ticket.store');
 
             Route::get('/compte/archiver', [AccountClosureController::class, 'edit'])->name('portals.settings.account.archive');
             Route::delete('/compte', [AccountClosureController::class, 'destroy'])->name('portals.settings.account.destroy');

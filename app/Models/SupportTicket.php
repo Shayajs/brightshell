@@ -9,6 +9,14 @@ class SupportTicket extends Model
 {
     public const CATEGORY_EMAIL_CONFIRMATION = 'email_confirmation';
 
+    public const CATEGORY_INFORMATION = 'information';
+
+    public const CATEGORY_RECLAMATION = 'reclamation';
+
+    public const CATEGORY_SUPPORT_ISSUE = 'support_issue';
+
+    public const CATEGORY_API = 'api';
+
     public const CATEGORY_OTHER = 'other';
 
     public const STATUS_OPEN = 'open';
@@ -19,6 +27,7 @@ class SupportTicket extends Model
 
     protected $fillable = [
         'user_id',
+        'company_id',
         'email',
         'category',
         'subject',
@@ -30,5 +39,38 @@ class SupportTicket extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /** @return BelongsTo<Company, $this> */
+    public function company(): BelongsTo
+    {
+        return $this->belongsTo(Company::class);
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public static function portalCategoryChoices(): array
+    {
+        return [
+            self::CATEGORY_INFORMATION => 'Information',
+            self::CATEGORY_RECLAMATION => 'Réclamation',
+            self::CATEGORY_SUPPORT_ISSUE => 'Demande liée à un problème',
+            self::CATEGORY_API => 'API',
+            self::CATEGORY_OTHER => 'Autre',
+        ];
+    }
+
+    public static function categoryLabel(string $category): string
+    {
+        return match ($category) {
+            self::CATEGORY_EMAIL_CONFIRMATION => 'Confirmation e-mail',
+            self::CATEGORY_INFORMATION => 'Information',
+            self::CATEGORY_RECLAMATION => 'Réclamation',
+            self::CATEGORY_SUPPORT_ISSUE => 'Demande liée à un problème',
+            self::CATEGORY_API => 'API',
+            self::CATEGORY_OTHER => 'Autre',
+            default => $category,
+        };
     }
 }

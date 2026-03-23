@@ -51,6 +51,12 @@ class Company extends Model
         return $this->hasMany(Invoice::class);
     }
 
+    /** @return HasMany<SupportTicket, $this> */
+    public function supportTickets(): HasMany
+    {
+        return $this->hasMany(SupportTicket::class);
+    }
+
     public function totalHt(): float
     {
         return (float) $this->invoices()->where('status', 'paid')->sum('amount_ht');

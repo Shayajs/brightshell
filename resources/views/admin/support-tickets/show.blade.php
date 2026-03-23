@@ -37,7 +37,17 @@
                     </div>
                     <div class="flex justify-between gap-4">
                         <dt class="text-zinc-500">Catégorie</dt>
-                        <dd class="text-zinc-300">{{ $ticket->category }}</dd>
+                        <dd class="text-right text-zinc-300">{{ \App\Models\SupportTicket::categoryLabel($ticket->category) }}</dd>
+                    </div>
+                    <div class="flex justify-between gap-4">
+                        <dt class="text-zinc-500">Portée</dt>
+                        <dd class="text-right text-zinc-300">
+                            @if ($ticket->company)
+                                {{ $ticket->company->name }}
+                            @else
+                                Compte personnel
+                            @endif
+                        </dd>
                     </div>
                     <div class="flex justify-between gap-4">
                         <dt class="text-zinc-500">Statut</dt>

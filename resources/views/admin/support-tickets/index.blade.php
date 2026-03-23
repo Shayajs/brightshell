@@ -21,12 +21,13 @@
 
     <div class="overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/50 ring-1 ring-white/5">
         <div class="overflow-x-auto">
-            <table class="w-full min-w-[42rem] text-left text-sm">
+            <table class="w-full min-w-[48rem] text-left text-sm">
                 <thead>
                     <tr class="border-b border-zinc-800 bg-zinc-950/50 text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
                         <th class="px-5 py-3">#</th>
                         <th class="px-5 py-3">Sujet</th>
                         <th class="px-5 py-3">Catégorie</th>
+                        <th class="px-5 py-3">Portée</th>
                         <th class="px-5 py-3">E-mail</th>
                         <th class="px-5 py-3">Statut</th>
                         <th class="px-5 py-3">Date</th>
@@ -38,7 +39,14 @@
                         <tr class="transition hover:bg-zinc-800/30">
                             <td class="px-5 py-3.5 font-mono text-xs text-zinc-500">{{ $ticket->id }}</td>
                             <td class="px-5 py-3.5 text-zinc-200">{{ \Illuminate\Support\Str::limit($ticket->subject, 48) }}</td>
-                            <td class="px-5 py-3.5 text-zinc-400">{{ $ticket->category }}</td>
+                            <td class="px-5 py-3.5 text-zinc-400">{{ \App\Models\SupportTicket::categoryLabel($ticket->category) }}</td>
+                            <td class="px-5 py-3.5 text-zinc-400">
+                                @if ($ticket->company)
+                                    <span class="text-zinc-300">{{ $ticket->company->name }}</span>
+                                @else
+                                    <span class="text-zinc-500">Personnel</span>
+                                @endif
+                            </td>
                             <td class="px-5 py-3.5 font-mono text-xs text-zinc-400">{{ $ticket->email }}</td>
                             <td class="px-5 py-3.5">
                                 <span class="rounded-md border border-zinc-700 bg-zinc-950 px-2 py-0.5 text-xs text-zinc-300">{{ $ticket->status }}</span>
@@ -50,7 +58,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="px-5 py-10 text-center text-zinc-500">Aucun ticket pour ce filtre.</td>
+                            <td colspan="8" class="px-5 py-10 text-center text-zinc-500">Aucun ticket pour ce filtre.</td>
                         </tr>
                     @endforelse
                 </tbody>
