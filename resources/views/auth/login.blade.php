@@ -3,68 +3,158 @@
 @section('title', 'Connexion')
 
 @section('content')
+    @php
+        $registerFieldErrors = $errors->hasAny(['name', 'password_confirmation']);
+        $oldTab = old('_auth_tab');
+        $isRegisterRoute = request()->routeIs('register');
+        $activeTab = ($registerFieldErrors || $oldTab === 'register' || $isRegisterRoute) ? 'register' : 'login';
+    @endphp
+
     <a
         href="{{ \App\Support\BrightshellDomain::publicSiteUrl() }}"
-        class="mb-6 inline-flex text-sm font-medium text-zinc-500 transition hover:text-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+        class="auth-back-link"
     >
         ← Retour au site
     </a>
 
-    <h1 class="font-display text-xl font-bold uppercase tracking-[0.12em] text-white sm:text-2xl">Connexion</h1>
-    <p class="mt-2 text-sm leading-relaxed text-zinc-400">Accède à ton espace BrightShell.</p>
+    <h1 class="auth-title">Espace compte</h1>
+    <p class="auth-subtitle">Connexion rapide sur mobile, onglets dédiés sur desktop.</p>
 
-    <form method="post" action="{{ route('login') }}" class="mt-8 space-y-5">
-        @csrf
-
-        <div>
-            <label for="email" class="block text-[11px] font-semibold uppercase tracking-[0.14em] text-zinc-500">E-mail</label>
-            <input
-                id="email"
-                type="email"
-                name="email"
-                value="{{ old('email') }}"
-                required
-                autofocus
-                autocomplete="username"
-                class="mt-2 w-full rounded-lg border border-zinc-700 bg-zinc-950/80 px-3.5 py-2.5 text-sm text-zinc-100 placeholder:text-zinc-600 focus:border-indigo-500/50 focus:outline-none focus:ring-2 focus:ring-indigo-500/25"
-            >
-            @error('email')
-                <p class="mt-1.5 text-sm text-red-400">{{ $message }}</p>
-            @enderror
+    <div class="auth-tabs" data-auth-tabs data-auth-active-tab="{{ $activeTab }}">
+        <div class="auth-tabs__header" role="tablist" aria-label="Connexion et inscription">
+            <button type="button" class="auth-tabs__trigger" data-auth-tab-trigger="login" role="tab" aria-selected="{{ $activeTab === 'login' ? 'true' : 'false' }}">
+                Connexion
+            </button>
+            @if (Route::has('register'))
+                <button type="button" class="auth-tabs__trigger" data-auth-tab-trigger="register" role="tab" aria-selected="{{ $activeTab === 'register' ? 'true' : 'false' }}">
+                    Inscription
+                </button>
+            @endif
         </div>
 
-        <div>
-            <label for="password" class="block text-[11px] font-semibold uppercase tracking-[0.14em] text-zinc-500">Mot de passe</label>
-            <input
-                id="password"
-                type="password"
-                name="password"
-                required
-                autocomplete="current-password"
-                class="mt-2 w-full rounded-lg border border-zinc-700 bg-zinc-950/80 px-3.5 py-2.5 text-sm text-zinc-100 focus:border-indigo-500/50 focus:outline-none focus:ring-2 focus:ring-indigo-500/25"
-            >
-            @error('password')
-                <p class="mt-1.5 text-sm text-red-400">{{ $message }}</p>
-            @enderror
-        </div>
+        <section class="auth-tabs__panel" data-auth-tab-panel="login" @if($activeTab !== 'login') hidden @endif>
+            <form method="post" action="{{ route('login') }}" class="auth-form">
+                @csrf
+                <input type="hidden" name="_auth_tab" value="login">
 
-        <label class="flex cursor-pointer items-center gap-2.5 text-sm text-zinc-400">
-            <input type="checkbox" name="remember" value="1" @checked(old('remember')) class="size-4 rounded border-zinc-600 bg-zinc-950 text-indigo-500 focus:ring-indigo-500/40">
-            Se souvenir de moi
-        </label>
+                <div>
+                    <label for="login_email" class="auth-label">E-mail</label>
+                    <input
+                        id="login_email"
+                        type="email"
+                        name="email"
+                        value="{{ $activeTab === 'login' ? old('email') : '' }}"
+                        required
+                        autofocus
+                        autocomplete="username"
+                        class="auth-input"
+                    >
+                    @if($activeTab === 'login')
+                        @error('email')
+                            <p class="auth-error">{{ $message }}</p>
+                        @enderror
+                    @endif
+                </div>
 
-        <button
-            type="submit"
-            class="w-full rounded-lg border border-indigo-500/40 bg-indigo-600/90 px-4 py-3 text-center text-sm font-semibold uppercase tracking-wider text-white shadow-lg shadow-indigo-950/40 transition hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-400"
-        >
-            Se connecter
-        </button>
-    </form>
+                <div>
+                    <label for="login_password" class="auth-label">Mot de passe</label>
+                    <input
+                        id="login_password"
+                        type="password"
+                        name="password"
+                        required
+                        autocomplete="current-password"
+                        class="auth-input"
+                    >
+                    @if($activeTab === 'login')
+                        @error('password')
+                            <p class="auth-error">{{ $message }}</p>
+                        @enderror
+                    @endif
+                </div>
 
-    @if (Route::has('register'))
-        <p class="mt-8 border-t border-zinc-800 pt-6 text-center text-sm text-zinc-500">
-            Pas encore de compte ?
-            <a href="{{ route('register') }}" class="font-medium text-indigo-400 underline-offset-2 hover:text-indigo-300 hover:underline">Créer un compte</a>
-        </p>
-    @endif
+                <label class="auth-check">
+                    <input type="checkbox" name="remember" value="1" @checked(old('remember')) class="auth-check__box">
+                    Se souvenir de moi
+                </label>
+
+                <button type="submit" class="auth-submit">Se connecter</button>
+            </form>
+        </section>
+
+        @if (Route::has('register'))
+            <section class="auth-tabs__panel" data-auth-tab-panel="register" @if($activeTab !== 'register') hidden @endif>
+                <form method="post" action="{{ route('register') }}" class="auth-form">
+                    @csrf
+                    <input type="hidden" name="_auth_tab" value="register">
+
+                    <div>
+                        <label for="register_name" class="auth-label">Nom</label>
+                        <input
+                            id="register_name"
+                            type="text"
+                            name="name"
+                            value="{{ old('name') }}"
+                            required
+                            autocomplete="name"
+                            class="auth-input"
+                        >
+                        @error('name')
+                            <p class="auth-error">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div>
+                        <label for="register_email" class="auth-label">E-mail</label>
+                        <input
+                            id="register_email"
+                            type="email"
+                            name="email"
+                            value="{{ old('email') }}"
+                            required
+                            autocomplete="username"
+                            class="auth-input"
+                        >
+                        @if($activeTab === 'register')
+                            @error('email')
+                                <p class="auth-error">{{ $message }}</p>
+                            @enderror
+                        @endif
+                    </div>
+
+                    <div>
+                        <label for="register_password" class="auth-label">Mot de passe</label>
+                        <input
+                            id="register_password"
+                            type="password"
+                            name="password"
+                            required
+                            autocomplete="new-password"
+                            class="auth-input"
+                        >
+                        @error('password')
+                            <p class="auth-error">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div>
+                        <label for="register_password_confirmation" class="auth-label">Confirmation</label>
+                        <input
+                            id="register_password_confirmation"
+                            type="password"
+                            name="password_confirmation"
+                            required
+                            autocomplete="new-password"
+                            class="auth-input"
+                        >
+                        @error('password_confirmation')
+                            <p class="auth-error">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <button type="submit" class="auth-submit">S’inscrire</button>
+                </form>
+            </section>
+        @endif
+    </div>
 @endsection

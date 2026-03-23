@@ -11,7 +11,7 @@ return [
     | Mets BRIGHTSHELL_REGISTRATION_OPEN=true en dev si besoin.
     |
     */
-    'registration_open' => filter_var(env('BRIGHTSHELL_REGISTRATION_OPEN', false), FILTER_VALIDATE_BOOLEAN),
+    'registration_open' => filter_var(env('BRIGHTSHELL_REGISTRATION_OPEN', true), FILTER_VALIDATE_BOOLEAN),
 
     /*
     |--------------------------------------------------------------------------

@@ -18,12 +18,18 @@
             src: url('{{ asset("fonts/Gilroy-ExtraBold.otf") }}') format('opentype');
         }
     </style>
-    @vite(['resources/css/app.css'])
+    @vite(['resources/css/app.css', 'resources/js/auth-perlin.js'])
 </head>
-<body class="auth-body min-h-full bg-zinc-950 text-zinc-100 antialiased">
-    <div class="pointer-events-none fixed inset-0 z-0 bg-[radial-gradient(ellipse_90%_60%_at_50%_-10%,rgba(99,102,241,0.14),transparent)]" aria-hidden="true"></div>
-    <div class="relative z-10 flex min-h-full items-center justify-center px-5 py-10 sm:px-6">
-        <div class="w-full max-w-[26rem] rounded-2xl border border-zinc-800/90 bg-zinc-900/70 p-8 shadow-[0_24px_80px_rgba(0,0,0,0.45)] ring-1 ring-white/5 backdrop-blur-xl sm:p-9">
+<body class="auth-body auth-shell min-h-full text-zinc-100 antialiased">
+    <canvas id="auth-perlin-canvas" class="auth-perlin-canvas" aria-hidden="true"></canvas>
+    <div class="auth-shell__overlay" aria-hidden="true"></div>
+
+    <header class="auth-shell__header">
+        <a href="{{ route('home') }}" class="auth-shell__brand">BRIGHTSHELL</a>
+    </header>
+
+    <div class="auth-shell__layout">
+        <div class="auth-shell__panel">
             @yield('content')
         </div>
     </div>
