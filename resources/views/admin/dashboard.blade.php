@@ -99,23 +99,57 @@
             </article>
         </section>
 
-        <div class="grid gap-4 lg:grid-cols-2">
-            @foreach (['visitors' => 'from-indigo-600 to-indigo-400', 'signups' => 'from-emerald-600 to-emerald-400', 'revenue' => 'from-amber-600 to-amber-400', 'quiz' => 'from-violet-600 to-violet-400'] as $chartKey => $gradient)
-                <section class="rounded-2xl border border-zinc-800 bg-zinc-900/60 ring-1 ring-white/5">
-                    <div class="flex flex-wrap items-start justify-between gap-2 border-b border-zinc-800 px-5 py-4">
-                        <div>
-                            <h2 class="font-display text-sm font-bold uppercase tracking-wide text-white" data-chart-title="{{ $chartKey }}">{{ $p30['charts'][$chartKey]['title'] }}</h2>
-                            <p class="mt-1 max-w-md text-[11px] leading-snug text-zinc-500" data-chart-hint="{{ $chartKey }}">{{ $p30['charts'][$chartKey]['hint'] }}</p>
+        <section class="space-y-4" aria-labelledby="admin-dashboard-charts-heading">
+            <div class="flex flex-col gap-1 border-b border-zinc-800/80 pb-4 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                    <h2 id="admin-dashboard-charts-heading" class="font-display text-lg font-bold tracking-tight text-white">
+                        Tendances du site
+                    </h2>
+                    <p class="mt-1 max-w-2xl text-sm text-zinc-500">
+                        Même période que les boutons ci-dessus — les barres sont normalisées sur le pic de la plage affichée.
+                    </p>
+                </div>
+            </div>
+
+            <div class="grid gap-4 sm:gap-5 lg:grid-cols-2">
+                @foreach (['visitors' => 'from-indigo-600 to-indigo-400', 'signups' => 'from-emerald-600 to-emerald-400', 'revenue' => 'from-amber-600 to-amber-400', 'quiz' => 'from-violet-600 to-violet-400'] as $chartKey => $gradient)
+                    <article
+                        class="flex flex-col rounded-2xl border border-zinc-800 bg-zinc-900/60 p-5 shadow-sm ring-1 ring-white/5 transition hover:border-zinc-700 hover:ring-indigo-500/10"
+                    >
+                        <div class="flex flex-wrap items-start justify-between gap-3">
+                            <div class="flex min-w-0 gap-3">
+                                <span
+                                    class="mt-0.5 h-10 w-1 shrink-0 rounded-full bg-gradient-to-b {{ $gradient }} opacity-90 ring-1 ring-white/10"
+                                    aria-hidden="true"
+                                ></span>
+                                <div class="min-w-0">
+                                    <h3 class="font-display text-sm font-bold uppercase tracking-wide text-white" data-chart-title="{{ $chartKey }}">{{ $p30['charts'][$chartKey]['title'] }}</h3>
+                                    <p class="mt-1 max-w-md text-[11px] leading-snug text-zinc-500" data-chart-hint="{{ $chartKey }}">{{ $p30['charts'][$chartKey]['hint'] }}</p>
+                                </div>
+                            </div>
+                            <span
+                                class="shrink-0 rounded-lg border border-zinc-700/90 bg-zinc-950/80 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-zinc-400"
+                                data-range-label
+                            >{{ $p30['range_label'] }}</span>
                         </div>
-                        <span class="shrink-0 rounded-md border border-zinc-700 bg-zinc-950 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-zinc-500" data-range-label>{{ $p30['range_label'] }}</span>
-                    </div>
-                    <div class="p-5">
-                        <div class="flex min-h-[9rem] items-end justify-between gap-0.5 sm:gap-1" role="img" aria-label="{{ $p30['charts'][$chartKey]['title'] }}" data-chart-bars="{{ $chartKey }}"></div>
-                        <p class="mt-3 text-center text-[10px] text-zinc-600">Valeur max sur la période affichée · survol des barres pour le détail</p>
-                    </div>
-                </section>
-            @endforeach
-        </div>
+
+                        <div
+                            class="mt-4 flex min-h-0 flex-1 flex-col rounded-xl border border-zinc-800/80 bg-zinc-950/45 p-4 ring-1 ring-inset ring-white/[0.04] sm:p-5"
+                        >
+                            <div
+                                class="relative flex min-h-[10.5rem] flex-1 flex-row flex-nowrap items-stretch justify-between gap-0.5 overflow-x-auto rounded-lg bg-[linear-gradient(to_top,rgba(39,39,42,0.45)_1px,transparent_1px)] bg-[length:100%_2.25rem] bg-bottom pb-1 sm:gap-1 [scrollbar-width:thin]"
+                                role="img"
+                                aria-label="{{ $p30['charts'][$chartKey]['title'] }}"
+                                data-chart-bars="{{ $chartKey }}"
+                            ></div>
+                            <p class="mt-3 border-t border-zinc-800/70 pt-3 text-center text-[10px] leading-relaxed text-zinc-500">
+                                Échelle relative au maximum sur la période · survol d’une barre pour le détail
+                            </p>
+                        </div>
+                    </article>
+                @endforeach
+            </div>
+        </section>
 
         <div class="grid gap-4 lg:grid-cols-5 lg:gap-6">
             <section class="rounded-2xl border border-zinc-800 bg-zinc-900/60 ring-1 ring-white/5 lg:col-span-2">
@@ -206,10 +240,12 @@
             let title = l + ' : ' + v;
             if (mode === 'revenue') title = l + ' : ' + formatEuro(v);
             return (
-                '<div class="flex h-full min-h-0 flex-1 flex-col items-stretch justify-end gap-1">' +
+                '<div class="flex h-full min-h-0 min-w-0 flex-1 flex-col gap-1">' +
+                '<div class="flex min-h-0 flex-1 flex-col justify-end">' +
                 '<div class="w-full rounded-t-md bg-gradient-to-t ' + gradients[key] + ' opacity-90 transition-all duration-300 hover:opacity-100" ' +
                 'style="min-height:4px;height:' + pct + '%;" title="' + title.replace(/"/g, '&quot;') + '"></div>' +
-                '<span class="text-center text-[9px] font-medium uppercase leading-tight text-zinc-600 sm:text-[10px]">' + l + '</span>' +
+                '</div>' +
+                '<span class="block shrink-0 whitespace-nowrap text-center text-[9px] font-medium uppercase leading-tight text-zinc-600 sm:text-[10px]">' + l + '</span>' +
                 '</div>'
             );
         }).join('');

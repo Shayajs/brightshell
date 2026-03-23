@@ -1,0 +1,32 @@
+{
+  "key": "custom.personal",
+  "name": "Message personnel",
+  "category": "custom",
+  "subject_template": "{{custom_subject}}",
+  "variables": [
+    "user_name",
+    "custom_subject",
+    "custom_message",
+    "action_label",
+    "action_url"
+  ],
+  "content": [
+    {
+      "type": "title",
+      "text": "Message personnel"
+    },
+    {
+      "type": "text",
+      "text": "Bonjour {{user_name}},"
+    },
+    {
+      "type": "text",
+      "text": "{{custom_message}}"
+    },
+    {
+      "type": "button",
+      "label": "{{action_label}}",
+      "url": "{{action_url}}"
+    }
+  ]
+}

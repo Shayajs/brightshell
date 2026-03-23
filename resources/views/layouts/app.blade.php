@@ -30,6 +30,7 @@
     @stack('schema')
 </head>
 <body
+    class="{{ trim($bodyClass ?? '') }}"
     data-brightshell-authed="{{ auth()->check() ? '1' : '0' }}"
     data-brightshell-user-name="{{ auth()->check() ? e(auth()->user()->name) : '' }}"
     data-brightshell-login-url="{{ $brightshellLoginUrl }}"

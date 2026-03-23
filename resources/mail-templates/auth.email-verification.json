@@ -1,0 +1,30 @@
+{
+  "key": "auth.email-verification",
+  "name": "Confirmation email",
+  "category": "auth",
+  "subject_template": "Confirmez votre adresse email",
+  "variables": [
+    "user_name",
+    "action_url",
+    "expires_at"
+  ],
+  "content": [
+    {
+      "type": "title",
+      "text": "Confirmation de votre email"
+    },
+    {
+      "type": "text",
+      "text": "Bonjour {{user_name}}, merci de confirmer votre adresse email."
+    },
+    {
+      "type": "button",
+      "label": "Confirmer mon email",
+      "url": "{{action_url}}"
+    },
+    {
+      "type": "text",
+      "text": "Lien valide jusqu au {{expires_at}}."
+    }
+  ]
+}

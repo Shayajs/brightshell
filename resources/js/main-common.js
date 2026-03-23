@@ -1,89 +1,81 @@
 // Smooth animations and interactions
 import { createClippedText } from './clipped-text-common.js';
 
-// Curseur personnalisé : rond avec un point au centre
-const customCursor = document.createElement('div');
-customCursor.className = 'custom-cursor';
-document.body.appendChild(customCursor);
-
-// Variables pour détecter les mouvements rapides
-let lastMouseX = 0;
-let lastMouseY = 0;
-let lastMouseTime = Date.now();
-let fastMoveStartTime = null;
-let fastMoveTimer = null;
-const FAST_MOVE_THRESHOLD = 100; // pixels par seconde minimum pour être considéré comme rapide
-const FAST_MOVE_DURATION = 1500; // 1.5 secondes en millisecondes
-
-document.addEventListener('mousemove', (e) => {
-    const currentTime = Date.now();
-    const timeDelta = currentTime - lastMouseTime;
-    
-    // Calculer la distance parcourue
-    const distance = Math.sqrt(
-        Math.pow(e.clientX - lastMouseX, 2) + 
-        Math.pow(e.clientY - lastMouseY, 2)
-    );
-    
-    // Calculer la vitesse (pixels par seconde)
-    const speed = timeDelta > 0 ? (distance / timeDelta) * 1000 : 0;
-    
-    // Mettre à jour la position du curseur
-    customCursor.style.left = e.clientX + 'px';
-    customCursor.style.top = e.clientY + 'px';
-    
-    // Détecter les mouvements rapides
-    if (speed > FAST_MOVE_THRESHOLD) {
-        // Si c'est le début d'un mouvement rapide, enregistrer le temps
-        if (fastMoveStartTime === null) {
-            fastMoveStartTime = currentTime;
-        }
-        
-        // Vérifier si on dépasse 3 secondes de mouvement rapide
-        if (currentTime - fastMoveStartTime >= FAST_MOVE_DURATION) {
-            customCursor.classList.add('fast-moving');
-        }
-        
-        // Réinitialiser le timer de réduction
-        if (fastMoveTimer) {
-            clearTimeout(fastMoveTimer);
-        }
-    } else {
-        // Mouvement lent ou arrêt - réinitialiser
-        fastMoveStartTime = null;
-        
-        // Réduire le curseur après un court délai
-        if (fastMoveTimer) {
-            clearTimeout(fastMoveTimer);
-        }
-        fastMoveTimer = setTimeout(() => {
-            customCursor.classList.remove('fast-moving');
-        }, 200); // Petit délai pour éviter les clignotements
+/** Curseur rond + menu contextuel : réservé à la page d’accueil (.home-vitrine) */
+function initHomeVitrineCursor() {
+    if (!document.body.classList.contains('home-vitrine')) {
+        return;
     }
-    
-    // Mettre à jour les valeurs pour le prochain calcul
-    lastMouseX = e.clientX;
-    lastMouseY = e.clientY;
-    lastMouseTime = currentTime;
-});
 
-// Animation au clic
-document.addEventListener('mousedown', (e) => {
-    if (e.button === 0) { // Clic gauche
-        customCursor.classList.add('clicking');
-    } else if (e.button === 2) { // Clic droit
-        customCursor.classList.add('right-clicking');
-    }
-});
+    const customCursor = document.createElement('div');
+    customCursor.className = 'custom-cursor';
+    document.body.appendChild(customCursor);
 
-document.addEventListener('mouseup', () => {
-    customCursor.classList.remove('clicking', 'right-clicking');
-});
+    let lastMouseX = 0;
+    let lastMouseY = 0;
+    let lastMouseTime = Date.now();
+    let fastMoveStartTime = null;
+    let fastMoveTimer = null;
+    const FAST_MOVE_THRESHOLD = 100;
+    const FAST_MOVE_DURATION = 1500;
 
-// Menu contextuel personnalisé
-const contextMenu = document.createElement('div');
-contextMenu.className = 'context-menu';
-contextMenu.innerHTML = `
+    document.addEventListener('mousemove', (e) => {
+        const currentTime = Date.now();
+        const timeDelta = currentTime - lastMouseTime;
+
+        const distance = Math.sqrt(
+            Math.pow(e.clientX - lastMouseX, 2) +
+            Math.pow(e.clientY - lastMouseY, 2)
+        );
+
+        const speed = timeDelta > 0 ? (distance / timeDelta) * 1000 : 0;
+
+        customCursor.style.left = e.clientX + 'px';
+        customCursor.style.top = e.clientY + 'px';
+
+        if (speed > FAST_MOVE_THRESHOLD) {
+            if (fastMoveStartTime === null) {
+                fastMoveStartTime = currentTime;
+            }
+
+            if (currentTime - fastMoveStartTime >= FAST_MOVE_DURATION) {
+                customCursor.classList.add('fast-moving');
+            }
+
+            if (fastMoveTimer) {
+                clearTimeout(fastMoveTimer);
+            }
+        } else {
+            fastMoveStartTime = null;
+
+            if (fastMoveTimer) {
+                clearTimeout(fastMoveTimer);
+            }
+            fastMoveTimer = setTimeout(() => {
+                customCursor.classList.remove('fast-moving');
+            }, 200);
+        }
+
+        lastMouseX = e.clientX;
+        lastMouseY = e.clientY;
+        lastMouseTime = currentTime;
+    });
+
+    document.addEventListener('mousedown', (e) => {
+        if (e.button === 0) {
+            customCursor.classList.add('clicking');
+        } else if (e.button === 2) {
+            customCursor.classList.add('right-clicking');
+        }
+    });
+
+    document.addEventListener('mouseup', () => {
+        customCursor.classList.remove('clicking', 'right-clicking');
+    });
+
+    const contextMenu = document.createElement('div');
+    contextMenu.className = 'context-menu';
+    contextMenu.innerHTML = `
     <div class="context-menu-item" data-action="home">
         <span>Accueil</span>
     </div>
@@ -103,134 +95,130 @@ contextMenu.innerHTML = `
         <span>Bonus</span>
     </div>
 `;
-document.body.appendChild(contextMenu);
+    document.body.appendChild(contextMenu);
 
-// Gérer l'affichage du menu contextuel
-document.addEventListener('contextmenu', (e) => {
-    e.preventDefault();
+    document.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
 
-    const labelEl = contextMenu.querySelector('.context-menu-account-label');
-    if (labelEl && document.body) {
-        const authed = document.body.dataset.brightshellAuthed === '1';
-        const userName = document.body.dataset.brightshellUserName || '';
-        labelEl.textContent = authed && userName
-            ? userName
-            : 'Connexion · Inscription';
-    }
-    
-    const x = e.clientX;
-    const y = e.clientY;
-    
-    contextMenu.style.left = x + 'px';
-    contextMenu.style.top = y + 'px';
-    contextMenu.classList.add('active');
-    
-    // Ajuster la position si le menu dépasse de l'écran
-    setTimeout(() => {
-        const rect = contextMenu.getBoundingClientRect();
-        if (rect.right > window.innerWidth) {
-            contextMenu.style.left = (x - rect.width) + 'px';
+        const labelEl = contextMenu.querySelector('.context-menu-account-label');
+        if (labelEl && document.body) {
+            const authed = document.body.dataset.brightshellAuthed === '1';
+            const userName = document.body.dataset.brightshellUserName || '';
+            labelEl.textContent = authed && userName
+                ? userName
+                : 'Connexion · Inscription';
         }
-        if (rect.bottom > window.innerHeight) {
-            contextMenu.style.top = (y - rect.height) + 'px';
-        }
-    }, 0);
-});
 
-// Fermer le menu au clic ailleurs
-document.addEventListener('click', (e) => {
-    if (!contextMenu.contains(e.target)) {
-        contextMenu.classList.remove('active');
-    }
-});
+        const x = e.clientX;
+        const y = e.clientY;
 
-// Actions du menu contextuel
-contextMenu.addEventListener('click', (e) => {
-    const action = e.target.closest('.context-menu-item')?.dataset.action;
-    
-    if (action) {
-        contextMenu.classList.remove('active');
-        
-        switch(action) {
-            case 'home':
-                window.location.href = '/';
-                break;
-            case 'account': {
-                const authed = document.body?.dataset.brightshellAuthed === '1';
-                const loginUrl = document.body?.dataset.brightshellLoginUrl || '/login';
-                const spaceUrl = document.body?.dataset.brightshellSpaceUrl || '/';
-                window.location.href = authed ? spaceUrl : loginUrl;
-                break;
+        contextMenu.style.left = x + 'px';
+        contextMenu.style.top = y + 'px';
+        contextMenu.classList.add('active');
+
+        setTimeout(() => {
+            const rect = contextMenu.getBoundingClientRect();
+            if (rect.right > window.innerWidth) {
+                contextMenu.style.left = (x - rect.width) + 'px';
             }
-            case 'realisations':
-                window.location.href = '/realisations';
-                break;
-            case 'contact':
-                window.location.href = '/cv';
-                break;
-            case 'bonus':
-                // TODO: On ira s'amuser plus tard
-                console.log('Bonus - À venir !');
-                break;
+            if (rect.bottom > window.innerHeight) {
+                contextMenu.style.top = (y - rect.height) + 'px';
+            }
+        }, 0);
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!contextMenu.contains(e.target)) {
+            contextMenu.classList.remove('active');
         }
-    }
-});
-
-// Détecter les éléments interactifs (liens, boutons, etc.)
-const interactiveElements = document.querySelectorAll('a, button, [role="button"], input[type="button"], input[type="submit"]');
-
-interactiveElements.forEach(element => {
-    element.addEventListener('mouseenter', () => {
-        customCursor.classList.add('hovering');
     });
-    
-    element.addEventListener('mouseleave', () => {
-        customCursor.classList.remove('hovering');
-    });
-});
 
-// Observer pour les nouveaux éléments ajoutés dynamiquement
-const observer = new MutationObserver((mutations) => {
-    mutations.forEach((mutation) => {
-        mutation.addedNodes.forEach((node) => {
-            if (node.nodeType === 1) {
-                const newInteractiveElements = node.querySelectorAll ? node.querySelectorAll('a, button, [role="button"], input[type="button"], input[type="submit"]') : [];
-                newInteractiveElements.forEach(element => {
-                    element.addEventListener('mouseenter', () => {
-                        customCursor.classList.add('hovering');
-                    });
-                    element.addEventListener('mouseleave', () => {
-                        customCursor.classList.remove('hovering');
-                    });
-                });
-                
-                // Vérifier si le nœud lui-même est interactif
-                if (node.matches && node.matches('a, button, [role="button"], input[type="button"], input[type="submit"]')) {
-                    node.addEventListener('mouseenter', () => {
-                        customCursor.classList.add('hovering');
-                    });
-                    node.addEventListener('mouseleave', () => {
-                        customCursor.classList.remove('hovering');
-                    });
+    contextMenu.addEventListener('click', (e) => {
+        const action = e.target.closest('.context-menu-item')?.dataset.action;
+
+        if (action) {
+            contextMenu.classList.remove('active');
+
+            switch (action) {
+                case 'home':
+                    window.location.href = '/';
+                    break;
+                case 'account': {
+                    const authed = document.body?.dataset.brightshellAuthed === '1';
+                    const loginUrl = document.body?.dataset.brightshellLoginUrl || '/login';
+                    const spaceUrl = document.body?.dataset.brightshellSpaceUrl || '/';
+                    window.location.href = authed ? spaceUrl : loginUrl;
+                    break;
                 }
+                case 'realisations':
+                    window.location.href = '/realisations';
+                    break;
+                case 'contact':
+                    window.location.href = '/cv';
+                    break;
+                case 'bonus':
+                    console.log('Bonus - À venir !');
+                    break;
             }
+        }
+    });
+
+    const interactiveElements = document.querySelectorAll('a, button, [role="button"], input[type="button"], input[type="submit"]');
+
+    interactiveElements.forEach((element) => {
+        element.addEventListener('mouseenter', () => {
+            customCursor.classList.add('hovering');
+        });
+
+        element.addEventListener('mouseleave', () => {
+            customCursor.classList.remove('hovering');
         });
     });
-});
 
-observer.observe(document.body, {
-    childList: true,
-    subtree: true
-});
+    const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            mutation.addedNodes.forEach((node) => {
+                if (node.nodeType === 1) {
+                    const newInteractiveElements = node.querySelectorAll
+                        ? node.querySelectorAll('a, button, [role="button"], input[type="button"], input[type="submit"]')
+                        : [];
+                    newInteractiveElements.forEach((element) => {
+                        element.addEventListener('mouseenter', () => {
+                            customCursor.classList.add('hovering');
+                        });
+                        element.addEventListener('mouseleave', () => {
+                            customCursor.classList.remove('hovering');
+                        });
+                    });
 
-// Cacher le curseur quand on sort de la page
-document.addEventListener('mouseleave', () => {
-    customCursor.style.opacity = '0';
-});
+                    if (node.matches && node.matches('a, button, [role="button"], input[type="button"], input[type="submit"]')) {
+                        node.addEventListener('mouseenter', () => {
+                            customCursor.classList.add('hovering');
+                        });
+                        node.addEventListener('mouseleave', () => {
+                            customCursor.classList.remove('hovering');
+                        });
+                    }
+                }
+            });
+        });
+    });
 
-document.addEventListener('mouseenter', () => {
-    customCursor.style.opacity = '1';
-});
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true,
+    });
+
+    document.addEventListener('mouseleave', () => {
+        customCursor.style.opacity = '0';
+    });
+
+    document.addEventListener('mouseenter', () => {
+        customCursor.style.opacity = '1';
+    });
+}
+
+initHomeVitrineCursor();
 
 // Cursor follow effect for decorative elements
 document.addEventListener('mousemove', (e) => {

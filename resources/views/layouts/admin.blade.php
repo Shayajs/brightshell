@@ -183,6 +183,12 @@
                                 'icon'   => '<path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>',
                             ])
                             @include('layouts.partials.nav-item', [
+                                'href'   => route('admin.mail-templates.index'),
+                                'active' => request()->routeIs('admin.mail-templates.*'),
+                                'label'  => 'Templates mail',
+                                'icon'   => '<path d="M4 6h16v12H4z"/><path d="M4 7l8 6 8-6"/>',
+                            ])
+                            @include('layouts.partials.nav-item', [
                                 'href'   => route('admin.realisations.index'),
                                 'active' => request()->routeIs('admin.realisations.*'),
                                 'label'  => 'Réalisations',

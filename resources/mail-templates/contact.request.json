@@ -1,0 +1,34 @@
+{
+  "key": "contact.request",
+  "name": "Demande de contact",
+  "category": "contact",
+  "subject_template": "Nouvelle demande de contact - {{sender_name}}",
+  "variables": [
+    "sender_name",
+    "sender_email",
+    "sender_phone",
+    "message"
+  ],
+  "content": [
+    {
+      "type": "title",
+      "text": "Nouvelle demande de contact"
+    },
+    {
+      "type": "text",
+      "text": "Nom: {{sender_name}}"
+    },
+    {
+      "type": "text",
+      "text": "Email: {{sender_email}}"
+    },
+    {
+      "type": "text",
+      "text": "Telephone: {{sender_phone}}"
+    },
+    {
+      "type": "text",
+      "text": "Message: {{message}}"
+    }
+  ]
+}

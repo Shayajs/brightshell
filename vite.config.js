@@ -15,6 +15,7 @@ export default defineConfig({
                 'resources/js/cv.js',
                 'resources/js/realisations.js',
                 'resources/js/services.js',
+                'resources/js/auth-perlin.js',
             ],
             refresh: true,
         }),

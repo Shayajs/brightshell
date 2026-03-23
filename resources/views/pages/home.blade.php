@@ -56,7 +56,7 @@
     </script>
 @endpush
 
-@extends('layouts.app')
+@extends('layouts.app', ['bodyClass' => 'home-vitrine'])
 
 @section('content')
     <!-- Logo -->

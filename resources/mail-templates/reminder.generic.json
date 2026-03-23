@@ -1,0 +1,27 @@
+{
+  "key": "reminder.generic",
+  "name": "Rappel",
+  "category": "reminder",
+  "subject_template": "Rappel: {{reminder_title}}",
+  "variables": [
+    "user_name",
+    "reminder_title",
+    "reminder_text",
+    "action_url"
+  ],
+  "content": [
+    {
+      "type": "title",
+      "text": "Rappel"
+    },
+    {
+      "type": "text",
+      "text": "Bonjour {{user_name}}, {{reminder_text}}"
+    },
+    {
+      "type": "button",
+      "label": "Voir le detail",
+      "url": "{{action_url}}"
+    }
+  ]
+}

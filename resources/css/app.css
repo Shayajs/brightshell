@@ -16,15 +16,57 @@
     --accent-light: #d0dff0;
 }
 
-/* Vitrine : curseur custom — portails / auth (.auth-body) = curseur normal */
-body:not(.auth-body),
-body:not(.auth-body) * {
+/* Vitrine : curseur custom — uniquement page d’accueil (.home-vitrine) */
+body.home-vitrine,
+body.home-vitrine * {
     cursor: none;
 }
 
-body.auth-body,
-body.auth-body * {
+/* Auth / portails : pas de curseur custom ; ne pas forcer cursor:auto sur * (sinon plus de « main » sur les liens) */
+body.auth-body {
     cursor: auto;
+}
+
+/* Hors page d’accueil vitrine : curseur système explicite (en base pour laisser passer cursor-* Tailwind) */
+@layer base {
+    body:not(.home-vitrine) :where(
+        a[href],
+        button:not(:disabled),
+        [role="button"]:not([aria-disabled="true"]),
+        input[type="submit"]:not(:disabled),
+        input[type="button"]:not(:disabled),
+        input[type="reset"]:not(:disabled),
+        input[type="checkbox"],
+        input[type="radio"],
+        input[type="file"],
+        input[type="range"],
+        input[type="color"],
+        label[for],
+        summary,
+        select:not(:disabled)
+    ) {
+        cursor: pointer;
+    }
+
+    body:not(.home-vitrine) :where(
+        input:not([type]),
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        input[type="search"],
+        input[type="url"],
+        input[type="tel"],
+        input[type="number"],
+        input[type="date"],
+        input[type="datetime-local"],
+        input[type="time"],
+        input[type="month"],
+        input[type="week"],
+        textarea:not(:disabled),
+        [contenteditable="true"]
+    ) {
+        cursor: text;
+    }
 }
 
 body {
@@ -569,9 +611,9 @@ main {
 
 /* Responsive */
 @media (max-width: 768px) {
-    /* Désactiver le curseur personnalisé sur mobile */
-    body,
-    body * {
+    /* Désactiver le curseur personnalisé sur mobile (vitrine accueil uniquement) */
+    body.home-vitrine,
+    body.home-vitrine * {
         cursor: auto !important;
     }
 
@@ -965,11 +1007,11 @@ main {
 .auth-shell__panel {
     width: 100%;
     max-width: 28rem;
-    border: 1px solid rgba(175, 211, 247, 0.24);
+    border: 0;
     background: rgba(9, 20, 34, 0.5);
     box-shadow: 0 24px 64px rgba(0, 0, 0, 0.42);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
     border-radius: 1.05rem;
     padding: 1.4rem 1.1rem 1.2rem;
 }
@@ -1030,6 +1072,31 @@ main {
     border-color: rgba(84, 188, 255, 0.45);
     background: rgba(19, 69, 105, 0.62);
     color: #f2f9ff;
+}
+
+/* Animation Connexion → Inscription (clic uniquement, gérée par auth-perlin.js) */
+.auth-tabs__panel[data-auth-tab-panel='register'].auth-tabs__panel--enter {
+    transition:
+        opacity 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+        transform 0.48s cubic-bezier(0.22, 1, 0.36, 1);
+    opacity: 0;
+    transform: translate3d(16px, 10px, 0);
+    will-change: opacity, transform;
+}
+
+.auth-tabs__panel[data-auth-tab-panel='register'].auth-tabs__panel--enter.auth-tabs__panel--enter-active {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .auth-tabs__panel[data-auth-tab-panel='register'].auth-tabs__panel--enter,
+    .auth-tabs__panel[data-auth-tab-panel='register'].auth-tabs__panel--enter.auth-tabs__panel--enter-active {
+        transition: none;
+        opacity: 1;
+        transform: none;
+        will-change: auto;
+    }
 }
 
 .auth-form {
@@ -1105,15 +1172,19 @@ main {
 @media (min-width: 1024px) {
     .auth-shell__layout {
         justify-content: flex-end;
-        padding: 2.2rem 3rem 2.2rem 2.2rem;
+        align-items: stretch;
+        padding: 0;
     }
 
     .auth-shell__panel {
-        width: min(40vw, 35rem);
-        max-width: none;
-        min-height: calc(100vh - 4.4rem);
-        border-radius: 1.25rem;
-        padding: 1.9rem 1.5rem;
+        width: 40vw;
+        max-width: 40vw;
+        min-height: 100vh;
+        border-radius: 0;
+        border-left: 1px solid rgba(175, 211, 247, 0.24);
+        backdrop-filter: blur(36px);
+        -webkit-backdrop-filter: blur(36px);
+        padding: 4.8rem 1.8rem 1.8rem;
         display: flex;
         flex-direction: column;
         justify-content: center;

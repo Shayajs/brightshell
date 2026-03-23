@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DeclarationsController;
 use App\Http\Controllers\Admin\InvoicesController;
 use App\Http\Controllers\Admin\MembersController;
+use App\Http\Controllers\Admin\MailTemplatesController;
 use App\Http\Controllers\Admin\RealisationsAdminController;
 use App\Http\Controllers\Admin\StudentCourseQuizQuestionsController;
 use App\Http\Controllers\Admin\StudentCourseQuizzesController;
@@ -157,6 +158,10 @@ $registerAdminRoutes = function (): void {
     Route::redirect('/urssaf', '/declarations/urssaf')->name('admin.urssaf.index');
 
     Route::get('/api-publique', [ApiManagerController::class, 'index'])->name('admin.api-manager.index');
+    Route::get('/mail-templates', [MailTemplatesController::class, 'index'])->name('admin.mail-templates.index');
+    Route::get('/mail-templates/{key}', [MailTemplatesController::class, 'edit'])->name('admin.mail-templates.edit');
+    Route::put('/mail-templates/{key}', [MailTemplatesController::class, 'update'])->name('admin.mail-templates.update');
+    Route::post('/mail-templates/{key}/preview', [MailTemplatesController::class, 'preview'])->name('admin.mail-templates.preview');
 
     // Réalisations
     Route::get('/realisations', [RealisationsAdminController::class, 'index'])->name('admin.realisations.index');
