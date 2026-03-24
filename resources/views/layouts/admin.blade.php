@@ -700,6 +700,108 @@
     })();
     </script>
 
+    @php
+        $bsRootDomain = \App\Support\BrightshellDomain::effectiveRoot();
+        $bsNotifBridgeUrl = route('portals.settings.notifications.bridge');
+    @endphp
+    <iframe
+        id="bs-notif-bridge-frame"
+        src="{{ $bsNotifBridgeUrl }}"
+        title="BrightShell Notification Bridge"
+        tabindex="-1"
+        aria-hidden="true"
+        style="position:absolute;width:0;height:0;border:0;opacity:0;pointer-events:none;"
+    ></iframe>
+    <script>
+        (function () {
+            const bridgeFrame = document.getElementById('bs-notif-bridge-frame');
+            const bridgeUrl = @json($bsNotifBridgeUrl);
+            const bridgeOrigin = (() => {
+                try { return new URL(bridgeUrl).origin; } catch (_) { return null; }
+            })();
+            const currentOrigin = window.location.origin;
+            const rootDomain = @json($bsRootDomain);
+
+            const allowedHost = (host) => {
+                if (!rootDomain || !host) return false;
+                return host === rootDomain || host.endsWith('.' + rootDomain);
+            };
+
+            const callBridge = (action, payload = {}) => new Promise((resolve, reject) => {
+                if (!bridgeFrame || !bridgeOrigin || !bridgeFrame.contentWindow) {
+                    reject(new Error('bridge_unavailable'));
+                    return;
+                }
+
+                const requestId = `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+                const timer = window.setTimeout(() => {
+                    window.removeEventListener('message', onMessage);
+                    reject(new Error('bridge_timeout'));
+                }, 5000);
+
+                const onMessage = (event) => {
+                    const data = event?.data;
+                    if (event.origin !== bridgeOrigin || !data || data.__bsNotifBridge !== true || data.requestId !== requestId) {
+                        return;
+                    }
+                    window.clearTimeout(timer);
+                    window.removeEventListener('message', onMessage);
+                    if (data.ok) {
+                        resolve(data);
+                    } else {
+                        reject(Object.assign(new Error(data.error || 'bridge_error'), { data }));
+                    }
+                };
+
+                window.addEventListener('message', onMessage);
+                bridgeFrame.contentWindow.postMessage({
+                    __bsNotifBridge: true,
+                    requestId,
+                    action,
+                    ...payload,
+                }, bridgeOrigin);
+            });
+
+            const api = {
+                async getPermission() {
+                    try {
+                        const res = await callBridge('status');
+                        return res.permission || 'default';
+                    } catch (_) {
+                        return ('Notification' in window) ? Notification.permission : 'unsupported';
+                    }
+                },
+                async requestPermission() {
+                    // La demande de permission doit se faire sur la page top-level de l'origine settings.
+                    if (currentOrigin === bridgeOrigin) {
+                        if (!('Notification' in window)) {
+                            throw new Error('unsupported');
+                        }
+                        const permission = await Notification.requestPermission();
+                        return { ok: true, permission };
+                    }
+
+                    const err = new Error('request_permission_requires_settings_origin');
+                    err.data = {
+                        code: 'request_permission_requires_settings_origin',
+                        settingsUrl: bridgeUrl.replace(/\/notifications\/bridge$/, '/notifications'),
+                    };
+                    throw err;
+                },
+                notify(title, options = {}) {
+                    return callBridge('notify', { title, options });
+                },
+                canBridgeFromCurrentHost() {
+                    return allowedHost(window.location.hostname);
+                },
+                bridgeOrigin: bridgeOrigin,
+                bridgeUrl: bridgeUrl,
+            };
+
+            window.BrightshellNotifications = api;
+        })();
+    </script>
+
     @stack('scripts')
 </body>
 </html>

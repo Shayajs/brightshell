@@ -28,6 +28,11 @@ class NotificationPreferencesController extends Controller
             ->with('success', 'Préférences de notification enregistrées.');
     }
 
+    public function bridge(): View
+    {
+        return view('portals.settings.notifications-bridge');
+    }
+
     public function markAllRead(Request $request): RedirectResponse
     {
         $request->user()->unreadNotifications()->update(['read_at' => now()]);

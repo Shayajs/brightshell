@@ -3,6 +3,7 @@
 > **Portail documentation** : le même contenu peut être affiché dans **docs.*** (page *Référence des endpoints*, dossier *API Sanctum (v1)*) via `App\Support\Documentation\PortailApiDocumentationBodies` et les migrations `2026_03_25_100000_seed_default_documentation_content` / `2026_03_28_160000_sync_portail_documentation_api_sanctum`.
 
 Ce document décrit l’API JSON authentifiée par **jeton personnel Laravel Sanctum**. Les routes sont enregistrées dans `routes/api-private.php` et servies sur le **sous-domaine API** (`config('brightshell.domains.api_host')`, ou `api.<racine>` par défaut).
+Les jetons Sanctum sont configurés **sans expiration automatique** : ils restent valides tant qu’ils ne sont pas révoqués.
 
 ## Prérequis
 
@@ -18,6 +19,11 @@ Sur l’hôte réservé à l’API (`BRIGHTSHELL_API_HOST` ou `api.<racine>`) : 
 ### Création des jetons (interface web)
 
 La page **Réglages → API** (création / révocation des jetons) est actuellement protégée par le middleware **`role.developer`**. Les utilisateurs sans ce rôle n’ont pas d’UI pour générer un token, même si certains endpoints leur seraient autorisés une fois authentifiés.
+
+### Connexion / déconnexion par token (API)
+
+- `POST /v1/auth/token` (public) : crée un token Bearer à partir de `email`, `password`, `device_name` (optionnel).
+- `DELETE /v1/auth/token` (privé, `auth:sanctum`) : révoque le token courant (déconnexion de l’appareil).
 
 ### Autorisations métier
 

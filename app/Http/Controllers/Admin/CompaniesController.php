@@ -7,7 +7,7 @@ use App\Models\Company;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class CompaniesController extends Controller
@@ -24,16 +24,12 @@ class CompaniesController extends Controller
 
     public function create(): View
     {
-        $members = User::with('roles')->orderBy('last_name')->orderBy('first_name')->get();
-
-        return view('admin.companies.form', ['company' => null, 'members' => $members]);
+        return view('admin.companies.form', ['company' => null]);
     }
 
     public function store(Request $request): RedirectResponse
     {
-        $data = $this->validated($request);
-        $company = Company::create(Arr::except($data, ['user_ids', 'manage_user_ids']));
-        $this->syncCompanyUsers($company, $request);
+        $company = Company::create($this->payload($request));
 
         return redirect()->route('admin.companies.show', $company)->with('success', 'Société créée.');
     }
@@ -47,18 +43,57 @@ class CompaniesController extends Controller
 
     public function edit(Company $company): View
     {
-        $company->load('users.roles');
-        $members = User::with('roles')->orderBy('last_name')->orderBy('first_name')->get();
-
-        return view('admin.companies.form', compact('company', 'members'));
+        return view('admin.companies.form', compact('company'));
     }
 
     public function update(Request $request, Company $company): RedirectResponse
     {
-        $company->update(Arr::except($this->validated($request), ['user_ids', 'manage_user_ids']));
-        $this->syncCompanyUsers($company, $request);
+        $company->update($this->payload($request, $company));
 
         return redirect()->route('admin.companies.show', $company)->with('success', 'Société mise à jour.');
+    }
+
+    public function attachMember(Request $request, Company $company): RedirectResponse
+    {
+        $data = $request->validate([
+            'user_id' => ['required', 'integer', 'exists:users,id'],
+            'can_manage_company' => ['nullable', 'boolean'],
+        ]);
+
+        $user = User::with('roles')->findOrFail((int) $data['user_id']);
+        $canManage = (bool) ($data['can_manage_company'] ?? false) && $user->hasRole('client');
+
+        $company->users()->syncWithoutDetaching([
+            $user->id => ['can_manage_company' => $canManage],
+        ]);
+
+        return back()->with('success', 'Personne liée à la société.');
+    }
+
+    public function updateMemberAccess(Request $request, Company $company, User $user): RedirectResponse
+    {
+        if (! $company->users()->whereKey($user->id)->exists()) {
+            return back()->with('error', 'Cette personne n’est pas liée à la société.');
+        }
+
+        $data = $request->validate([
+            'can_manage_company' => ['nullable', 'boolean'],
+        ]);
+
+        $canManage = (bool) ($data['can_manage_company'] ?? false) && $user->hasRole('client');
+
+        $company->users()->updateExistingPivot($user->id, [
+            'can_manage_company' => $canManage,
+        ]);
+
+        return back()->with('success', 'Accès membre mis à jour.');
+    }
+
+    public function detachMember(Company $company, User $user): RedirectResponse
+    {
+        $company->users()->detach($user->id);
+
+        return back()->with('success', 'Personne retirée de la société.');
     }
 
     public function destroy(Company $company): RedirectResponse
@@ -69,9 +104,9 @@ class CompaniesController extends Controller
     }
 
     /** @return array<string, mixed> */
-    private function validated(Request $request): array
+    private function payload(Request $request, ?Company $company = null): array
     {
-        return $request->validate([
+        $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'siret' => ['nullable', 'string', 'max:14'],
             'address' => ['nullable', 'string', 'max:255'],
@@ -81,32 +116,26 @@ class CompaniesController extends Controller
             'contact_name' => ['nullable', 'string', 'max:255'],
             'contact_email' => ['nullable', 'email', 'max:255'],
             'notes' => ['nullable', 'string'],
-            'user_ids' => ['nullable', 'array'],
-            'user_ids.*' => ['integer', 'exists:users,id'],
-            'manage_user_ids' => ['nullable', 'array'],
-            'manage_user_ids.*' => ['integer', 'exists:users,id'],
+            'logo' => ['nullable', 'image', 'max:4096'],
+            'remove_logo' => ['nullable', 'boolean'],
         ]);
-    }
 
-    private function syncCompanyUsers(Company $company, Request $request): void
-    {
-        $userIds = $request->input('user_ids', []);
-        $manageIds = collect($request->input('manage_user_ids', []))
-            ->map(fn ($id) => (int) $id)
-            ->all();
-
-        $users = User::query()->whereIn('id', $userIds)->with('roles')->get()->keyBy('id');
-
-        $sync = [];
-        foreach ($userIds as $id) {
-            $id = (int) $id;
-            $u = $users->get($id);
-            $canManage = in_array($id, $manageIds, true)
-                && $u !== null
-                && $u->hasRole('client');
-            $sync[$id] = ['can_manage_company' => $canManage];
+        if ($request->boolean('remove_logo')) {
+            if ($company?->logo_path) {
+                Storage::disk('public')->delete($company->logo_path);
+            }
+            $data['logo_path'] = null;
         }
 
-        $company->users()->sync($sync);
+        if ($request->hasFile('logo')) {
+            if ($company?->logo_path) {
+                Storage::disk('public')->delete($company->logo_path);
+            }
+            $data['logo_path'] = $request->file('logo')->store('companies/logos', 'public');
+        }
+
+        unset($data['logo'], $data['remove_logo']);
+
+        return $data;
     }
 }

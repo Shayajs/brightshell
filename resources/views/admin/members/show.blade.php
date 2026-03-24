@@ -122,6 +122,62 @@
 
         {{-- Rôles --}}
         <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 ring-1 ring-white/5 lg:col-span-2">
+            <h2 class="font-display text-sm font-bold uppercase tracking-wide text-white">Informations internes</h2>
+            <p class="mt-1 text-xs text-zinc-500">Mise à jour de la fiche membre (nom, prénom, e-mail, téléphone, notes internes).</p>
+
+            @if ($member->trashed())
+                <p class="mt-5 text-sm text-zinc-500">Compte archivé — restaure le compte pour modifier ses informations.</p>
+            @else
+                <form method="POST" action="{{ route('admin.members.update', $member) }}" class="mt-5 space-y-4 border-b border-zinc-800 pb-6">
+                    @csrf
+                    @method('PUT')
+
+                    <div class="grid gap-4 sm:grid-cols-2">
+                        <div>
+                            <label for="first_name" class="mb-1 block text-xs font-semibold uppercase tracking-wide text-zinc-500">Prénom</label>
+                            <input id="first_name" name="first_name" type="text" value="{{ old('first_name', $member->first_name) }}"
+                                   class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 placeholder-zinc-600 focus:border-indigo-500/50 focus:outline-none focus:ring-2 focus:ring-indigo-500/20">
+                            @error('first_name')<p class="mt-1 text-xs text-red-400">{{ $message }}</p>@enderror
+                        </div>
+                        <div>
+                            <label for="last_name" class="mb-1 block text-xs font-semibold uppercase tracking-wide text-zinc-500">Nom</label>
+                            <input id="last_name" name="last_name" type="text" value="{{ old('last_name', $member->last_name) }}"
+                                   class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 placeholder-zinc-600 focus:border-indigo-500/50 focus:outline-none focus:ring-2 focus:ring-indigo-500/20">
+                            @error('last_name')<p class="mt-1 text-xs text-red-400">{{ $message }}</p>@enderror
+                        </div>
+                    </div>
+
+                    <div class="grid gap-4 sm:grid-cols-2">
+                        <div>
+                            <label for="email" class="mb-1 block text-xs font-semibold uppercase tracking-wide text-zinc-500">E-mail</label>
+                            <input id="email" name="email" type="email" value="{{ old('email', $member->email) }}"
+                                   class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 placeholder-zinc-600 focus:border-indigo-500/50 focus:outline-none focus:ring-2 focus:ring-indigo-500/20">
+                            @error('email')<p class="mt-1 text-xs text-red-400">{{ $message }}</p>@enderror
+                        </div>
+                        <div>
+                            <label for="phone" class="mb-1 block text-xs font-semibold uppercase tracking-wide text-zinc-500">Téléphone</label>
+                            <input id="phone" name="phone" type="text" value="{{ old('phone', $member->phone) }}"
+                                   class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 placeholder-zinc-600 focus:border-indigo-500/50 focus:outline-none focus:ring-2 focus:ring-indigo-500/20">
+                            @error('phone')<p class="mt-1 text-xs text-red-400">{{ $message }}</p>@enderror
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="profile_notes" class="mb-1 block text-xs font-semibold uppercase tracking-wide text-zinc-500">Notes internes</label>
+                        <textarea id="profile_notes" name="profile_notes" rows="4"
+                                  class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 placeholder-zinc-600 focus:border-indigo-500/50 focus:outline-none focus:ring-2 focus:ring-indigo-500/20">{{ old('profile_notes', $member->profile_notes) }}</textarea>
+                        @error('profile_notes')<p class="mt-1 text-xs text-red-400">{{ $message }}</p>@enderror
+                    </div>
+
+                    <div class="flex justify-end">
+                        <button type="submit"
+                                class="rounded-lg border border-indigo-500/40 bg-indigo-600/90 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-950/40 transition hover:bg-indigo-500">
+                            Enregistrer les informations
+                        </button>
+                    </div>
+                </form>
+            @endif
+
             <h2 class="font-display text-sm font-bold uppercase tracking-wide text-white">Rôles &amp; accès</h2>
             <p class="mt-1 text-xs text-zinc-500">Les rôles définissent les portails accessibles par ce membre.</p>
 

@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\V1\Admin\AdminMembersApiController;
 use App\Http\Controllers\Api\V1\Admin\AdminProjectsApiController;
 use App\Http\Controllers\Api\V1\Admin\AdminSearchApiController;
 use App\Http\Controllers\Api\V1\Admin\AdminSupportTicketsApiController;
+use App\Http\Controllers\Api\V1\AuthTokensController;
 use App\Http\Controllers\Api\V1\ClientCompaniesApiController;
 use App\Http\Controllers\Api\V1\CollaboratorTeamsApiController;
 use App\Http\Controllers\Api\V1\CoursesController;
@@ -27,6 +28,8 @@ use App\Http\Controllers\Api\V1\StudentMaterialsController;
 use App\Http\Controllers\Api\V1\StudentQuizzesApiController;
 use App\Http\Controllers\Api\V1\SupportTicketsApiController;
 use Illuminate\Support\Facades\Route;
+
+Route::delete('/auth/token', [AuthTokensController::class, 'destroy'])->name('api.v1.auth.token.destroy');
 
 Route::get('/me', [MeController::class, 'show'])->name('api.v1.me.show');
 Route::put('/me', [MeController::class, 'update'])->name('api.v1.me.update');

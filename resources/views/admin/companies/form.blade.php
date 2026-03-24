@@ -21,6 +21,7 @@
             method="POST"
             action="{{ $company ? route('admin.companies.update', $company) : route('admin.companies.store') }}"
             class="space-y-6"
+            enctype="multipart/form-data"
         >
             @csrf
             @if ($company) @method('PUT') @endif
@@ -38,6 +39,30 @@
                     @include('layouts.partials.form-field', ['name' => 'city', 'label' => 'Ville', 'type' => 'text', 'value' => old('city', $company?->city)])
                     @include('layouts.partials.form-field', ['name' => 'contact_name', 'label' => 'Contact', 'type' => 'text', 'value' => old('contact_name', $company?->contact_name)])
                     @include('layouts.partials.form-field', ['name' => 'contact_email', 'label' => 'E-mail contact', 'type' => 'email', 'value' => old('contact_email', $company?->contact_email)])
+                    <div class="sm:col-span-2">
+                        <label for="logo" class="block text-[11px] font-semibold uppercase tracking-[0.14em] text-zinc-500">Image / logo</label>
+                        @if ($company?->logoUrl())
+                            <div class="mt-2 flex items-center gap-3 rounded-lg border border-zinc-800 bg-zinc-950/50 p-3">
+                                <img src="{{ $company->logoUrl() }}" alt="Logo actuel" class="h-14 w-14 rounded-lg border border-zinc-800 object-contain bg-zinc-950 p-1">
+                                <label class="flex items-center gap-2 text-xs text-zinc-500">
+                                    <input type="hidden" name="remove_logo" value="0">
+                                    <input type="checkbox" name="remove_logo" value="1" class="h-4 w-4 rounded border-zinc-600 bg-zinc-950 text-red-500 focus:ring-red-500/40">
+                                    Supprimer le logo actuel
+                                </label>
+                            </div>
+                        @endif
+                        <input
+                            id="logo"
+                            type="file"
+                            name="logo"
+                            accept="image/*"
+                            class="mt-2 w-full rounded-lg border border-zinc-700 bg-zinc-950/80 px-3.5 py-2.5 text-sm text-zinc-100 file:mr-3 file:rounded-md file:border-0 file:bg-indigo-600/90 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-white hover:file:bg-indigo-500 focus:border-indigo-500/50 focus:outline-none focus:ring-2 focus:ring-indigo-500/25"
+                        >
+                        <p class="mt-1 text-xs text-zinc-600">PNG/JPG/WebP/GIF, max 4 Mo.</p>
+                        @error('logo')
+                            <p class="mt-1.5 text-xs text-red-400">{{ $message }}</p>
+                        @enderror
+                    </div>
                 </div>
 
                 <div>
@@ -51,46 +76,6 @@
                 </div>
             </div>
 
-            {{-- Membres liés --}}
-            <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 ring-1 ring-white/5 space-y-4">
-                <div>
-                    <h2 class="font-display text-sm font-bold uppercase tracking-wide text-white">Membres liés</h2>
-                    <p class="mt-1 text-xs text-zinc-500">Accès portail client et facturation. Pour les comptes <span class="text-zinc-400">client</span>, vous pouvez désigner qui peut modifier la fiche société dans l’espace client.</p>
-                </div>
-                <div class="space-y-2">
-                    @foreach ($members as $m)
-                        @php
-                            $attached = $company && $company->users->contains($m);
-                            $canManage = $attached && (bool) optional($company->users->firstWhere('id', $m->id))->pivot?->can_manage_company;
-                        @endphp
-                        <div class="flex flex-col gap-2 rounded-lg border border-zinc-800 bg-zinc-950/50 px-3 py-2.5 sm:flex-row sm:items-center sm:justify-between">
-                            <label class="flex cursor-pointer items-center gap-3">
-                                <input
-                                    type="checkbox"
-                                    name="user_ids[]"
-                                    value="{{ $m->id }}"
-                                    @checked($attached)
-                                    class="h-4 w-4 rounded border-zinc-600 bg-zinc-950 text-indigo-500 focus:ring-indigo-500/40"
-                                >
-                                <span class="text-sm text-zinc-300">{{ $m->name }}</span>
-                            </label>
-                            @if ($m->hasRole('client'))
-                                <label class="flex cursor-pointer items-center gap-2 sm:ml-auto">
-                                    <input
-                                        type="checkbox"
-                                        name="manage_user_ids[]"
-                                        value="{{ $m->id }}"
-                                        @checked($canManage)
-                                        class="h-4 w-4 rounded border-zinc-600 bg-zinc-950 text-amber-500 focus:ring-amber-500/40"
-                                    >
-                                    <span class="text-[11px] text-zinc-500">Autorisé à modifier la société</span>
-                                </label>
-                            @endif
-                        </div>
-                    @endforeach
-                </div>
-            </div>
-
             <div class="flex justify-end gap-3">
                 <a href="{{ route('admin.companies.index') }}"
                     class="rounded-lg border border-zinc-700 px-5 py-2.5 text-sm font-medium text-zinc-400 transition hover:text-zinc-200">
@@ -101,6 +86,12 @@
                     {{ $company ? 'Enregistrer' : 'Créer la société' }}
                 </button>
             </div>
+
+            @if (! $company)
+                <p class="text-xs text-zinc-500">
+                    Les personnes sont associées après création depuis la fiche société, via la modale de recherche.
+                </p>
+            @endif
         </form>
     </div>
 </div>

@@ -67,13 +67,15 @@ final class PortalNavigation
         $portals['collabs'] = ['label' => 'Collaborateurs', 'href' => PortalUrls::forRoleSlug('collaborator'), 'role' => 'collaborator'];
         $portals['users'] = ['label' => 'Espace client', 'href' => PortalUrls::forRoleSlug('client'), 'role' => 'client'];
         $portals['courses'] = ['label' => 'Cours', 'href' => PortalUrls::forRoleSlug('student'), 'role' => 'student'];
-        $portals['settings'] = ['label' => 'Réglages', 'href' => PortalUrls::settingsUrl(), 'role' => null];
         $portals['docs'] = ['label' => 'Documentation', 'href' => PortalUrls::docsUrl(), 'role' => null];
 
         $projectUrl = PortalUrls::projectUrl();
         if ($projectUrl !== '') {
             $portals['project'] = ['label' => 'Projets', 'href' => $projectUrl, 'role' => 'project_portal'];
         }
+
+        // Toujours en fin de liste dans le switcher.
+        $portals['settings'] = ['label' => 'Réglages', 'href' => PortalUrls::settingsUrl(), 'role' => null];
 
         return $portals;
     }

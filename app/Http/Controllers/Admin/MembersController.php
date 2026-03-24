@@ -143,6 +143,44 @@ class MembersController extends Controller
         return view('admin.members.show', compact('member', 'allRoles', 'collaboratorTeams'));
     }
 
+    public function update(Request $request, User $member): RedirectResponse
+    {
+        if ($member->trashed()) {
+            return back()->with('error', 'Les informations d’un compte archivé ne peuvent pas être modifiées.');
+        }
+
+        $validated = $request->validate([
+            'first_name' => ['required', 'string', 'max:255'],
+            'last_name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email:rfc,dns', 'max:255', Rule::unique('users', 'email')->ignore($member->id)],
+            'phone' => ['nullable', 'string', 'max:50'],
+            'profile_notes' => ['nullable', 'string', 'max:5000'],
+        ]);
+
+        $before = [
+            'first_name' => $member->first_name,
+            'last_name' => $member->last_name,
+            'email' => $member->email,
+            'phone' => $member->phone,
+            'profile_notes' => $member->profile_notes,
+        ];
+
+        $member->update($validated);
+
+        AdminAudit::record('member.profile_updated', $member, [
+            'before' => $before,
+            'after' => [
+                'first_name' => $member->first_name,
+                'last_name' => $member->last_name,
+                'email' => $member->email,
+                'phone' => $member->phone,
+                'profile_notes' => $member->profile_notes,
+            ],
+        ]);
+
+        return back()->with('success', 'Informations internes mises à jour.');
+    }
+
     public function updateRoles(Request $request, User $member): RedirectResponse
     {
         if ($member->trashed()) {

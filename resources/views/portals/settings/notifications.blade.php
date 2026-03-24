@@ -18,7 +18,7 @@
 
         <section class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 ring-1 ring-white/5">
             <h2 class="font-display text-sm font-bold uppercase tracking-wide text-white">Navigateur</h2>
-            <p class="mt-2 text-sm text-zinc-500">Demandez l’autorisation à votre navigateur. Vous pourrez affiner les types d’alertes quand la web app sera branchée.</p>
+            <p class="mt-2 text-sm text-zinc-500">Demandez l’autorisation une fois depuis ce portail : les autres sous-domaines BrightShell délégueront ensuite l’affichage au bridge notifications.</p>
 
             <div class="mt-6 flex flex-wrap items-center gap-3">
                 <button type="button" id="browser-notif-request"
@@ -88,23 +88,35 @@
         (function () {
             const btn = document.getElementById('browser-notif-request');
             const status = document.getElementById('browser-notif-status');
-            if (!('Notification' in window)) {
-                if (status) status.textContent = 'Ce navigateur ne supporte pas les notifications.';
+            const bridge = window.BrightshellNotifications;
+            if (!bridge || typeof bridge.getPermission !== 'function') {
+                if (status) status.textContent = 'Bridge notifications indisponible.';
                 if (btn) btn.disabled = true;
                 return;
             }
+
             function label(p) {
                 if (p === 'granted') return 'Autorisation accordée.';
                 if (p === 'denied') return 'Autorisations refusées — modifie-les dans les réglages du navigateur.';
                 return 'Autorisation non demandée ou ignorée.';
             }
-            if (status) status.textContent = label(Notification.permission);
+            bridge.getPermission().then((permission) => {
+                if (status) status.textContent = label(permission);
+            });
             btn?.addEventListener('click', async function () {
                 try {
-                    const p = await Notification.requestPermission();
-                    if (status) status.textContent = label(p);
+                    const res = await bridge.requestPermission();
+                    if (status) status.textContent = label(res.permission || 'default');
                 } catch (e) {
-                    if (status) status.textContent = 'Impossible de demander l’autorisation.';
+                    const code = e?.data?.code || e?.message || '';
+                    if (code === 'request_permission_requires_settings_origin') {
+                        const url = e?.data?.settingsUrl || bridge.bridgeUrl || '';
+                        if (status) status.textContent = url
+                            ? `Ouvre ${url} pour accorder l’autorisation (demande bloquée hors settings).`
+                            : 'Demande bloquée sur ce sous-domaine : ouvre settings pour autoriser.';
+                        return;
+                    }
+                    if (status) status.textContent = `Impossible de demander l’autorisation (${code || 'erreur inconnue'}).`;
                 }
             });
         })();

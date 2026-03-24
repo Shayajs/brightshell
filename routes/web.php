@@ -93,6 +93,9 @@ $registerAuthRoutes = function (): void {
         }
     });
     Route::post('/logout', [LoginController::class, 'destroy'])->middleware('auth')->name('logout');
+    Route::get('/logout/confirm', static function () {
+        return view('auth.logout-confirm');
+    })->name('logout.confirm');
 
     Route::middleware('auth')->group(function (): void {
         Route::get('/email/verify', [EmailVerificationPromptController::class, 'show'])->name('verification.notice');
@@ -149,6 +152,7 @@ if ($homeHost !== '') {
 $registerAdminRoutes = function (): void {
     Route::get('/', DashboardController::class)->name('admin.dashboard');
     Route::get('/recherche', SearchController::class)->middleware('throttle:60,1')->name('admin.search');
+    Route::get('/recherche/modal', [SearchController::class, 'modal'])->middleware('throttle:90,1')->name('admin.search.modal');
 
     // Membres
     Route::get('/clients', [ClientsController::class, 'index'])->name('admin.clients.index');
@@ -161,6 +165,7 @@ $registerAdminRoutes = function (): void {
     Route::delete('/members/{member}/supprimer-definitif', [MembersController::class, 'forceDestroy'])->name('admin.members.force-destroy');
 
     Route::get('/members/{member}', [MembersController::class, 'show'])->name('admin.members.show');
+    Route::put('/members/{member}', [MembersController::class, 'update'])->name('admin.members.update');
     Route::post('/members/{member}/verify-email', [MembersController::class, 'verifyEmail'])->name('admin.members.verify-email');
     Route::post('/members/{member}/roles', [MembersController::class, 'updateRoles'])->name('admin.members.roles');
     Route::post('/members/{member}/collaborateur-acces', [MembersController::class, 'updateCollaboratorAccess'])->name('admin.members.collaborator-access');
@@ -230,6 +235,9 @@ $registerAdminRoutes = function (): void {
     Route::get('/companies/{company}', [CompaniesController::class, 'show'])->name('admin.companies.show');
     Route::get('/companies/{company}/edit', [CompaniesController::class, 'edit'])->name('admin.companies.edit');
     Route::put('/companies/{company}', [CompaniesController::class, 'update'])->name('admin.companies.update');
+    Route::post('/companies/{company}/members', [CompaniesController::class, 'attachMember'])->name('admin.companies.members.attach');
+    Route::patch('/companies/{company}/members/{user}', [CompaniesController::class, 'updateMemberAccess'])->name('admin.companies.members.update');
+    Route::delete('/companies/{company}/members/{user}', [CompaniesController::class, 'detachMember'])->name('admin.companies.members.detach');
     Route::delete('/companies/{company}', [CompaniesController::class, 'destroy'])->name('admin.companies.destroy');
 
     // Projets (portail project.* — invitations et droits réservés admin)
@@ -450,6 +458,7 @@ if ($settingsHost !== '') {
             Route::get('/notifications', [NotificationPreferencesController::class, 'edit'])->name('portals.settings.notifications.edit');
             Route::put('/notifications', [NotificationPreferencesController::class, 'update'])->name('portals.settings.notifications.update');
             Route::post('/notifications/lues', [NotificationPreferencesController::class, 'markAllRead'])->name('portals.settings.notifications.read-all');
+            Route::get('/notifications/bridge', [NotificationPreferencesController::class, 'bridge'])->name('portals.settings.notifications.bridge');
 
             Route::get('/securite', [SettingsSecurityController::class, 'edit'])->name('portals.settings.security.edit');
             Route::put('/securite/mot-de-passe', [SettingsSecurityController::class, 'updatePassword'])->name('portals.settings.security.password');
