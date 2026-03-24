@@ -141,7 +141,7 @@
         </section>
 
         <div class="grid gap-4 lg:grid-cols-5 lg:gap-6">
-            <section class="rounded-2xl border border-zinc-800 bg-zinc-900/60 ring-1 ring-white/5 lg:col-span-2">
+            <section class="min-w-0 rounded-2xl border border-zinc-800 bg-zinc-900/60 ring-1 ring-white/5 lg:col-span-2">
                 <div class="border-b border-zinc-800 px-5 py-4">
                     <h2 class="font-display text-sm font-bold uppercase tracking-wide text-white">Derniers inscrits</h2>
                 </div>
@@ -161,12 +161,12 @@
                 </ul>
             </section>
 
-            <section class="rounded-2xl border border-zinc-800 bg-zinc-900/60 ring-1 ring-white/5 lg:col-span-3">
+            <section class="min-w-0 rounded-2xl border border-zinc-800 bg-zinc-900/60 ring-1 ring-white/5 lg:col-span-3">
                 <div class="flex flex-wrap items-center justify-between gap-2 border-b border-zinc-800 px-5 py-4">
                     <h2 class="font-display text-sm font-bold uppercase tracking-wide text-white">Factures récentes</h2>
                     <a href="{{ route('admin.invoices.index') }}" class="text-xs font-semibold text-indigo-400 hover:text-indigo-300">Tout voir →</a>
                 </div>
-                <div class="overflow-x-auto">
+                <div class="min-w-0 overflow-x-auto">
                     <table class="w-full min-w-[28rem] text-left text-sm">
                         <thead>
                             <tr class="border-b border-zinc-800 bg-zinc-950/50 text-[10px] font-semibold uppercase tracking-wider text-zinc-500">

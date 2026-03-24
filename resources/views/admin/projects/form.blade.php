@@ -99,7 +99,7 @@
                 <p class="mt-1 text-xs text-zinc-500">Compte inexistant : lien d’inscription ou de connexion (14 jours). Compte existant : utilisez le menu ci-dessous.</p>
                 <form method="POST" action="{{ route('admin.projects.invite-email', $project) }}" class="mt-4 flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-end">
                     @csrf
-                    <div class="min-w-[14rem] flex-1">
+                    <div class="w-full flex-1 sm:min-w-[14rem]">
                         <label for="invite-email" class="block text-xs font-semibold uppercase tracking-wide text-zinc-500">E-mail</label>
                         <input id="invite-email" type="email" name="invite_email" value="{{ old('invite_email') }}" required autocomplete="email"
                             class="mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-white focus:border-indigo-500/50 focus:outline-none focus:ring-1 focus:ring-indigo-500/30">
@@ -133,7 +133,7 @@
 
             <form method="POST" action="{{ route('admin.projects.members.attach', $project) }}" class="flex flex-col gap-4 border-b border-zinc-800 pb-6 sm:flex-row sm:flex-wrap sm:items-end">
                 @csrf
-                <div class="min-w-[12rem] flex-1">
+                <div class="w-full flex-1 sm:min-w-[12rem]">
                     <label for="m-user" class="block text-xs font-semibold uppercase tracking-wide text-zinc-500">Ajouter un membre</label>
                     <select id="m-user" name="user_id" required
                         class="mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-white">

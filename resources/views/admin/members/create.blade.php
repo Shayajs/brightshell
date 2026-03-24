@@ -48,7 +48,7 @@
                         Annuler
                     </a>
                     <button type="submit" id="submit-btn"
-                        class="min-w-[12rem] rounded-lg border border-indigo-500/40 bg-indigo-600/90 px-6 py-2.5 text-center text-sm font-semibold text-white shadow-lg shadow-indigo-950/40 transition hover:bg-indigo-500">
+                        class="w-full rounded-lg border border-indigo-500/40 bg-indigo-600/90 px-6 py-2.5 text-center text-sm font-semibold text-white shadow-lg shadow-indigo-950/40 transition hover:bg-indigo-500 sm:w-auto sm:min-w-[12rem]">
                         Créer le membre
                     </button>
                 </div>

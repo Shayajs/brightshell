@@ -62,7 +62,7 @@
 
         <form method="POST" action="{{ route('admin.collaborator-teams.members.store', $team) }}" class="mt-4 flex flex-wrap items-end gap-3 border-b border-zinc-800 pb-6">
             @csrf
-            <div class="min-w-[14rem] flex-1">
+            <div class="w-full flex-1 sm:min-w-[14rem]">
                 <label for="invite-email" class="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-zinc-500">Ajouter par e-mail</label>
                 <input type="email" id="invite-email" name="email" value="{{ old('email') }}" required placeholder="collaborateur@…"
                        class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 placeholder-zinc-600 focus:border-indigo-500/50 focus:outline-none focus:ring-2 focus:ring-indigo-500/20">

@@ -456,7 +456,7 @@
         <div class="portal-wrap flex min-h-screen min-w-0 flex-1 flex-col overflow-x-hidden">
 
             {{-- Topbar --}}
-            <header class="portal-topbar sticky top-0 z-20 flex min-w-0 shrink-0 flex-wrap items-center gap-x-3 gap-y-2 border-b border-zinc-800 bg-zinc-950/80 px-3 py-2.5 backdrop-blur-md sm:flex-nowrap sm:gap-y-0 sm:px-4 sm:py-3">
+            <header class="portal-topbar sticky top-0 z-20 flex min-w-0 shrink-0 flex-wrap items-center gap-x-2 gap-y-2 border-b border-zinc-800 bg-zinc-950/80 px-3 py-2.5 backdrop-blur-md sm:flex-nowrap sm:gap-x-3 sm:gap-y-0 sm:px-4 sm:py-3">
 
                 @unless ($portalKey === 'home')
                 {{-- Burger mobile --}}
@@ -472,7 +472,7 @@
                 @endunless
 
                 {{-- Label page --}}
-                <span class="truncate text-xs font-semibold uppercase tracking-[0.12em] text-zinc-400 font-display lg:block">@yield('topbar_label', 'Tableau de bord')</span>
+                <span class="max-w-[8rem] truncate text-[11px] font-semibold uppercase tracking-[0.12em] text-zinc-400 font-display sm:max-w-none sm:text-xs lg:block">@yield('topbar_label', 'Tableau de bord')</span>
 
                 @if ($portalKey === 'home' && $u)
                     <div class="flex shrink-0 items-center gap-2 sm:gap-3">
@@ -513,14 +513,23 @@
                             >
                         </div>
                     </form>
+                    <a
+                        href="{{ route('admin.search') }}"
+                        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-zinc-700 bg-zinc-900/80 text-zinc-300 transition hover:border-indigo-500/50 hover:text-indigo-300 sm:hidden"
+                        aria-label="Recherche administration"
+                    >
+                        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                    </a>
                 @endif
 
                 {{-- Slot extra --}}
-                <div class="flex shrink-0 items-center gap-2">@stack('topbar_extra')</div>
+                <div class="order-3 -mx-1 flex w-full min-w-0 items-center gap-2 overflow-x-auto px-1 pb-0.5 sm:order-none sm:mx-0 sm:w-auto sm:overflow-visible sm:px-0 sm:pb-0">
+                    @stack('topbar_extra')
+                </div>
 
                 {{-- ↓ Sélecteur de portail --}}
                 @if (count($accessiblePortals) > 1)
-                    <div class="relative" data-portal-switcher>
+                    <div class="relative shrink-0" data-portal-switcher>
                         <button
                             type="button"
                             class="flex h-9 shrink-0 items-center gap-2 rounded-lg border border-zinc-700 bg-zinc-900/80 px-3 py-0 text-sm font-semibold leading-none text-zinc-200 transition hover:border-indigo-500/50 hover:bg-zinc-800/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
@@ -575,7 +584,7 @@
                 </span>
             </header>
 
-            <main class="portal-main portal-main-scale mx-auto w-full min-w-0 flex-1 px-4 py-6 sm:px-6 lg:px-8 lg:py-8 @yield('portal_main_max', 'max-w-7xl') @yield('portal_main_class')">
+            <main class="portal-main portal-main-scale mx-auto w-full min-w-0 flex-1 overflow-x-hidden px-4 py-6 sm:px-6 lg:px-8 lg:py-8 @yield('portal_main_max', 'max-w-7xl') @yield('portal_main_class')">
                 @yield('content')
             </main>
         </div>

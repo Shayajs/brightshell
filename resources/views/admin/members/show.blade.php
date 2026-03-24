@@ -246,7 +246,7 @@
             <form method="POST" action="{{ route('admin.members.force-destroy', $member) }}" class="mt-4 flex flex-wrap items-end gap-3" onsubmit="return confirm('Supprimer DÉFINITIVEMENT ce compte et toutes ses données ?')">
                 @csrf
                 @method('DELETE')
-                <div class="min-w-[12rem] flex-1">
+                <div class="w-full flex-1 sm:min-w-[12rem]">
                     <label for="confirmation" class="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-zinc-500">Tape <span class="font-mono text-zinc-400">SUPPRIMER</span></label>
                     <input type="text" id="confirmation" name="confirmation" autocomplete="off" placeholder="SUPPRIMER"
                            class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 placeholder-zinc-600 focus:border-red-500/50 focus:outline-none focus:ring-2 focus:ring-red-500/20">

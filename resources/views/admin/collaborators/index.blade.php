@@ -33,13 +33,13 @@
 
     <form method="GET" action="{{ route('admin.collaborators.index') }}" class="flex flex-wrap items-end gap-3 rounded-2xl border border-zinc-800 bg-zinc-900/50 p-4 ring-1 ring-white/5">
         <input type="hidden" name="status" value="{{ $status ?? 'active' }}">
-        <div class="min-w-[12rem] flex-1">
+        <div class="w-full flex-1 sm:min-w-[12rem]">
             <label for="collab-q" class="block text-[10px] font-semibold uppercase tracking-wider text-zinc-500">Recherche</label>
             <input type="search" name="q" id="collab-q" value="{{ $q }}"
                    placeholder="Nom ou e-mail…"
                    class="mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-600 focus:border-indigo-500/50 focus:outline-none focus:ring-1 focus:ring-indigo-500/30">
         </div>
-        <div class="min-w-[10rem]">
+        <div class="w-full sm:min-w-[10rem]">
             <label for="collab-team" class="block text-[10px] font-semibold uppercase tracking-wider text-zinc-500">Équipe</label>
             <select name="team" id="collab-team"
                     class="mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 focus:border-indigo-500/50 focus:outline-none focus:ring-1 focus:ring-indigo-500/30">

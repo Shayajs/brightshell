@@ -31,6 +31,36 @@ body.auth-body {
     cursor: auto;
 }
 
+/* Portails connectés: ne jamais élargir le document en X sur mobile */
+html:has(.portal-shell),
+body.auth-body:has(.portal-shell) {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: clip;
+}
+
+.portal-shell,
+.portal-wrap,
+.portal-main {
+    min-width: 0;
+    max-width: 100%;
+}
+
+/* Admin: même protection sur tous les onglets/pages */
+.portal-shell[data-portal="admin"] .portal-main > * {
+    min-width: 0;
+    max-width: 100%;
+}
+
+.portal-shell[data-portal="admin"] .portal-main .grid > * {
+    min-width: 0;
+}
+
+.portal-shell[data-portal="admin"] .portal-main .overflow-x-auto {
+    width: 100%;
+    max-width: 100%;
+}
+
 /* Hors page d’accueil vitrine : curseur système explicite (en base pour laisser passer cursor-* Tailwind) */
 @layer base {
     body:not(.home-vitrine) :where(
