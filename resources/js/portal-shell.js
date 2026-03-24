@@ -31,4 +31,22 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
+
+    // Scroll automatique vers l'item actif dans la nav sidebar
+    const nav = shell.querySelector('.portal-nav');
+    const activeLink = nav?.querySelector('[aria-current="page"]');
+
+    if (nav && activeLink) {
+        const navRect = nav.getBoundingClientRect();
+        const linkRect = activeLink.getBoundingClientRect();
+
+        const isAbove = linkRect.top < navRect.top;
+        const isBelow = linkRect.bottom > navRect.bottom;
+
+        if (isAbove || isBelow) {
+            // Centre l'item actif dans la zone scrollable de la nav
+            const scrollTarget = activeLink.offsetTop - (nav.clientHeight / 2) + (activeLink.clientHeight / 2);
+            nav.scrollTo({ top: Math.max(0, scrollTarget), behavior: 'instant' });
+        }
+    }
 });
