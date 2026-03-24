@@ -61,6 +61,8 @@
 @extends('layouts.app', ['bodyClass' => 'home-vitrine'])
 
 @section('content')
+    <canvas id="hero-canvas" class="home-aurora-canvas" aria-hidden="true"></canvas>
+
     <!-- Logo -->
     <div class="logo-container">
         <img src="{{ BrightshellBrand::siteLogoUrl() }}" alt="Logo BrightShell - Développement Web Full Stack - Solutions innovantes" class="main-logo">

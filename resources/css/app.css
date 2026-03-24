@@ -311,6 +311,32 @@ body::before {
     overflow: hidden;
 }
 
+/* Accueil — fond aurora (canvas worker hors thread UI) */
+.home-aurora-canvas {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    display: block;
+    background:
+        radial-gradient(75% 85% at 20% 15%, rgba(23, 94, 157, 0.28), rgba(5, 9, 20, 0) 72%),
+        radial-gradient(65% 80% at 78% 28%, rgba(49, 42, 123, 0.25), rgba(5, 9, 20, 0) 74%),
+        linear-gradient(145deg, #030814 0%, #071226 45%, #020611 100%);
+}
+
+body.home-vitrine.home-aurora--fallback .home-aurora-canvas {
+    background:
+        radial-gradient(75% 85% at 20% 15%, rgba(23, 94, 157, 0.32), rgba(5, 9, 20, 0) 72%),
+        radial-gradient(65% 80% at 78% 28%, rgba(49, 42, 123, 0.3), rgba(5, 9, 20, 0) 74%),
+        linear-gradient(145deg, #031126 0%, #061b35 42%, #020611 100%);
+}
+
+body.home-vitrine .background-decoration {
+    display: none;
+}
+
 .circle {
     position: absolute;
     border: 1px solid rgba(208, 223, 240, 0.1);
