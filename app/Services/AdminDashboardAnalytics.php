@@ -18,6 +18,10 @@ use Illuminate\Support\Facades\Schema;
  */
 final class AdminDashboardAnalytics
 {
+    public function __construct(
+        private readonly OutboundApiWidgetDashboardPayload $outboundApiWidgets,
+    ) {}
+
     /** @return array<string, mixed> */
     public function payload(): array
     {
@@ -30,6 +34,7 @@ final class AdminDashboardAnalytics
             'uses_database_sessions' => config('session.driver') === 'database',
             'recent_users' => $this->recentUsers(),
             'recent_invoices' => $this->recentInvoices(),
+            'outbound_api_widgets' => $this->outboundApiWidgets->forDashboard(),
         ];
     }
 

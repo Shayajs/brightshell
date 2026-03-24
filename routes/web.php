@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Account\HomeController as AccountHomeController;
 use App\Http\Controllers\Admin\AdminAuditLogsController;
+use App\Http\Controllers\Admin\AdminOutboundApiWidgetsController;
 use App\Http\Controllers\Admin\ApiManagerController;
 use App\Http\Controllers\Admin\ClientsController;
 use App\Http\Controllers\Admin\CollaboratorsController;
@@ -285,6 +286,14 @@ $registerAdminRoutes = function (): void {
     Route::delete('/documentation/{docNode}', [DocNodesController::class, 'destroy'])->name('admin.doc-nodes.destroy');
 
     Route::get('/api-publique', [ApiManagerController::class, 'index'])->name('admin.api-manager.index');
+
+    Route::get('/outbound-api-widgets', [AdminOutboundApiWidgetsController::class, 'index'])->name('admin.outbound-api-widgets.index');
+    Route::get('/outbound-api-widgets/creer', [AdminOutboundApiWidgetsController::class, 'create'])->name('admin.outbound-api-widgets.create');
+    Route::post('/outbound-api-widgets', [AdminOutboundApiWidgetsController::class, 'store'])->name('admin.outbound-api-widgets.store');
+    Route::get('/outbound-api-widgets/{outbound_api_widget}/editer', [AdminOutboundApiWidgetsController::class, 'edit'])->name('admin.outbound-api-widgets.edit');
+    Route::put('/outbound-api-widgets/{outbound_api_widget}', [AdminOutboundApiWidgetsController::class, 'update'])->name('admin.outbound-api-widgets.update');
+    Route::delete('/outbound-api-widgets/{outbound_api_widget}', [AdminOutboundApiWidgetsController::class, 'destroy'])->name('admin.outbound-api-widgets.destroy');
+    Route::post('/outbound-api-widgets/{outbound_api_widget}/test', [AdminOutboundApiWidgetsController::class, 'test'])->name('admin.outbound-api-widgets.test');
     Route::get('/mail-templates', [MailTemplatesController::class, 'index'])->name('admin.mail-templates.index');
     Route::get('/mail-templates/{key}', [MailTemplatesController::class, 'edit'])->name('admin.mail-templates.edit');
     Route::put('/mail-templates/{key}', [MailTemplatesController::class, 'update'])->name('admin.mail-templates.update');

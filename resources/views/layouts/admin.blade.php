@@ -308,6 +308,12 @@
                                 'icon'   => '<path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>',
                             ])
                             @include('layouts.partials.nav-item', [
+                                'href'   => route('admin.outbound-api-widgets.index'),
+                                'active' => request()->routeIs('admin.outbound-api-widgets.*'),
+                                'label'  => 'API sortantes',
+                                'icon'   => '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>',
+                            ])
+                            @include('layouts.partials.nav-item', [
                                 'href'   => route('admin.doc-nodes.index'),
                                 'active' => request()->routeIs('admin.doc-nodes.*'),
                                 'label'  => 'Documentation',

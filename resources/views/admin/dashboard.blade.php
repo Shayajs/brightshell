@@ -196,6 +196,52 @@
                 </div>
             </section>
         </div>
+
+        <section class="space-y-4 border-t border-zinc-800/80 pt-10" aria-labelledby="admin-dashboard-outbound-api-heading">
+            <div class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                    <h2 id="admin-dashboard-outbound-api-heading" class="font-display text-lg font-bold tracking-tight text-white">
+                        API perso
+                    </h2>
+                    <p class="mt-1 max-w-2xl text-sm text-zinc-500">
+                        Données issues d’APIs externes configurées dans
+                        <a href="{{ route('admin.outbound-api-widgets.index') }}" class="font-semibold text-indigo-400 hover:text-indigo-300">API sortantes</a>.
+                        Plusieurs modules peuvent coexister (météo, statut distant, etc.).
+                    </p>
+                </div>
+            </div>
+
+            @if (empty($dashboard['outbound_api_widgets'] ?? []))
+                <p class="rounded-2xl border border-dashed border-zinc-800 bg-zinc-950/40 px-5 py-10 text-center text-sm text-zinc-500">
+                    Aucun module actif. Ajoutez une connexion sortante pour afficher des données ici.
+                </p>
+            @else
+                <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                    @foreach ($dashboard['outbound_api_widgets'] as $w)
+                        <article class="flex min-h-0 min-w-0 flex-col rounded-2xl border border-zinc-800 bg-zinc-900/60 p-5 shadow-sm ring-1 ring-white/5">
+                            <div class="flex flex-wrap items-start justify-between gap-2 border-b border-zinc-800/80 pb-3">
+                                <div class="min-w-0">
+                                    <h3 class="truncate font-display text-sm font-bold text-white">{{ $w['title'] }}</h3>
+                                    <p class="mt-0.5 text-[10px] font-medium uppercase tracking-wide text-zinc-500">{{ $w['fetch_label'] }}</p>
+                                </div>
+                                @if (($w['status_code'] ?? null) !== null)
+                                    <span class="shrink-0 rounded-md border border-zinc-700 bg-zinc-950 px-2 py-0.5 font-mono text-[10px] font-semibold text-zinc-400">HTTP {{ $w['status_code'] }}</span>
+                                @endif
+                            </div>
+                            @if (! empty($w['error']))
+                                <p class="mt-3 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-100/90">{{ $w['error'] }}</p>
+                            @endif
+                            <div class="mt-3 min-h-0 flex-1 overflow-auto rounded-xl border border-zinc-800/80 bg-zinc-950/50 p-3">
+                                <pre class="whitespace-pre-wrap break-words font-mono text-[11px] leading-relaxed text-zinc-300">{{ $w['body_display'] }}</pre>
+                            </div>
+                            @if (! empty($w['fetched_at']))
+                                <p class="mt-3 text-[10px] text-zinc-600">Rafraîchi / affiché : {{ $w['fetched_at'] }}</p>
+                            @endif
+                        </article>
+                    @endforeach
+                </div>
+            @endif
+        </section>
     </div>
 @endsection
 

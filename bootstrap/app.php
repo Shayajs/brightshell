@@ -83,6 +83,7 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withSchedule(function (Schedule $schedule): void {
         $schedule->command('mailbox:process-reverse-verification')->everyFiveMinutes();
+        $schedule->command('outbound-api-widgets:sync')->everyFiveMinutes();
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
