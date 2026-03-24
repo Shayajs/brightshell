@@ -64,4 +64,18 @@ final class BrightshellDomain
 
         return self::urlScheme().'://mail.'.$root;
     }
+
+    /**
+     * Hôte effectif de l’API (même logique que le chargement des routes dans bootstrap/app.php).
+     */
+    public static function effectiveApiHost(): string
+    {
+        $apiHost = trim((string) config('brightshell.domains.api_host', ''));
+        $root = self::effectiveRoot();
+        if ($apiHost === '' && $root !== '') {
+            $apiHost = 'api.'.$root;
+        }
+
+        return $apiHost;
+    }
 }

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\BlockWebVitrineOnApiHost;
 use App\Http\Middleware\DeveloperApiCors;
 use App\Http\Middleware\EnsureSanctumApiUser;
 use App\Http\Middleware\EnsureUserCanAccessProjectPortal;
@@ -48,6 +49,13 @@ return Application::configure(basePath: dirname(__DIR__))
                 ])
                 ->prefix('v1')
                 ->group(base_path('routes/api-private.php'));
+
+            Route::domain($apiHost)
+                ->middleware([ForceJsonForApiRequests::class])
+                ->fallback(static fn () => response()->json([
+                    'message' => 'Route API introuvable.',
+                ], 404))
+                ->name('api.fallback');
         },
     )
     ->withMiddleware(function (Middleware $middleware): void {
@@ -56,6 +64,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'roles.any' => EnsureUserHasAnyRole::class,
             'role.developer' => EnsureUserHasDeveloperRole::class,
             'portal.project' => EnsureUserCanAccessProjectPortal::class,
+            'block.web.on.api.host' => BlockWebVitrineOnApiHost::class,
         ]);
         $middleware->redirectGuestsTo(fn () => route('login'));
         $middleware->redirectUsersTo(function () {

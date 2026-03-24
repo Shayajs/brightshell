@@ -332,16 +332,19 @@ if ($adminHost !== '') {
 |--------------------------------------------------------------------------
 | Vitrine (domaine principal)
 |--------------------------------------------------------------------------
+| Sans contrainte d’hôte : évite de servir la vitrine sur api.* (middleware).
 */
-Route::get('/', [HomeController::class, 'index'])->name('home');
-Route::get('/services', [ServicesController::class, 'index'])->name('services');
-Route::get('/realisations', [RealisationsController::class, 'index'])->name('realisations');
-Route::get('/cv', [CvController::class, 'index'])->name('cv');
+Route::middleware(['block.web.on.api.host'])->group(function (): void {
+    Route::get('/', [HomeController::class, 'index'])->name('home');
+    Route::get('/services', [ServicesController::class, 'index'])->name('services');
+    Route::get('/realisations', [RealisationsController::class, 'index'])->name('realisations');
+    Route::get('/cv', [CvController::class, 'index'])->name('cv');
 
-Route::permanentRedirect('/index.html', '/');
-Route::permanentRedirect('/services.html', '/services');
-Route::permanentRedirect('/realisations.html', '/realisations');
-Route::permanentRedirect('/cv.html', '/cv');
+    Route::permanentRedirect('/index.html', '/');
+    Route::permanentRedirect('/services.html', '/services');
+    Route::permanentRedirect('/realisations.html', '/realisations');
+    Route::permanentRedirect('/cv.html', '/cv');
+});
 
 /*
 |--------------------------------------------------------------------------

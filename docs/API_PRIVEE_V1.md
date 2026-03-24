@@ -11,6 +11,10 @@ Ce document décrit l’API JSON authentifiée par **jeton personnel Laravel San
 3. Compte **non archivé** et **e-mail vérifié** (middleware `EnsureSanctumApiUser`).
 4. Le middleware **`ForceJsonForApiRequests`** force `Accept: application/json` pour éviter des redirections HTML en cas d’erreur d’auth.
 
+### Comportement de l’hôte `api.*`
+
+Sur l’hôte réservé à l’API (`BRIGHTSHELL_API_HOST` ou `api.<racine>`) : la **vitrine** du site (`/`, `/services`, …) ne répond plus en HTML — **404 JSON** (`BlockWebVitrineOnApiHost`). Toute autre URL non couverte par une route API déclenchée déclenche un **fallback** JSON 404 (`api.fallback`).
+
 ### Création des jetons (interface web)
 
 La page **Réglages → API** (création / révocation des jetons) est actuellement protégée par le middleware **`role.developer`**. Les utilisateurs sans ce rôle n’ont pas d’UI pour générer un token, même si certains endpoints leur seraient autorisés une fois authentifiés.
