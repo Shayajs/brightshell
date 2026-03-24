@@ -598,13 +598,94 @@
         const btn   = switcher.querySelector('[data-portal-switcher-btn]');
         const menu  = switcher.querySelector('[data-portal-switcher-menu]');
         const chev  = switcher.querySelector('[data-portal-switcher-chevron]');
+        const viewportPadding = 8;
+        const isMobileSidebar = () => window.matchMedia('(max-width: 1023px)').matches;
 
-        const open  = () => { menu.classList.remove('hidden'); btn.setAttribute('aria-expanded', 'true');  chev.classList.add('rotate-180'); };
-        const close = () => { menu.classList.add('hidden');    btn.setAttribute('aria-expanded', 'false'); chev.classList.remove('rotate-180'); };
+        const positionMenu = () => {
+            if (menu.classList.contains('hidden')) return;
+
+            if (!isMobileSidebar()) {
+                // Desktop: comportement natif (ancrage CSS right-0), sans calcul JS.
+                menu.style.removeProperty('position');
+                menu.style.removeProperty('left');
+                menu.style.removeProperty('top');
+                menu.style.removeProperty('right');
+                menu.style.removeProperty('width');
+                menu.style.removeProperty('maxWidth');
+                return;
+            }
+
+            // Menu en fixed pour rester borné au viewport, quel que soit le wrap topbar.
+            menu.style.position = 'fixed';
+            menu.style.right = 'auto';
+            const viewportWidth = Math.max(0, document.documentElement.clientWidth || window.innerWidth || 0);
+            const viewportHeight = Math.max(0, document.documentElement.clientHeight || window.innerHeight || 0);
+            menu.style.maxWidth = `${Math.max(160, viewportWidth - viewportPadding * 2)}px`;
+
+            const btnRect = btn.getBoundingClientRect();
+            const firstRect = menu.getBoundingClientRect();
+
+            // Si la largeur intrinsèque dépasse l’écran, on force la largeur dispo.
+            if (firstRect.width > viewportWidth - viewportPadding * 2) {
+                menu.style.width = `${Math.max(160, viewportWidth - viewportPadding * 2)}px`;
+            } else {
+                menu.style.removeProperty('width');
+            }
+
+            const computeLeft = (menuWidth) => {
+                // Alignement desktop/mobile stable: bord droit du menu sur bord droit du bouton,
+                // puis clamp viewport pour ne jamais sortir de l'écran.
+                const idealLeft = (btnRect.right - menuWidth) - 4;
+                const maxLeft = Math.max(viewportPadding, viewportWidth - menuWidth - viewportPadding);
+                return Math.min(maxLeft, Math.max(viewportPadding, idealLeft));
+            };
+
+            const rect = menu.getBoundingClientRect();
+            const left = computeLeft(rect.width);
+
+            let top = btnRect.bottom + 8;
+            if (top + rect.height > viewportHeight - viewportPadding) {
+                top = Math.max(viewportPadding, viewportHeight - rect.height - viewportPadding);
+            }
+
+            menu.style.left = `${left}px`;
+            menu.style.top = `${top}px`;
+
+            // Recalcul complet après paint: largeur finale -> alignement final stable.
+            requestAnimationFrame(() => {
+                if (menu.classList.contains('hidden')) return;
+                const fixedRect = menu.getBoundingClientRect();
+                menu.style.left = `${computeLeft(fixedRect.width)}px`;
+            });
+        };
+
+        const open  = () => {
+            menu.classList.remove('hidden');
+            btn.setAttribute('aria-expanded', 'true');
+            chev.classList.add('rotate-180');
+            positionMenu();
+        };
+        const close = () => {
+            menu.classList.add('hidden');
+            btn.setAttribute('aria-expanded', 'false');
+            chev.classList.remove('rotate-180');
+            menu.style.removeProperty('position');
+            menu.style.removeProperty('left');
+            menu.style.removeProperty('top');
+            menu.style.removeProperty('right');
+            menu.style.removeProperty('width');
+            menu.style.removeProperty('maxWidth');
+        };
 
         btn.addEventListener('click', (e) => { e.stopPropagation(); menu.classList.contains('hidden') ? open() : close(); });
         document.addEventListener('click', close);
         document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+        window.addEventListener('resize', positionMenu);
+        window.addEventListener('scroll', () => {
+            if (isMobileSidebar()) {
+                positionMenu();
+            }
+        }, { passive: true });
     })();
     </script>
 
