@@ -32,18 +32,29 @@ body.auth-body {
 }
 
 /* Portails connectés: ne jamais élargir le document en X sur mobile */
-html:has(.portal-shell),
 body.auth-body:has(.portal-shell) {
-    width: 100%;
-    max-width: 100%;
-    overflow-x: clip;
+    overflow-x: hidden;
 }
+
 
 .portal-shell,
 .portal-wrap,
 .portal-main {
     min-width: 0;
     max-width: 100%;
+}
+
+.portal-main {
+    overflow-x: hidden;
+    /* Remonte sous le header (sticky) tout en réservant l'espace via padding-top */
+    margin-top: calc(-1 * var(--topbar-h, 0px));
+    padding-top: calc(var(--topbar-h, 0px) + 1.5rem);
+}
+
+@media (min-width: 1024px) {
+    .portal-main {
+        padding-top: calc(var(--topbar-h, 0px) + 2rem);
+    }
 }
 
 /* Admin: même protection sur tous les onglets/pages */
@@ -105,11 +116,21 @@ body.auth-body:has(.portal-shell) {
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-    background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-darker) 100%);
+    background: var(--bg-darker);
     color: var(--text-light);
     min-height: 100vh;
     overflow-x: hidden;
     position: relative;
+}
+
+/* Dégradé en position fixed : couvre le viewport sans jamais tiler, quelle que soit la longueur de la page */
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-darker) 100%);
+    pointer-events: none;
 }
 
 /* Créer le curseur personnalisé avec SVG */

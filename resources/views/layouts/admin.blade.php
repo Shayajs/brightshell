@@ -453,7 +453,7 @@
         @endunless
 
         {{-- ===================== CONTENU ===================== --}}
-        <div class="portal-wrap flex min-h-screen min-w-0 flex-1 flex-col overflow-x-hidden">
+        <div class="portal-wrap relative flex min-h-screen min-w-0 flex-1 flex-col">
 
             {{-- Topbar --}}
             <header class="portal-topbar sticky top-0 z-20 flex min-w-0 shrink-0 flex-wrap items-center gap-x-2 gap-y-2 border-b border-zinc-800 bg-zinc-950/80 px-3 py-2.5 backdrop-blur-md sm:flex-nowrap sm:gap-x-3 sm:gap-y-0 sm:px-4 sm:py-3">
@@ -584,13 +584,24 @@
                 </span>
             </header>
 
-            <main class="portal-main portal-main-scale mx-auto w-full min-w-0 flex-1 overflow-x-hidden px-4 py-6 sm:px-6 lg:px-8 lg:py-8 @yield('portal_main_max', 'max-w-7xl') @yield('portal_main_class')">
+            <main class="portal-main portal-main-scale mx-auto w-full min-w-0 flex-1 px-4 pb-6 sm:px-6 lg:px-8 lg:pb-8 @yield('portal_main_max', 'max-w-7xl') @yield('portal_main_class')">
                 @yield('content')
             </main>
         </div>
     </div>
 
     <script>
+    // Mesure la hauteur du topbar et expose --topbar-h pour le padding-top de .portal-main
+    (() => {
+        const header = document.querySelector('.portal-topbar');
+        if (!header) return;
+        const update = () => document.documentElement.style.setProperty('--topbar-h', header.offsetHeight + 'px');
+        update();
+        if (typeof ResizeObserver !== 'undefined') {
+            new ResizeObserver(update).observe(header);
+        }
+    })();
+
     // Portal switcher toggle
     (() => {
         const switcher = document.querySelector('[data-portal-switcher]');
