@@ -34,8 +34,12 @@ return [
         'docs_host' => env('BRIGHTSHELL_DOCS_HOST'),
         /** Hub portail connecté — vide = home.{root} */
         'home_host' => env('BRIGHTSHELL_HOME_HOST'),
+        /** Portail projets clients — vide = project.{root} */
+        'project_host' => env('BRIGHTSHELL_PROJECT_HOST'),
         /** API publique lecture seule — vide = api.{root} */
         'api_host' => env('BRIGHTSHELL_API_HOST'),
+        /** Webmail / interface mail — vide = mail.{root} */
+        'mail_web_host' => env('BRIGHTSHELL_MAIL_WEB_HOST'),
         /** Sous-domaines qui servent la même vitrine que le site principal (ex. www) */
         'vitrine_subdomains' => array_values(array_filter(array_map('trim', explode(',', env('BRIGHTSHELL_VITRINE_SUBDOMAINS', 'www'))))),
     ],
@@ -53,6 +57,7 @@ return [
         'settings_url' => rtrim((string) env('BRIGHTSHELL_PORTAL_SETTINGS_URL', ''), '/'),
         'docs_url' => rtrim((string) env('BRIGHTSHELL_PORTAL_DOCS_URL', ''), '/'),
         'home_url' => rtrim((string) env('BRIGHTSHELL_PORTAL_HOME_URL', ''), '/'),
+        'project_url' => rtrim((string) env('BRIGHTSHELL_PORTAL_PROJECT_URL', ''), '/'),
     ],
 
     /*

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class SupportTicket extends Model
 {
@@ -45,6 +46,12 @@ class SupportTicket extends Model
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);
+    }
+
+    /** @return HasMany<ProjectRequest, $this> */
+    public function projectRequests(): HasMany
+    {
+        return $this->hasMany(ProjectRequest::class, 'support_ticket_id');
     }
 
     /**

@@ -1,20 +1,26 @@
 @extends('layouts.admin')
-@section('title', 'Membres')
-@section('topbar_label', 'Membres')
+@php
+    $pageTitle = $pageTitle ?? 'Membres';
+    $membersIndexRoute = $membersIndexRoute ?? 'admin.members.index';
+@endphp
+@section('title', $pageTitle)
+@section('topbar_label', $pageTitle)
 
 @push('topbar_extra')
+    @if ($showMemberCreate ?? true)
     <a href="{{ route('admin.members.create') }}"
         class="flex items-center gap-2 rounded-lg border border-indigo-500/40 bg-indigo-600/90 px-3 py-2 text-xs font-semibold text-white transition hover:bg-indigo-500">
         <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         Nouveau membre
     </a>
+    @endif
 @endpush
 
 @section('content')
 <div class="space-y-6">
     <div class="flex flex-wrap items-end justify-between gap-4">
         <div>
-            <h1 class="font-display text-2xl font-bold text-white">Membres</h1>
+            <h1 class="font-display text-2xl font-bold text-white">{{ $pageTitle }}</h1>
             <p class="mt-1 text-sm text-zinc-500">{{ $members->total() }} compte(s) —
                 @if (($status ?? 'active') === 'active')
                     actifs
@@ -23,14 +29,17 @@
                 @else
                     tous
                 @endif
+                @if (! empty($pageSubtitle))
+                    — {{ $pageSubtitle }}
+                @endif
             </p>
         </div>
         <div class="flex flex-wrap gap-2">
-            <a href="{{ route('admin.members.index', ['status' => 'active']) }}"
+            <a href="{{ route($membersIndexRoute, ['status' => 'active']) }}"
                class="rounded-lg border px-3 py-1.5 text-xs font-semibold transition {{ ($status ?? 'active') === 'active' ? 'border-indigo-500/50 bg-indigo-500/10 text-indigo-300' : 'border-zinc-700 text-zinc-400 hover:border-zinc-600' }}">Actifs</a>
-            <a href="{{ route('admin.members.index', ['status' => 'archived']) }}"
+            <a href="{{ route($membersIndexRoute, ['status' => 'archived']) }}"
                class="rounded-lg border px-3 py-1.5 text-xs font-semibold transition {{ ($status ?? '') === 'archived' ? 'border-indigo-500/50 bg-indigo-500/10 text-indigo-300' : 'border-zinc-700 text-zinc-400 hover:border-zinc-600' }}">Archivés</a>
-            <a href="{{ route('admin.members.index', ['status' => 'all']) }}"
+            <a href="{{ route($membersIndexRoute, ['status' => 'all']) }}"
                class="rounded-lg border px-3 py-1.5 text-xs font-semibold transition {{ ($status ?? '') === 'all' ? 'border-indigo-500/50 bg-indigo-500/10 text-indigo-300' : 'border-zinc-700 text-zinc-400 hover:border-zinc-600' }}">Tous</a>
         </div>
     </div>
@@ -90,8 +99,13 @@
                     @empty
                         <tr>
                             <td colspan="6" class="px-5 py-12 text-center text-sm text-zinc-600">
-                                Aucun membre pour l'instant.
-                                <a href="{{ route('admin.members.create') }}" class="ml-2 text-indigo-400 hover:underline">Créer le premier →</a>
+                                @if ($pageTitle === 'Clients')
+                                    Aucun compte avec le rôle client.
+                                    <a href="{{ route('admin.members.create') }}" class="ml-2 text-indigo-400 hover:underline">Créer un membre →</a>
+                                @else
+                                    Aucun membre pour l'instant.
+                                    <a href="{{ route('admin.members.create') }}" class="ml-2 text-indigo-400 hover:underline">Créer le premier →</a>
+                                @endif
                             </td>
                         </tr>
                     @endforelse

@@ -10,7 +10,9 @@
             <h1 class="font-display text-2xl font-bold tracking-tight text-white sm:text-3xl">Clés d’API</h1>
             <p class="text-sm text-zinc-400">
                 Utilisez un jeton Bearer sur le sous-domaine API (ex. <code class="rounded bg-zinc-800 px-1 text-xs">Authorization: Bearer …</code>).
-                Les requêtes nécessitent le rôle développeur et un e-mail vérifié.
+                Chaque requête exige un <strong class="text-zinc-300">e-mail vérifié</strong> et un compte actif ; les droits ensuite dépendent des rôles et policies (voir la doc du dépôt
+                <code class="rounded bg-zinc-800 px-1 text-xs">docs/API_PRIVEE_V1.md</code>).
+                Seule la <strong class="text-zinc-300">création des jetons</strong> sur cette page est réservée au rôle développeur.
             </p>
         </header>
 

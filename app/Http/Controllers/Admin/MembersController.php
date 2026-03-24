@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\CollaboratorTeam;
 use App\Models\Role;
 use App\Models\User;
+use App\Support\AdminAudit;
 use App\Support\AdminEmailVerification;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Http\RedirectResponse;
@@ -90,6 +91,11 @@ class MembersController extends Controller
                 $member->roles()->sync($m['roles']);
             }
 
+            AdminAudit::record('member.created', $member, [
+                'email' => $member->email,
+                'is_admin' => $member->is_admin,
+            ]);
+
             $created[] = $member;
 
             if ($generated) {
@@ -149,6 +155,9 @@ class MembersController extends Controller
             'is_admin' => ['nullable', 'boolean'],
         ]);
 
+        $beforeRoles = $member->roles()->pluck('slug')->sort()->values()->all();
+        $beforeAdmin = $member->is_admin;
+
         $member->roles()->sync($request->input('roles', []));
 
         if ($request->has('is_admin')) {
@@ -157,6 +166,13 @@ class MembersController extends Controller
 
         $member->refresh();
         AdminEmailVerification::ensureVerifiedIfAdmin($member);
+
+        AdminAudit::record('member.roles_updated', $member, [
+            'roles_before' => $beforeRoles,
+            'roles_after' => $member->roles()->pluck('slug')->sort()->values()->all(),
+            'is_admin_before' => $beforeAdmin,
+            'is_admin_after' => $member->is_admin,
+        ]);
 
         return back()->with('success', 'Rôles mis à jour.');
     }
@@ -183,6 +199,10 @@ class MembersController extends Controller
 
         if (! $member->isCollaboratorPortalUser()) {
             $member->collaboratorTeams()->detach();
+            AdminAudit::record('member.collaborator_access_updated', $member, [
+                'team_ids' => [],
+                'cleared' => true,
+            ]);
 
             return back()->with('success', 'Accès coordinateur mis à jour. Équipes collaborateur vidées (compte sans rôle collaborateur / admin).');
         }
@@ -202,6 +222,11 @@ class MembersController extends Controller
 
         $member->collaboratorTeams()->sync($pivot);
 
+        AdminAudit::record('member.collaborator_access_updated', $member, [
+            'team_ids' => $ids,
+            'can_manage_collaborator_team_managers' => $member->can_manage_collaborator_team_managers,
+        ]);
+
         return back()->with('success', 'Équipes collaborateur et coordinateur mis à jour.');
     }
 
@@ -217,6 +242,7 @@ class MembersController extends Controller
                 ->with('error', 'Pour archiver votre propre compte, utilisez Réglages → Compte.');
         }
 
+        AdminAudit::record('member.archived', $member, ['email' => $member->email]);
         $member->delete();
 
         return redirect()
@@ -231,6 +257,8 @@ class MembersController extends Controller
         }
 
         $member->restore();
+
+        AdminAudit::record('member.restored', $member, ['email' => $member->email]);
 
         return redirect()
             ->route('admin.members.show', $member)
@@ -249,6 +277,7 @@ class MembersController extends Controller
             return back()->with('error', 'Vous ne pouvez pas effacer votre propre compte depuis cette page.');
         }
 
+        AdminAudit::record('member.force_deleted', $member, ['email' => $member->email]);
         $member->forceDelete();
 
         return redirect()

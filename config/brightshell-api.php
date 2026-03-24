@@ -3,6 +3,8 @@
 /**
  * Métadonnées des endpoints publics (clé = nom de route Laravel).
  * Les routes réelles sont dans routes/api-public.php ; complétez ce fichier lorsque vous en ajoutez.
+ *
+ * L’API privée Sanctum (préfixe /v1, auth Bearer) est documentée dans docs/API_PRIVEE_V1.md.
  */
 return [
     'endpoints' => [

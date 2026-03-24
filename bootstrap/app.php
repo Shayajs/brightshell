@@ -1,7 +1,8 @@
 <?php
 
 use App\Http\Middleware\DeveloperApiCors;
-use App\Http\Middleware\EnsureDeveloperApiAccess;
+use App\Http\Middleware\EnsureSanctumApiUser;
+use App\Http\Middleware\EnsureUserCanAccessProjectPortal;
 use App\Http\Middleware\EnsureUserHasAnyRole;
 use App\Http\Middleware\EnsureUserHasDeveloperRole;
 use App\Http\Middleware\ForceJsonForApiRequests;
@@ -41,9 +42,9 @@ return Application::configure(basePath: dirname(__DIR__))
                 ->middleware([
                     ForceJsonForApiRequests::class,
                     DeveloperApiCors::class,
-                    'throttle:60,1',
+                    'throttle:120,1',
                     'auth:sanctum',
-                    EnsureDeveloperApiAccess::class,
+                    EnsureSanctumApiUser::class,
                 ])
                 ->prefix('v1')
                 ->group(base_path('routes/api-private.php'));
@@ -54,6 +55,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'roles.any' => EnsureUserHasAnyRole::class,
             'role.developer' => EnsureUserHasDeveloperRole::class,
+            'portal.project' => EnsureUserCanAccessProjectPortal::class,
         ]);
         $middleware->redirectGuestsTo(fn () => route('login'));
         $middleware->redirectUsersTo(function () {

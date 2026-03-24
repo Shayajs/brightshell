@@ -1,7 +1,11 @@
 <?php
 
 use App\Http\Controllers\Account\HomeController as AccountHomeController;
+use App\Http\Controllers\Admin\AdminAuditLogsController;
 use App\Http\Controllers\Admin\ApiManagerController;
+use App\Http\Controllers\Admin\ClientsController;
+use App\Http\Controllers\Admin\CollaboratorsController;
+use App\Http\Controllers\Admin\CollaboratorTeamsController;
 use App\Http\Controllers\Admin\CompaniesController;
 use App\Http\Controllers\Admin\CvAdminController;
 use App\Http\Controllers\Admin\DashboardController;
@@ -10,6 +14,8 @@ use App\Http\Controllers\Admin\DocNodesController;
 use App\Http\Controllers\Admin\InvoicesController;
 use App\Http\Controllers\Admin\MailTemplatesController;
 use App\Http\Controllers\Admin\MembersController;
+use App\Http\Controllers\Admin\ProjectInvitationsController;
+use App\Http\Controllers\Admin\ProjectsController;
 use App\Http\Controllers\Admin\RealisationsAdminController;
 use App\Http\Controllers\Admin\SearchController;
 use App\Http\Controllers\Admin\SiteAppearanceController;
@@ -20,6 +26,8 @@ use App\Http\Controllers\Admin\StudentSubjectFilesController;
 use App\Http\Controllers\Admin\StudentSubjectFoldersController;
 use App\Http\Controllers\Admin\StudentSubjectsController;
 use App\Http\Controllers\Admin\SupportTicketsController;
+use App\Http\Controllers\Admin\SystemHealthController;
+use App\Http\Controllers\Auth\AcceptProjectInvitationController;
 use App\Http\Controllers\Auth\EmailVerificationNotificationController;
 use App\Http\Controllers\Auth\EmailVerificationPromptController;
 use App\Http\Controllers\Auth\LoginController;
@@ -39,6 +47,18 @@ use App\Http\Controllers\Docs\DashboardController as DocsDashboardController;
 use App\Http\Controllers\Docs\PageController as DocsPageController;
 use App\Http\Controllers\Home\DashboardController as HomePortalDashboardController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\Project\AppointmentsController as ProjectAppointmentsController;
+use App\Http\Controllers\Project\ContractsController as ProjectContractsController;
+use App\Http\Controllers\Project\CreateProjectController as ProjectPortalCreateController;
+use App\Http\Controllers\Project\DashboardController as ProjectPortalDashboardController;
+use App\Http\Controllers\Project\DocumentsController as ProjectDocumentsController;
+use App\Http\Controllers\Project\KanbanController as ProjectKanbanController;
+use App\Http\Controllers\Project\NotesController as ProjectNotesController;
+use App\Http\Controllers\Project\PriceItemsController as ProjectPriceItemsController;
+use App\Http\Controllers\Project\RequestsController as ProjectRequestsController;
+use App\Http\Controllers\Project\SettingsController as ProjectPortalSettingsController;
+use App\Http\Controllers\Project\ShowController as ProjectPortalShowController;
+use App\Http\Controllers\Project\SpecSectionsController as ProjectSpecSectionsController;
 use App\Http\Controllers\RealisationsController;
 use App\Http\Controllers\ServicesController;
 use App\Http\Controllers\Settings\AccountClosureController;
@@ -60,6 +80,9 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 $registerAuthRoutes = function (): void {
+    Route::get('/project-invitation/{token}', AcceptProjectInvitationController::class)
+        ->name('project-invitation.accept');
+
     Route::middleware('guest')->group(function (): void {
         Route::get('/login', [LoginController::class, 'create'])->name('login');
         Route::post('/login', [LoginController::class, 'store'])->middleware('throttle:10,1');
@@ -127,6 +150,8 @@ $registerAdminRoutes = function (): void {
     Route::get('/recherche', SearchController::class)->middleware('throttle:60,1')->name('admin.search');
 
     // Membres
+    Route::get('/clients', [ClientsController::class, 'index'])->name('admin.clients.index');
+
     Route::get('/members', [MembersController::class, 'index'])->name('admin.members.index');
     Route::get('/members/create', [MembersController::class, 'create'])->name('admin.members.create');
     Route::post('/members', [MembersController::class, 'store'])->name('admin.members.store');
@@ -138,6 +163,17 @@ $registerAdminRoutes = function (): void {
     Route::post('/members/{member}/verify-email', [MembersController::class, 'verifyEmail'])->name('admin.members.verify-email');
     Route::post('/members/{member}/roles', [MembersController::class, 'updateRoles'])->name('admin.members.roles');
     Route::post('/members/{member}/collaborateur-acces', [MembersController::class, 'updateCollaboratorAccess'])->name('admin.members.collaborator-access');
+
+    Route::get('/collaborateurs', [CollaboratorsController::class, 'index'])->name('admin.collaborators.index');
+    Route::get('/collaborateurs/groupes', [CollaboratorTeamsController::class, 'index'])->name('admin.collaborator-teams.index');
+    Route::get('/collaborateurs/groupes/creer', [CollaboratorTeamsController::class, 'create'])->name('admin.collaborator-teams.create');
+    Route::post('/collaborateurs/groupes', [CollaboratorTeamsController::class, 'store'])->name('admin.collaborator-teams.store');
+    Route::get('/collaborateurs/groupes/{collaborator_team}/editer', [CollaboratorTeamsController::class, 'edit'])->name('admin.collaborator-teams.edit');
+    Route::put('/collaborateurs/groupes/{collaborator_team}', [CollaboratorTeamsController::class, 'update'])->name('admin.collaborator-teams.update');
+    Route::delete('/collaborateurs/groupes/{collaborator_team}', [CollaboratorTeamsController::class, 'destroy'])->name('admin.collaborator-teams.destroy');
+    Route::post('/collaborateurs/groupes/{collaborator_team}/membres', [CollaboratorTeamsController::class, 'storeMember'])->name('admin.collaborator-teams.members.store');
+    Route::delete('/collaborateurs/groupes/{collaborator_team}/membres/{user}', [CollaboratorTeamsController::class, 'destroyMember'])->name('admin.collaborator-teams.members.destroy');
+    Route::patch('/collaborateurs/groupes/{collaborator_team}/membres/{user}/gerant', [CollaboratorTeamsController::class, 'updateMemberManager'])->name('admin.collaborator-teams.members.manager');
 
     // Cours par élève (indépendants par utilisateur)
     Route::get('/student-courses', [StudentCoursesController::class, 'index'])->name('admin.student-courses.index');
@@ -194,6 +230,31 @@ $registerAdminRoutes = function (): void {
     Route::get('/companies/{company}/edit', [CompaniesController::class, 'edit'])->name('admin.companies.edit');
     Route::put('/companies/{company}', [CompaniesController::class, 'update'])->name('admin.companies.update');
     Route::delete('/companies/{company}', [CompaniesController::class, 'destroy'])->name('admin.companies.destroy');
+
+    // Projets (portail project.* — invitations et droits réservés admin)
+    Route::get('/projects', [ProjectsController::class, 'index'])->name('admin.projects.index');
+    Route::get('/projects/create', [ProjectsController::class, 'create'])->name('admin.projects.create');
+    Route::post('/projects', [ProjectsController::class, 'store'])->name('admin.projects.store');
+    Route::get('/projects/{project}/edit', [ProjectsController::class, 'edit'])->name('admin.projects.edit');
+    Route::put('/projects/{project}', [ProjectsController::class, 'update'])->name('admin.projects.update');
+    Route::delete('/projects/{project}', [ProjectsController::class, 'destroy'])->name('admin.projects.destroy');
+    Route::post('/projects/{project}/archiver', [ProjectsController::class, 'archive'])->name('admin.projects.archive');
+    Route::post('/projects/{project}/reactiver', [ProjectsController::class, 'unarchive'])->name('admin.projects.unarchive');
+    Route::post('/projects/{project}/membres', [ProjectsController::class, 'attachMember'])->name('admin.projects.members.attach');
+    Route::put('/projects/{project}/membres/{user}', [ProjectsController::class, 'updateMember'])->name('admin.projects.members.update');
+    Route::delete('/projects/{project}/membres/{user}', [ProjectsController::class, 'detachMember'])->name('admin.projects.members.detach');
+    Route::post('/projects/{project}/inviter-email', [ProjectsController::class, 'inviteByEmail'])
+        ->middleware('throttle:15,1')
+        ->name('admin.projects.invite-email');
+
+    Route::get('/invitations-projets', [ProjectInvitationsController::class, 'index'])->name('admin.project-invitations.index');
+    Route::post('/invitations-projets/{project_invitation}/renvoyer', [ProjectInvitationsController::class, 'resend'])
+        ->middleware('throttle:12,1')
+        ->name('admin.project-invitations.resend');
+    Route::delete('/invitations-projets/{project_invitation}', [ProjectInvitationsController::class, 'destroy'])->name('admin.project-invitations.destroy');
+
+    Route::get('/journal', [AdminAuditLogsController::class, 'index'])->name('admin.audit-logs.index');
+    Route::get('/sante', SystemHealthController::class)->name('admin.system-health');
 
     // Factures
     Route::get('/invoices', [InvoicesController::class, 'index'])->name('admin.invoices.index');
@@ -400,6 +461,80 @@ if ($settingsHost !== '') {
 
 /*
 |--------------------------------------------------------------------------
+| Portail projets (project.*)
+|--------------------------------------------------------------------------
+*/
+$projectHost = (string) config('brightshell.domains.project_host', '');
+if ($projectHost === '' && $inferredRoot !== '') {
+    $projectHost = 'project.'.$inferredRoot;
+}
+if ($projectHost !== '') {
+    Route::domain($projectHost)
+        ->middleware(['auth', 'verified', 'portal.project'])
+        ->group(function (): void {
+            Route::get('/', ProjectPortalDashboardController::class)->name('portals.project');
+            Route::get('/parametres', ProjectPortalSettingsController::class)->name('portals.project.settings');
+
+            Route::get('/projets/nouveau', [ProjectPortalCreateController::class, 'create'])
+                ->middleware('can:create,App\Models\Project')
+                ->name('portals.project.create');
+            Route::post('/projets', [ProjectPortalCreateController::class, 'store'])
+                ->middleware('can:create,App\Models\Project')
+                ->name('portals.project.store');
+
+            Route::prefix('projets/{project}')
+                ->middleware(['can:view,project'])
+                ->group(function (): void {
+                    Route::get('/', ProjectPortalShowController::class)->name('portals.project.show');
+
+                    Route::get('/rendez-vous', [ProjectAppointmentsController::class, 'index'])->name('portals.project.appointments.index');
+                    Route::post('/rendez-vous', [ProjectAppointmentsController::class, 'store'])->middleware('can:update,project')->name('portals.project.appointments.store');
+                    Route::put('/rendez-vous/{appointment}', [ProjectAppointmentsController::class, 'update'])->middleware('can:update,project')->name('portals.project.appointments.update');
+                    Route::delete('/rendez-vous/{appointment}', [ProjectAppointmentsController::class, 'destroy'])->middleware('can:update,project')->name('portals.project.appointments.destroy');
+
+                    Route::get('/notes', [ProjectNotesController::class, 'index'])->name('portals.project.notes.index');
+                    Route::post('/notes', [ProjectNotesController::class, 'store'])->name('portals.project.notes.store');
+                    Route::delete('/notes/{note}', [ProjectNotesController::class, 'destroy'])->name('portals.project.notes.destroy');
+
+                    Route::get('/kanban', [ProjectKanbanController::class, 'index'])->name('portals.project.kanban.index');
+                    Route::post('/kanban/colonnes', [ProjectKanbanController::class, 'storeColumn'])->middleware('can:update,project')->name('portals.project.kanban.columns.store');
+                    Route::delete('/kanban/colonnes/{column}', [ProjectKanbanController::class, 'destroyColumn'])->middleware('can:update,project')->name('portals.project.kanban.columns.destroy');
+                    Route::post('/kanban/colonnes/{column}/cartes', [ProjectKanbanController::class, 'storeCard'])->middleware('can:update,project')->name('portals.project.kanban.cards.store');
+                    Route::post('/kanban/cartes/{card}/deplacer', [ProjectKanbanController::class, 'moveCard'])->middleware('can:update,project')->name('portals.project.kanban.cards.move');
+                    Route::delete('/kanban/cartes/{card}', [ProjectKanbanController::class, 'destroyCard'])->middleware('can:update,project')->name('portals.project.kanban.cards.destroy');
+
+                    Route::get('/documents', [ProjectDocumentsController::class, 'index'])->name('portals.project.documents.index');
+                    Route::post('/documents', [ProjectDocumentsController::class, 'store'])->middleware('can:update,project')->name('portals.project.documents.store');
+                    Route::delete('/documents/{document}', [ProjectDocumentsController::class, 'destroy'])->middleware('can:update,project')->name('portals.project.documents.destroy');
+                    Route::get('/documents/{document}/telecharger', [ProjectDocumentsController::class, 'download'])
+                        ->middleware(['can:download,project'])
+                        ->name('portals.project.documents.download');
+
+                    Route::get('/cahier-des-charges', [ProjectSpecSectionsController::class, 'index'])->name('portals.project.specs.index');
+                    Route::post('/cahier-des-charges', [ProjectSpecSectionsController::class, 'store'])->middleware('can:update,project')->name('portals.project.specs.store');
+                    Route::put('/cahier-des-charges/{section}', [ProjectSpecSectionsController::class, 'update'])->middleware('can:update,project')->name('portals.project.specs.update');
+                    Route::delete('/cahier-des-charges/{section}', [ProjectSpecSectionsController::class, 'destroy'])->middleware('can:update,project')->name('portals.project.specs.destroy');
+
+                    Route::get('/contrats', [ProjectContractsController::class, 'index'])->name('portals.project.contracts.index');
+                    Route::post('/contrats', [ProjectContractsController::class, 'store'])->middleware('can:update,project')->name('portals.project.contracts.store');
+                    Route::put('/contrats/{contract}', [ProjectContractsController::class, 'update'])->middleware('can:update,project')->name('portals.project.contracts.update');
+                    Route::delete('/contrats/{contract}', [ProjectContractsController::class, 'destroy'])->middleware('can:update,project')->name('portals.project.contracts.destroy');
+
+                    Route::get('/prix', [ProjectPriceItemsController::class, 'index'])->name('portals.project.prices.index');
+                    Route::post('/prix', [ProjectPriceItemsController::class, 'store'])->middleware('can:update,project')->name('portals.project.prices.store');
+                    Route::put('/prix/{item}', [ProjectPriceItemsController::class, 'update'])->middleware('can:update,project')->name('portals.project.prices.update');
+                    Route::delete('/prix/{item}', [ProjectPriceItemsController::class, 'destroy'])->middleware('can:update,project')->name('portals.project.prices.destroy');
+
+                    Route::get('/demandes', [ProjectRequestsController::class, 'index'])->name('portals.project.requests.index');
+                    Route::post('/demandes', [ProjectRequestsController::class, 'store'])->name('portals.project.requests.store');
+                    Route::put('/demandes/{project_request}', [ProjectRequestsController::class, 'update'])->middleware('can:update,project')->name('portals.project.requests.update');
+                    Route::delete('/demandes/{project_request}', [ProjectRequestsController::class, 'destroy'])->middleware('can:update,project')->name('portals.project.requests.destroy');
+                });
+        });
+}
+
+/*
+|--------------------------------------------------------------------------
 | Portail documentation (docs.*)
 |--------------------------------------------------------------------------
 */
@@ -444,7 +579,7 @@ if (is_string($rootDomain) && $rootDomain !== '' && is_array($vitrineSubs) && $v
 */
 if (is_string($rootDomain) && $rootDomain !== '') {
     $reservedSubs = array_values(array_unique(array_filter(array_merge(
-        ['account', 'admin', 'api', 'collabs', 'users', 'courses', 'settings', 'docs', 'home'],
+        ['account', 'admin', 'api', 'collabs', 'users', 'courses', 'settings', 'docs', 'home', 'project'],
         is_array($vitrineSubs) ? $vitrineSubs : []
     ))));
 

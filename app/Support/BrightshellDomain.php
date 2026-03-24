@@ -41,4 +41,27 @@ final class BrightshellDomain
     {
         return rtrim((string) config('app.url'), '/');
     }
+
+    /**
+     * URL du webmail (sous-domaine mail), schéma aligné sur APP_URL.
+     * Surcharge : BRIGHTSHELL_MAIL_WEB_HOST (hôte seul ou URL complète).
+     */
+    public static function mailWebUrl(): string
+    {
+        $configured = trim((string) config('brightshell.domains.mail_web_host', ''));
+        if ($configured !== '') {
+            if (str_starts_with($configured, 'http://') || str_starts_with($configured, 'https://')) {
+                return rtrim($configured, '/');
+            }
+
+            return self::urlScheme().'://'.$configured;
+        }
+
+        $root = self::effectiveRoot();
+        if ($root === '') {
+            return '';
+        }
+
+        return self::urlScheme().'://mail.'.$root;
+    }
 }

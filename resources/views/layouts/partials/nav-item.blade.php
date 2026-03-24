@@ -1,5 +1,6 @@
 <a
     href="{{ $href }}"
+    @if (! empty($external ?? false)) target="_blank" rel="noopener noreferrer" @endif
     @class([
         'flex min-w-0 w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition',
         'bg-indigo-500/10 text-white ring-1 ring-inset ring-indigo-500/20' => $active,

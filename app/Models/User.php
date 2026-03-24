@@ -7,6 +7,7 @@ use Illuminate\Auth\MustVerifyEmail;
 use Illuminate\Contracts\Auth\MustVerifyEmail as MustVerifyEmailContract;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -123,6 +124,16 @@ class User extends Authenticatable implements MustVerifyEmailContract
             ->withTimestamps();
     }
 
+    /**
+     * @return BelongsToMany<Project, $this>
+     */
+    public function projects(): BelongsToMany
+    {
+        return $this->belongsToMany(Project::class)
+            ->withPivot(['can_view', 'can_modify', 'can_annotate', 'can_download'])
+            ->withTimestamps();
+    }
+
     public function belongsToCompany(Company $company): bool
     {
         return $this->companies()->where('companies.id', $company->id)->exists();
@@ -176,6 +187,20 @@ class User extends Authenticatable implements MustVerifyEmailContract
     public function isCollaboratorPortalUser(): bool
     {
         return $this->isAdmin() || $this->hasRole('admin') || $this->hasRole('collaborator');
+    }
+
+    /**
+     * Comptes pouvant accéder au portail collaborateurs.
+     *
+     * @param  Builder<User>  $query
+     * @return Builder<User>
+     */
+    public function scopeCollaboratorPortalUsers(Builder $query): Builder
+    {
+        return $query->where(function (Builder $q): void {
+            $q->where('is_admin', true)
+                ->orWhereHas('roles', fn (Builder $r) => $r->whereIn('slug', ['admin', 'collaborator']));
+        });
     }
 
     public function canAssignCollaboratorTeamManagers(): bool

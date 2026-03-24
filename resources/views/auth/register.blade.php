@@ -11,6 +11,8 @@
 
     <a href="{{ \App\Support\BrightshellDomain::publicSiteUrl() }}" class="auth-back-link">← Retour au site</a>
 
+    @include('layouts.partials.flash')
+
     <h1 class="auth-title">Espace compte</h1>
     <p class="auth-subtitle">Connexion rapide sur mobile, onglets dédiés sur desktop.</p>
 
@@ -48,6 +50,13 @@
             <form method="post" action="{{ route('register') }}" class="auth-form">
                 @csrf
                 <input type="hidden" name="_auth_tab" value="register">
+                @if (! empty($projectInvitation))
+                    <input type="hidden" name="project_invitation_token" value="{{ $projectInvitation->token }}">
+                    <div class="mb-4 rounded-xl border border-cyan-500/30 bg-cyan-500/10 px-4 py-3 text-sm text-cyan-100">
+                        <p class="font-semibold">Invitation au projet « {{ $projectInvitation->project->name }} »</p>
+                        <p class="mt-1 text-cyan-200/90">Inscrivez-vous avec l’e-mail <strong>{{ $projectInvitation->email }}</strong>. Le rôle <strong>client</strong> sera attribué automatiquement.</p>
+                    </div>
+                @endif
 
                 <div class="grid gap-3 sm:grid-cols-2">
                     <div>
@@ -67,7 +76,7 @@
                 </div>
                 <div>
                     <label for="register_email" class="auth-label">E-mail</label>
-                    <input id="register_email" type="email" name="email" value="{{ old('email') }}" required autocomplete="username" class="auth-input">
+                    <input id="register_email" type="email" name="email" value="{{ old('email', isset($projectInvitation) ? $projectInvitation->email : '') }}" required autocomplete="username" class="auth-input" @if(! empty($projectInvitation)) readonly @endif>
                     @error('email')
                         <p class="auth-error">{{ $message }}</p>
                     @enderror
@@ -87,7 +96,9 @@
                     @enderror
                 </div>
 
-                @include('auth.partials.member-role-fields')
+                @if (empty($projectInvitation))
+                    @include('auth.partials.member-role-fields')
+                @endif
 
                 <button type="submit" class="auth-submit">S’inscrire</button>
             </form>
