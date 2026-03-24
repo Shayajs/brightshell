@@ -52,10 +52,11 @@ return Application::configure(basePath: dirname(__DIR__))
 
             Route::domain($apiHost)
                 ->middleware([ForceJsonForApiRequests::class])
-                ->fallback(static fn () => response()->json([
-                    'message' => 'Route API introuvable.',
-                ], 404))
-                ->name('api.fallback');
+                ->group(function (): void {
+                    Route::fallback(static fn () => response()->json([
+                        'message' => 'Route API introuvable.',
+                    ], 404))->name('api.fallback');
+                });
         },
     )
     ->withMiddleware(function (Middleware $middleware): void {
