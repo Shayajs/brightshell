@@ -1,0 +1,315 @@
+.home-vitrine .nav-logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.home-nav-quesako-arrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+    text-decoration: none;
+    opacity: 0.92;
+    transform: translateY(1px);
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.home-nav-quesako-arrow__shaft {
+    width: 2rem;
+    height: 2px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, rgba(232, 240, 248, 0.2), rgba(232, 240, 248, 0.92));
+    box-shadow: 0 0 12px rgba(208, 223, 240, 0.22);
+}
+
+.home-nav-quesako-arrow__head {
+    width: 0.7rem;
+    height: 0.7rem;
+    border-top: 2px solid rgba(232, 240, 248, 0.95);
+    border-right: 2px solid rgba(232, 240, 248, 0.95);
+    transform: rotate(45deg);
+    margin-left: -0.35rem;
+}
+
+.home-nav-quesako-arrow:hover {
+    opacity: 1;
+    transform: translate(4px, 1px);
+}
+
+body.page-transitioning main,
+body.page-transitioning .bottom-nav,
+body.page-transitioning .site-top-nav {
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.22s ease, transform 0.22s ease;
+}
+
+body.quesako-vitrine main {
+    justify-content: flex-start;
+    width: 95vw;
+    max-width: none;
+    margin: 0 auto 0 0;
+    padding-left: 1.5vw;
+    padding-top: 7rem;
+    padding-bottom: 7rem;
+}
+
+.quesako-shell {
+    width: 100%;
+    position: relative;
+}
+
+.quesako-corner {
+    position: fixed;
+    top: 1.35rem;
+    font-size: 0.62rem;
+    letter-spacing: 0.26em;
+    color: rgba(232, 240, 248, 0.72);
+    z-index: 1100;
+}
+
+.quesako-corner--left {
+    left: 1.3rem;
+}
+
+.quesako-corner--right {
+    right: 1.3rem;
+}
+
+.quesako-content {
+    display: grid;
+    gap: 2.2rem;
+}
+
+.quesako-content--left {
+    margin-left: 0;
+}
+
+.quesako-main-brand {
+    margin: 0 0 1rem;
+    font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+    font-size: clamp(4.4rem, 16vw, 13rem);
+    line-height: 0.9;
+    text-align: left;
+    letter-spacing: 0.03em;
+    color: rgba(232, 240, 248, 0.97);
+}
+
+.quesako-module {
+    max-width: 760px;
+}
+
+.quesako-hero-title {
+    margin: 0;
+    font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+    font-size: clamp(2.2rem, 6vw, 4.6rem);
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+    opacity: 0;
+    transform: translateY(14px);
+    transition: opacity 0.45s ease, transform 0.45s ease;
+}
+
+.quesako-hero-title.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.quesako-hero-subtitle,
+.quesako-section-text {
+    margin-top: 0.9rem;
+    color: rgba(232, 240, 248, 0.75);
+    line-height: 1.65;
+    max-width: 62ch;
+}
+
+.quesako-section-title {
+    margin: 0;
+    font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+    font-size: clamp(1.25rem, 2.4vw, 1.75rem);
+    letter-spacing: 0.01em;
+}
+
+.quesako-list,
+.quesako-timeline {
+    margin: 0.9rem 0 0;
+    padding-left: 1rem;
+    color: rgba(232, 240, 248, 0.78);
+}
+
+.quesako-list li,
+.quesako-timeline li {
+    margin: 0.45rem 0;
+}
+
+.quesako-timeline li p {
+    margin: 0.35rem 0 0;
+    color: rgba(232, 240, 248, 0.7);
+}
+
+.quesako-quote blockquote {
+    margin: 0;
+    font-size: clamp(1.1rem, 2.2vw, 1.6rem);
+    line-height: 1.45;
+    color: rgba(232, 240, 248, 0.9);
+}
+
+.quesako-quote cite {
+    display: inline-block;
+    margin-top: 0.75rem;
+    color: rgba(232, 240, 248, 0.58);
+    font-size: 0.9rem;
+}
+
+.quesako-cta-btn {
+    display: inline-block;
+    text-decoration: none;
+    border: 1px solid rgba(232, 240, 248, 0.34);
+    color: rgba(232, 240, 248, 0.95);
+    padding: 0.6rem 1rem;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.quesako-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 0.8rem;
+    margin-top: 1rem;
+}
+
+.quesako-stats article {
+    border: 1px solid rgba(232, 240, 248, 0.14);
+    border-radius: 0.8rem;
+    padding: 0.7rem 0.9rem;
+}
+
+.quesako-stats strong {
+    display: block;
+    font-size: 1.3rem;
+    color: rgba(232, 240, 248, 0.95);
+}
+
+.quesako-stats span {
+    color: rgba(232, 240, 248, 0.63);
+    font-size: 0.82rem;
+}
+
+.quesako-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 0.8rem;
+    margin-top: 1rem;
+}
+
+.quesako-cards article {
+    border: 1px solid rgba(232, 240, 248, 0.14);
+    border-radius: 0.8rem;
+    padding: 0.8rem 0.9rem;
+}
+
+.quesako-cards h3 {
+    margin: 0 0 0.35rem;
+    font-size: 1rem;
+}
+
+.quesako-cards p {
+    margin: 0;
+    color: rgba(232, 240, 248, 0.68);
+}
+
+.quesako-faq {
+    margin-top: 0.8rem;
+    display: grid;
+    gap: 0.5rem;
+}
+
+.quesako-faq details {
+    border: 1px solid rgba(232, 240, 248, 0.14);
+    border-radius: 0.7rem;
+    padding: 0.65rem 0.8rem;
+}
+
+.quesako-faq summary {
+    cursor: pointer;
+    color: rgba(232, 240, 248, 0.9);
+}
+
+.quesako-faq p {
+    margin: 0.55rem 0 0;
+    color: rgba(232, 240, 248, 0.68);
+}
+
+.quesako-media {
+    margin: 0.9rem 0 0;
+}
+
+.quesako-media img {
+    width: 100%;
+    max-width: 900px;
+    border-radius: 0.9rem;
+    border: 1px solid rgba(232, 240, 248, 0.15);
+}
+
+.quesako-media figcaption {
+    margin-top: 0.4rem;
+    font-size: 0.85rem;
+    color: rgba(232, 240, 248, 0.62);
+}
+
+.quesako-divider {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    color: rgba(232, 240, 248, 0.52);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.quesako-divider::before,
+.quesako-divider::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: rgba(232, 240, 248, 0.16);
+}
+
+body.quesako-vitrine .bottom-nav {
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    width: fit-content;
+    max-width: min(92vw, 1200px);
+    gap: 1.1rem;
+    padding: 0.75rem 1.4rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    border-radius: 999px;
+    background: rgba(10, 14, 26, 0.58);
+    border: 1px solid rgba(208, 223, 240, 0.18);
+    backdrop-filter: blur(24px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .quesako-hero-title {
+        opacity: 1;
+        transform: none;
+        transition: none;
+    }
+
+    body.page-transitioning main,
+    body.page-transitioning .bottom-nav,
+    body.page-transitioning .site-top-nav {
+        opacity: 1;
+        transform: none;
+        transition: none;
+    }
+
+    .home-nav-quesako-arrow {
+        transform: none;
+        transition: none;
+    }
+}

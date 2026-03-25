@@ -75,7 +75,7 @@
 @endsection
 
 @push('vite')
-    @vite(['resources/js/app.js'])
+    @vite(['resources/css/quesako.css', 'resources/js/app.js', 'resources/js/quesako-public.js'])
 @endpush
 
 @section('bottom-nav')

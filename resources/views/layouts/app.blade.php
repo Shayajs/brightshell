@@ -62,32 +62,40 @@
     @endif
 
     <!-- Top Navigation (classe dédiée : évite d’écraser .portal-nav dans app.css) -->
-    <nav class="site-top-nav" aria-label="Navigation principale">
-        <div class="nav-logo">
-            <a href="{{ route('home') }}" style="color: inherit; text-decoration: none;">BRIGHTSHELL</a>
-        </div>
-        @if(isset($showNavLinks) && $showNavLinks)
-        <ul class="nav-links">
-            @auth
-                <li>
-                    <a href="{{ $brightshellSpaceUrl }}">
-                        {{ auth()->user()->greetingFirstName() ?: auth()->user()->name }}
+    @unless(isset($hideTopNav) && $hideTopNav)
+        <nav class="site-top-nav" aria-label="Navigation principale">
+            <div class="nav-logo">
+                <a href="{{ route('home') }}" style="color: inherit; text-decoration: none;">BRIGHTSHELL</a>
+                @if(($bodyClass ?? '') === 'home-vitrine')
+                    <a href="{{ route('quesako.index') }}" class="home-nav-quesako-arrow" aria-label="Aller vers Quesako" data-transition-link>
+                        <span class="home-nav-quesako-arrow__shaft"></span>
+                        <span class="home-nav-quesako-arrow__head"></span>
                     </a>
-                </li>
-                <li>
-                    <form class="nav-logout-form" method="POST" action="{{ route('logout') }}">
-                        @csrf
-                        <button type="submit">Déconnexion</button>
-                    </form>
-                </li>
-            @else
-                <li>
-                    <a href="{{ $brightshellLoginUrl }}">Connexion · Inscription</a>
-                </li>
-            @endauth
-        </ul>
-        @endif
-    </nav>
+                @endif
+            </div>
+            @if(isset($showNavLinks) && $showNavLinks)
+            <ul class="nav-links">
+                @auth
+                    <li>
+                        <a href="{{ $brightshellSpaceUrl }}">
+                            {{ auth()->user()->greetingFirstName() ?: auth()->user()->name }}
+                        </a>
+                    </li>
+                    <li>
+                        <form class="nav-logout-form" method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit">Déconnexion</button>
+                        </form>
+                    </li>
+                @else
+                    <li>
+                        <a href="{{ $brightshellLoginUrl }}">Connexion · Inscription</a>
+                    </li>
+                @endauth
+            </ul>
+            @endif
+        </nav>
+    @endunless
 
     <!-- Main Content -->
     <main @if(isset($mainClass))class="{{ $mainClass }}"@endif>

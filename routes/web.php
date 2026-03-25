@@ -17,6 +17,7 @@ use App\Http\Controllers\Admin\MailTemplatesController;
 use App\Http\Controllers\Admin\MembersController;
 use App\Http\Controllers\Admin\ProjectInvitationsController;
 use App\Http\Controllers\Admin\ProjectsController;
+use App\Http\Controllers\Admin\QuesakoBuilderController;
 use App\Http\Controllers\Admin\RealisationsAdminController;
 use App\Http\Controllers\Admin\SearchController;
 use App\Http\Controllers\Admin\SiteAppearanceController;
@@ -60,6 +61,7 @@ use App\Http\Controllers\Project\RequestsController as ProjectRequestsController
 use App\Http\Controllers\Project\SettingsController as ProjectPortalSettingsController;
 use App\Http\Controllers\Project\ShowController as ProjectPortalShowController;
 use App\Http\Controllers\Project\SpecSectionsController as ProjectSpecSectionsController;
+use App\Http\Controllers\QuesakoController;
 use App\Http\Controllers\RealisationsController;
 use App\Http\Controllers\ServicesController;
 use App\Http\Controllers\Settings\AccountClosureController;
@@ -310,6 +312,9 @@ $registerAdminRoutes = function (): void {
     Route::get('/identite-site', [SiteAppearanceController::class, 'edit'])->name('admin.site-appearance.edit');
     Route::put('/identite-site', [SiteAppearanceController::class, 'update'])->name('admin.site-appearance.update');
     Route::post('/identite-site/reinitialiser-theme-mail', [SiteAppearanceController::class, 'resetMailTheme'])->name('admin.site-appearance.reset-mail-theme');
+    Route::get('/quesako-builder', [QuesakoBuilderController::class, 'edit'])->name('admin.quesako-builder.edit');
+    Route::put('/quesako-builder', [QuesakoBuilderController::class, 'update'])->name('admin.quesako-builder.update');
+    Route::post('/quesako-builder/preview', [QuesakoBuilderController::class, 'preview'])->name('admin.quesako-builder.preview');
 
     // Réalisations
     Route::get('/realisations', [RealisationsAdminController::class, 'index'])->name('admin.realisations.index');
@@ -353,6 +358,8 @@ if ($adminHost !== '') {
 */
 Route::middleware(['block.web.on.api.host'])->group(function (): void {
     Route::get('/', [HomeController::class, 'index'])->name('home');
+    Route::get('/quesako', [QuesakoController::class, 'index'])->name('quesako.index');
+    Route::get('/quesako/{tabSlug}', [QuesakoController::class, 'show'])->name('quesako.tab');
     Route::get('/services', [ServicesController::class, 'index'])->name('services');
     Route::get('/realisations', [RealisationsController::class, 'index'])->name('realisations');
     Route::get('/cv', [CvController::class, 'index'])->name('cv');
@@ -587,6 +594,8 @@ if (is_string($rootDomain) && $rootDomain !== '' && is_array($vitrineSubs) && $v
         ->whereIn('sub', $vitrineSubs)
         ->group(function (): void {
             Route::get('/', [HomeController::class, 'index'])->name('home.subdomain');
+            Route::get('/quesako', [QuesakoController::class, 'index'])->name('quesako.index.subdomain');
+            Route::get('/quesako/{tabSlug}', [QuesakoController::class, 'show'])->name('quesako.tab.subdomain');
             Route::get('/services', [ServicesController::class, 'index'])->name('services.subdomain');
             Route::get('/realisations', [RealisationsController::class, 'index'])->name('realisations.subdomain');
             Route::get('/cv', [CvController::class, 'index'])->name('cv.subdomain');

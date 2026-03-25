@@ -26,7 +26,7 @@
     <div class="auth-shell__overlay" aria-hidden="true"></div>
 
     <header class="auth-shell__header">
-        <a href="{{ route('home') }}" class="auth-shell__brand">BRIGHTSHELL</a>
+        <a href="{{ config('app.url') }}" class="auth-shell__brand">BRIGHTSHELL</a>
     </header>
 
     <div class="auth-shell__layout">
