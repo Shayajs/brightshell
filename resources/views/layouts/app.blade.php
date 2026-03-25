@@ -65,7 +65,7 @@
     @unless(isset($hideTopNav) && $hideTopNav)
         <nav class="site-top-nav" aria-label="Navigation principale">
             <div class="nav-logo">
-                <a href="{{ route('home') }}" style="color: inherit; text-decoration: none;">BRIGHTSHELL</a>
+                <a href="{{ route('quesako.index') }}" style="color: inherit; text-decoration: none;" data-transition-link>BRIGHTSHELL</a>
                 @if(($bodyClass ?? '') === 'home-vitrine')
                     <a href="{{ route('quesako.index') }}" class="home-nav-quesako-arrow" aria-label="Aller vers Quesako" data-transition-link>
                         <span class="home-nav-quesako-arrow__shaft"></span>
