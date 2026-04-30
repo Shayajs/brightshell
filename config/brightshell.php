@@ -86,6 +86,17 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Page contact publique (/contact)
+    |--------------------------------------------------------------------------
+    |
+    | Adresse e-mail recevant les messages des 4 types de contact.
+    | Si vide, fallback sur MAIL_FROM_ADDRESS.
+    |
+    */
+    'contact_recipient' => env('BRIGHTSHELL_CONTACT_RECIPIENT', env('MAIL_FROM_ADDRESS')),
+
+    /*
+    |--------------------------------------------------------------------------
     | Vitrine : favicon et logo principal (OG, JSON-LD, page d’accueil)
     |--------------------------------------------------------------------------
     |

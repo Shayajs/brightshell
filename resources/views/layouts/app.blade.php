@@ -75,6 +75,9 @@
             </div>
             @if(isset($showNavLinks) && $showNavLinks)
             <ul class="nav-links">
+                <li>
+                    <a href="{{ route('contact') }}">Contact</a>
+                </li>
                 @auth
                     <li>
                         <a href="{{ $brightshellSpaceUrl }}">

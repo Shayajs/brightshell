@@ -80,6 +80,7 @@
 
 @section('bottom-nav')
     <a href="{{ route('cv') }}" class="bottom-link">CV</a>
+    <a href="{{ route('contact') }}" class="bottom-link bottom-link--center">Contact</a>
     <a href="{{ route('realisations') }}" class="bottom-link">Réalisations</a>
 @endsection
 

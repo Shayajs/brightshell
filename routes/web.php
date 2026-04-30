@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\AdminAuditLogsController;
 use App\Http\Controllers\Admin\AdminOutboundApiWidgetsController;
 use App\Http\Controllers\Admin\ApiManagerController;
 use App\Http\Controllers\Admin\ClientsController;
+use App\Http\Controllers\Admin\ContactMessagesController;
 use App\Http\Controllers\Admin\CollaboratorsController;
 use App\Http\Controllers\Admin\CollaboratorTeamsController;
 use App\Http\Controllers\Admin\CompaniesController;
@@ -44,6 +45,7 @@ use App\Http\Controllers\Collabs\TeamsController as CollabsTeamsController;
 use App\Http\Controllers\Courses\DashboardController as CoursesDashboardController;
 use App\Http\Controllers\Courses\StudentCourseQuizController;
 use App\Http\Controllers\Courses\StudentMaterialsController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\CvController;
 use App\Http\Controllers\Docs\DashboardController as DocsDashboardController;
 use App\Http\Controllers\Docs\PageController as DocsPageController;
@@ -283,6 +285,14 @@ $registerAdminRoutes = function (): void {
     Route::put('/declarations/entreprise', [DeclarationsController::class, 'updateBusiness'])->name('admin.declarations.business.update');
     Route::redirect('/urssaf', '/declarations/urssaf')->name('admin.urssaf.index');
 
+    // Messages de contact (page publique /contact)
+    Route::get('/contacts', [ContactMessagesController::class, 'index'])->name('admin.contact-messages.index');
+    Route::get('/contacts/{contactMessage}', [ContactMessagesController::class, 'show'])->name('admin.contact-messages.show');
+    Route::patch('/contacts/{contactMessage}', [ContactMessagesController::class, 'update'])->name('admin.contact-messages.update');
+    Route::delete('/contacts/{contactMessage}', [ContactMessagesController::class, 'destroy'])->name('admin.contact-messages.destroy');
+    Route::get('/contacts/{contactMessage}/pieces-jointes/{attachment}/telecharger', [ContactMessagesController::class, 'downloadAttachment'])
+        ->name('admin.contact-messages.attachments.download');
+
     Route::get('/support-tickets', [SupportTicketsController::class, 'index'])->name('admin.support-tickets.index');
     Route::get('/support-tickets/{ticket}', [SupportTicketsController::class, 'show'])->name('admin.support-tickets.show');
     Route::patch('/support-tickets/{ticket}', [SupportTicketsController::class, 'update'])->name('admin.support-tickets.update');
@@ -363,6 +373,14 @@ Route::middleware(['block.web.on.api.host'])->group(function (): void {
     Route::get('/services', [ServicesController::class, 'index'])->name('services');
     Route::get('/realisations', [RealisationsController::class, 'index'])->name('realisations');
     Route::get('/cv', [CvController::class, 'index'])->name('cv');
+
+    Route::get('/contact', [ContactController::class, 'create'])->name('contact');
+    Route::post('/contact', [ContactController::class, 'store'])
+        ->middleware('throttle:6,1')
+        ->name('contact.store');
+    Route::post('/contact/markdown-preview', [ContactController::class, 'markdownPreview'])
+        ->middleware('throttle:60,1')
+        ->name('contact.markdown.preview');
 
     Route::permanentRedirect('/index.html', '/');
     Route::permanentRedirect('/services.html', '/services');
@@ -599,6 +617,7 @@ if (is_string($rootDomain) && $rootDomain !== '' && is_array($vitrineSubs) && $v
             Route::get('/services', [ServicesController::class, 'index'])->name('services.subdomain');
             Route::get('/realisations', [RealisationsController::class, 'index'])->name('realisations.subdomain');
             Route::get('/cv', [CvController::class, 'index'])->name('cv.subdomain');
+            Route::get('/contact', [ContactController::class, 'create'])->name('contact.subdomain');
         });
 }
 

@@ -20,6 +20,7 @@
         }
     </style>
     @vite(['resources/css/app.css', 'resources/js/auth-perlin.js'])
+    @stack('vite')
 </head>
 <body class="auth-body auth-shell min-h-full text-zinc-100 antialiased">
     <canvas id="auth-perlin-canvas" class="auth-perlin-canvas" aria-hidden="true"></canvas>

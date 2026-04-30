@@ -20,6 +20,7 @@ export default defineConfig({
                 'resources/js/quesako-public.js',
                 'resources/js/quesako-builder.js',
                 'resources/js/auth-perlin.js',
+                'resources/js/contact-form.js',
             ],
             refresh: true,
         }),

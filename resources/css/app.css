@@ -1911,3 +1911,450 @@ html:has(body.brightshell-vitrine)::-webkit-scrollbar-thumb:hover {
         font-size: 2.375rem !important;
     }
 }
+
+/* --- Page contact (réutilise le shell auth) --- */
+.auth-shell__panel--full {
+    max-width: min(1100px, calc(100% - 1.5rem));
+    max-height: min(100dvh - 6rem, 100vh - 6rem);
+}
+
+.auth-honeypot {
+    position: absolute !important;
+    left: -9999px !important;
+    width: 1px !important;
+    height: 1px !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+.contact-form-root {
+    margin-top: 0.6rem;
+}
+
+.contact-type-grid {
+    display: grid;
+    gap: 0.55rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin: 1rem 0 1.4rem;
+}
+
+@media (min-width: 720px) {
+    .contact-type-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+}
+
+.contact-type-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.55rem;
+    text-align: left;
+    border-radius: 0.7rem;
+    border: 1px solid rgba(161, 191, 219, 0.18);
+    background: rgba(11, 26, 44, 0.45);
+    color: rgba(205, 227, 246, 0.86);
+    padding: 0.6rem 0.65rem;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.18s ease;
+}
+
+.contact-type-card:hover {
+    background: rgba(20, 50, 80, 0.55);
+    border-color: rgba(110, 180, 230, 0.35);
+    transform: translateY(-1px);
+}
+
+.contact-type-card[aria-selected="true"] {
+    border-color: rgba(84, 188, 255, 0.6);
+    background: rgba(19, 69, 105, 0.7);
+    color: #f2f9ff;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.32);
+}
+
+.contact-type-card__icon {
+    flex-shrink: 0;
+    width: 1.9rem;
+    height: 1.9rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.5rem;
+    background: rgba(84, 188, 255, 0.12);
+    color: rgba(180, 220, 255, 0.95);
+}
+
+.contact-type-card__icon svg {
+    width: 1rem;
+    height: 1rem;
+}
+
+.contact-type-card__body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.18rem;
+    min-width: 0;
+}
+
+.contact-type-card__label {
+    font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #f5faff;
+}
+
+.contact-type-card__tagline {
+    font-size: 0.74rem;
+    line-height: 1.35;
+    color: rgba(176, 202, 230, 0.78);
+}
+
+.contact-panel[hidden] {
+    display: none !important;
+}
+
+.contact-textarea {
+    font-family: ui-sans-serif, system-ui, sans-serif;
+    line-height: 1.5;
+    resize: vertical;
+}
+
+.contact-optional {
+    font-weight: 500;
+    color: rgba(155, 184, 214, 0.6);
+    font-size: 0.68rem;
+    margin-left: 0.25rem;
+    text-transform: none;
+    letter-spacing: 0;
+}
+
+/* --- Layout du formulaire « Soumettre un projet » --- */
+.contact-project-grid {
+    display: grid;
+    gap: 1.2rem;
+    grid-template-columns: 1fr;
+}
+
+@media (min-width: 960px) {
+    .contact-project-grid {
+        grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+    }
+}
+
+.contact-project-col {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    min-width: 0;
+}
+
+.contact-project-form {
+    gap: 1.1rem;
+}
+
+.contact-project-submit {
+    margin-top: 0.4rem;
+}
+
+/* --- Markdown éditeur (mode projet) --- */
+.contact-md-editor {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    min-height: 100%;
+}
+
+.contact-md-editor__head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+}
+
+.contact-md-editor__tabs {
+    display: inline-flex;
+    gap: 0.3rem;
+    border-radius: 0.55rem;
+    border: 1px solid rgba(161, 191, 219, 0.18);
+    padding: 0.18rem;
+    background: rgba(9, 20, 34, 0.5);
+}
+
+.contact-md-tab {
+    border: 0;
+    background: transparent;
+    color: rgba(176, 202, 230, 0.78);
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 0.32rem 0.7rem;
+    border-radius: 0.42rem;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.contact-md-tab:hover {
+    color: #eaf4ff;
+}
+
+.contact-md-tab[aria-selected="true"] {
+    background: rgba(19, 69, 105, 0.65);
+    color: #f3faff;
+}
+
+.contact-md-editor__textarea {
+    min-height: 22rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: 0.86rem;
+    line-height: 1.55;
+}
+
+.contact-md-preview {
+    border-radius: 0.62rem;
+    border: 1px solid rgba(140, 173, 203, 0.28);
+    background: rgba(5, 14, 24, 0.66);
+    padding: 0.95rem 1.05rem;
+    color: #eaf4ff;
+    min-height: 22rem;
+    overflow-y: auto;
+    line-height: 1.55;
+}
+
+.contact-md-preview h1,
+.contact-md-preview h2,
+.contact-md-preview h3,
+.contact-md-preview h4 {
+    color: #f5faff;
+    font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+    margin: 1rem 0 0.5rem;
+}
+
+.contact-md-preview h1 { font-size: 1.25rem; }
+.contact-md-preview h2 { font-size: 1.08rem; }
+.contact-md-preview h3 { font-size: 0.96rem; }
+
+.contact-md-preview p { margin: 0.5rem 0; }
+.contact-md-preview ul,
+.contact-md-preview ol { margin: 0.4rem 0 0.4rem 1.2rem; }
+.contact-md-preview li { margin: 0.18rem 0; }
+
+.contact-md-preview a {
+    color: #7ec8ff;
+    text-decoration: underline;
+    word-break: break-word;
+}
+
+.contact-md-preview code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    background: rgba(15, 35, 60, 0.55);
+    padding: 0.08rem 0.32rem;
+    border-radius: 0.32rem;
+    font-size: 0.84em;
+}
+
+.contact-md-preview pre {
+    background: rgba(8, 18, 32, 0.85);
+    border: 1px solid rgba(140, 173, 203, 0.18);
+    border-radius: 0.5rem;
+    padding: 0.65rem 0.85rem;
+    overflow-x: auto;
+    font-size: 0.8rem;
+}
+
+.contact-md-preview pre code {
+    background: transparent;
+    padding: 0;
+}
+
+.contact-md-preview table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0.5rem 0;
+    font-size: 0.85rem;
+}
+
+.contact-md-preview th,
+.contact-md-preview td {
+    border: 1px solid rgba(140, 173, 203, 0.22);
+    padding: 0.32rem 0.55rem;
+    text-align: left;
+}
+
+.contact-md-preview blockquote {
+    margin: 0.6rem 0;
+    padding: 0.4rem 0.85rem;
+    border-left: 3px solid rgba(84, 188, 255, 0.55);
+    color: rgba(200, 222, 246, 0.82);
+    background: rgba(15, 38, 62, 0.4);
+    border-radius: 0 0.4rem 0.4rem 0;
+}
+
+.contact-md-preview__placeholder {
+    margin: 0;
+    color: rgba(170, 196, 222, 0.55);
+    font-style: italic;
+    font-size: 0.84rem;
+}
+
+.contact-md-help {
+    margin: 0.1rem 0 0;
+    font-size: 0.74rem;
+    color: rgba(160, 188, 218, 0.7);
+}
+
+.contact-md-help code {
+    background: rgba(15, 35, 60, 0.55);
+    padding: 0.05rem 0.28rem;
+    border-radius: 0.28rem;
+    font-size: 0.78em;
+}
+
+/* --- Dropzone pièces jointes --- */
+.contact-dropzone {
+    position: relative;
+    margin-top: 0.34rem;
+    border: 1px dashed rgba(140, 173, 203, 0.5);
+    border-radius: 0.7rem;
+    background: rgba(5, 14, 24, 0.55);
+    padding: 0.65rem;
+    transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.contact-dropzone--over {
+    border-color: rgba(99, 193, 255, 0.85);
+    background: rgba(19, 69, 105, 0.45);
+}
+
+.contact-dropzone input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 1;
+}
+
+.contact-dropzone__label {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    color: rgba(195, 220, 244, 0.85);
+    font-size: 0.85rem;
+    line-height: 1.4;
+    padding: 0.6rem 0.4rem;
+    cursor: pointer;
+    pointer-events: none;
+}
+
+.contact-dropzone__label svg {
+    flex-shrink: 0;
+    color: rgba(120, 180, 230, 0.85);
+}
+
+.contact-dropzone__hint {
+    color: rgba(160, 188, 218, 0.7);
+    font-size: 0.76rem;
+}
+
+.contact-dropzone__list {
+    list-style: none;
+    margin: 0.6rem 0 0;
+    padding: 0;
+    display: grid;
+    gap: 0.35rem;
+    position: relative;
+    z-index: 2;
+}
+
+.contact-dropzone__item {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.4rem 0.6rem;
+    border-radius: 0.5rem;
+    background: rgba(13, 30, 50, 0.6);
+    border: 1px solid rgba(140, 173, 203, 0.2);
+    color: rgba(213, 232, 250, 0.92);
+    font-size: 0.82rem;
+}
+
+.contact-dropzone__item-name {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.contact-dropzone__item-size {
+    color: rgba(160, 188, 218, 0.7);
+    font-size: 0.76rem;
+    flex-shrink: 0;
+}
+
+.contact-dropzone__remove {
+    background: transparent;
+    border: 0;
+    color: rgba(255, 158, 165, 0.85);
+    font-size: 1rem;
+    line-height: 1;
+    padding: 0.15rem 0.3rem;
+    border-radius: 0.3rem;
+    cursor: pointer;
+    transition: color 0.18s ease, background 0.18s ease;
+}
+
+.contact-dropzone__remove:hover {
+    color: #ff9ea5;
+    background: rgba(255, 80, 100, 0.1);
+}
+
+/* --- Lien Contact dans la home (variante centrée) --- */
+.bottom-link--center {
+    flex: 0 1 auto;
+    text-align: center;
+}
+
+/* --- Lien depuis la page de connexion --- */
+.auth-secondary-link {
+    display: block;
+    margin-top: 1rem;
+    text-align: center;
+    color: rgba(176, 202, 230, 0.82);
+    font-size: 0.82rem;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.auth-secondary-link:hover {
+    color: #f5faff;
+}
+
+.auth-secondary-link strong {
+    color: #f3faff;
+}
+
+/* --- Page contact admin (compact) --- */
+.contact-admin-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.18rem 0.55rem;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.contact-admin-badge--general { background: rgba(84, 188, 255, 0.18); color: #cfe9ff; }
+.contact-admin-badge--professional { background: rgba(99, 102, 241, 0.18); color: #d8d8ff; }
+.contact-admin-badge--complaint { background: rgba(244, 114, 114, 0.18); color: #ffd0d3; }
+.contact-admin-badge--project { background: rgba(52, 211, 153, 0.18); color: #c4f5e0; }
+
+.contact-admin-badge--open { background: rgba(99, 102, 241, 0.18); color: #d8d8ff; }
+.contact-admin-badge--read { background: rgba(120, 144, 168, 0.2); color: #d6e2f0; }
+.contact-admin-badge--replied { background: rgba(52, 211, 153, 0.18); color: #c4f5e0; }
+.contact-admin-badge--archived { background: rgba(120, 120, 130, 0.2); color: #cfd2d8; }

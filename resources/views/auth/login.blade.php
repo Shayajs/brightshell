@@ -178,4 +178,8 @@
             </section>
         @endif
     </div>
+
+    <a href="{{ rtrim(\App\Support\BrightshellDomain::publicSiteUrl(), '/') }}/contact" class="auth-secondary-link">
+        Une question ? <strong>Nous contacter →</strong>
+    </a>
 @endsection
