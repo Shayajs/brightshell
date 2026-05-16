@@ -27,6 +27,7 @@ final class PortalNavigation
             'settings' => '<circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>',
             'docs' => '<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 7h8M8 11h6"/>',
             'project' => '<path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/>',
+            'prospects' => '<path d="M22 12h-4l-3 9L9 3l-3 9H2"/>',
         ];
     }
 
@@ -47,6 +48,7 @@ final class PortalNavigation
             'settings' => 'bg-zinc-500/25 text-zinc-200 ring-zinc-400/30',
             'docs' => 'bg-blue-500/20 text-blue-200 ring-blue-400/35',
             'project' => 'bg-cyan-500/20 text-cyan-200 ring-cyan-400/35',
+            'prospects' => 'bg-orange-500/20 text-orange-200 ring-orange-400/35',
             default => 'bg-zinc-500/25 text-zinc-200 ring-zinc-400/30',
         };
     }
@@ -72,6 +74,11 @@ final class PortalNavigation
         $projectUrl = PortalUrls::projectUrl();
         if ($projectUrl !== '') {
             $portals['project'] = ['label' => 'Projets', 'href' => $projectUrl, 'role' => 'project_portal'];
+        }
+
+        $prospectsUrl = PortalUrls::prospectsUrl();
+        if ($prospectsUrl !== '') {
+            $portals['prospects'] = ['label' => 'Prospection B2B', 'href' => $prospectsUrl, 'role' => 'admin'];
         }
 
         // Toujours en fin de liste dans le switcher.

@@ -36,6 +36,8 @@ return [
         'home_host' => env('BRIGHTSHELL_HOME_HOST'),
         /** Portail projets clients — vide = project.{root} */
         'project_host' => env('BRIGHTSHELL_PROJECT_HOST'),
+        /** Portail prospection B2B (admins uniquement) — vide = prospects.{root} */
+        'prospects_host' => env('BRIGHTSHELL_PROSPECTS_HOST'),
         /** API publique lecture seule — vide = api.{root} */
         'api_host' => env('BRIGHTSHELL_API_HOST'),
         /** Webmail / interface mail — vide = mail.{root} */
@@ -58,6 +60,7 @@ return [
         'docs_url' => rtrim((string) env('BRIGHTSHELL_PORTAL_DOCS_URL', ''), '/'),
         'home_url' => rtrim((string) env('BRIGHTSHELL_PORTAL_HOME_URL', ''), '/'),
         'project_url' => rtrim((string) env('BRIGHTSHELL_PORTAL_PROJECT_URL', ''), '/'),
+        'prospects_url' => rtrim((string) env('BRIGHTSHELL_PORTAL_PROSPECTS_URL', ''), '/'),
     ],
 
     /*

@@ -107,6 +107,26 @@ final class PortalUrls
         );
     }
 
+    /**
+     * Portail prospection B2B (prospects.{root}). Chaîne vide si aucun domaine racine.
+     */
+    public static function prospectsUrl(): string
+    {
+        $root = BrightshellDomain::effectiveRoot();
+        if ($root === '') {
+            return '';
+        }
+
+        $scheme = BrightshellDomain::urlScheme();
+
+        return self::resolve(
+            (string) config('brightshell.portals.prospects_url', ''),
+            'prospects',
+            $root,
+            $scheme
+        );
+    }
+
     private static function resolve(string $explicitUrl, string $subdomain, string $rootDomain, string $scheme): string
     {
         if ($explicitUrl !== '') {

@@ -9,12 +9,12 @@
     $portalKey = 'admin';
     if (count($labels) >= 3) {
         $portalKey = match ($labels[0]) {
-            'admin', 'collabs', 'users', 'courses', 'settings', 'docs', 'home', 'project' => $labels[0],
+            'admin', 'collabs', 'users', 'courses', 'settings', 'docs', 'home', 'project', 'prospects' => $labels[0],
             default => 'admin',
         };
     } elseif (count($labels) === 2 && str_ends_with($host, '.localhost')) {
         $portalKey = match ($labels[0]) {
-            'admin', 'collabs', 'users', 'courses', 'settings', 'docs', 'home', 'project' => $labels[0],
+            'admin', 'collabs', 'users', 'courses', 'settings', 'docs', 'home', 'project', 'prospects' => $labels[0],
             default => 'admin',
         };
     }
@@ -56,6 +56,11 @@
     @vite(['resources/css/app.css', 'resources/js/portal-shell.js'])
     @stack('vite')
     @stack('styles')
+    @if ($portalKey === 'prospects')
+        @livewireStyles
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+              integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    @endif
 </head>
 <body class="auth-body min-h-full bg-zinc-950 text-zinc-100 antialiased">
     <div class="pointer-events-none fixed inset-0 z-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(99,102,241,0.12),transparent)]" aria-hidden="true"></div>
@@ -288,6 +293,18 @@
                                 'icon'   => '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/>',
                             ])
 
+                            @php($prospectsUrl = \App\Support\PortalUrls::prospectsUrl())
+                            @if ($prospectsUrl !== '')
+                                @include('layouts.partials.nav-section', ['label' => 'Prospection B2B'])
+                                @include('layouts.partials.nav-item', [
+                                    'href'     => $prospectsUrl,
+                                    'active'   => false,
+                                    'label'    => 'Prospects (sous-domaine)',
+                                    'icon'     => '<path d="M22 12h-4l-3 9L9 3l-3 9H2"/>',
+                                    'external' => true,
+                                ])
+                            @endif
+
                             @include('layouts.partials.nav-section', ['label' => 'Outils'])
                             @include('layouts.partials.nav-item', [
                                 'href'   => route('admin.audit-logs.index'),
@@ -383,6 +400,34 @@
                                 'active' => request()->routeIs('portals.collabs.teams.*'),
                                 'label'  => 'Équipes & accès',
                                 'icon'   => '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>',
+                            ])
+                        @endif
+
+                        @if ($portalKey === 'prospects')
+                            @include('layouts.partials.nav-section', ['label' => 'Prospection'])
+                            @include('layouts.partials.nav-item', [
+                                'href'   => route('prospects.dashboard'),
+                                'active' => request()->routeIs('prospects.dashboard'),
+                                'label'  => 'Tableau de bord',
+                                'icon'   => '<rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/>',
+                            ])
+                            @include('layouts.partials.nav-item', [
+                                'href'   => route('prospects.index'),
+                                'active' => request()->routeIs('prospects.index'),
+                                'label'  => 'Liste des prospects',
+                                'icon'   => '<path d="M3 6h18M3 12h18M3 18h12"/>',
+                            ])
+                            @include('layouts.partials.nav-item', [
+                                'href'   => route('prospects.import'),
+                                'active' => request()->routeIs('prospects.import'),
+                                'label'  => 'Importateur API',
+                                'icon'   => '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>',
+                            ])
+                            @include('layouts.partials.nav-item', [
+                                'href'   => route('prospects.config'),
+                                'active' => request()->routeIs('prospects.config'),
+                                'label'  => 'Configuration',
+                                'icon'   => '<circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>',
                             ])
                         @endif
 
@@ -815,5 +860,10 @@
     </script>
 
     @stack('scripts')
+    @if ($portalKey === 'prospects')
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+                integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+        @livewireScripts
+    @endif
 </body>
 </html>

@@ -63,6 +63,7 @@ use App\Http\Controllers\Project\RequestsController as ProjectRequestsController
 use App\Http\Controllers\Project\SettingsController as ProjectPortalSettingsController;
 use App\Http\Controllers\Project\ShowController as ProjectPortalShowController;
 use App\Http\Controllers\Project\SpecSectionsController as ProjectSpecSectionsController;
+use App\Http\Controllers\Prospects\DashboardController as ProspectsDashboardController;
 use App\Http\Controllers\QuesakoController;
 use App\Http\Controllers\RealisationsController;
 use App\Http\Controllers\ServicesController;
@@ -362,6 +363,29 @@ if ($adminHost !== '') {
 
 /*
 |--------------------------------------------------------------------------
+| Portail Prospection B2B (sous-domaine prospects.*)
+|--------------------------------------------------------------------------
+| Accès admin uniquement (même middleware que admin.*). Toutes les vues
+| utilisent layouts.prospects (sidebar dédiée + Livewire 3).
+*/
+$prospectsHost = (string) config('brightshell.domains.prospects_host', '');
+if ($prospectsHost === '' && $inferredRoot !== '') {
+    $prospectsHost = 'prospects.'.$inferredRoot;
+}
+
+if ($prospectsHost !== '') {
+    Route::domain($prospectsHost)
+        ->middleware(['auth', 'verified', EnsureUserCanAccessAdminPortal::class])
+        ->group(function (): void {
+            Route::get('/', [ProspectsDashboardController::class, 'index'])->name('prospects.dashboard');
+            Route::get('/liste', [ProspectsDashboardController::class, 'list'])->name('prospects.index');
+            Route::get('/import', [ProspectsDashboardController::class, 'import'])->name('prospects.import');
+            Route::get('/configuration', [ProspectsDashboardController::class, 'config'])->name('prospects.config');
+        });
+}
+
+/*
+|--------------------------------------------------------------------------
 | Vitrine (domaine principal)
 |--------------------------------------------------------------------------
 | Sans contrainte d’hôte : évite de servir la vitrine sur api.* (middleware).
@@ -628,7 +652,7 @@ if (is_string($rootDomain) && $rootDomain !== '' && is_array($vitrineSubs) && $v
 */
 if (is_string($rootDomain) && $rootDomain !== '') {
     $reservedSubs = array_values(array_unique(array_filter(array_merge(
-        ['account', 'admin', 'api', 'collabs', 'users', 'courses', 'settings', 'docs', 'home', 'project'],
+        ['account', 'admin', 'api', 'collabs', 'users', 'courses', 'settings', 'docs', 'home', 'project', 'prospects'],
         is_array($vitrineSubs) ? $vitrineSubs : []
     ))));
 
