@@ -21,6 +21,8 @@ final readonly class ImportResult
         public array $byModifier,
         public ?string $csvPath,
         public int $durationMs,
+        /** @var array<string, int> */
+        public array $byNeed = [],
     ) {}
 
     public function toArray(): array
@@ -32,6 +34,7 @@ final readonly class ImportResult
             'by_band' => $this->byBand,
             'by_niveau' => $this->byNiveau,
             'by_modifier' => $this->byModifier,
+            'by_need' => $this->byNeed,
             'csv_path' => $this->csvPath,
             'duration_ms' => $this->durationMs,
         ];

@@ -172,6 +172,105 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Détecteurs de besoins (signaux indépendants, bonus secs)
+    |--------------------------------------------------------------------------
+    | Chaque besoin émerge tout seul selon les données collectées. Plusieurs
+    | besoins peuvent se cumuler sur le même prospect — c'est leur somme qui
+    | détermine le score différencié `score_website` / `score_software`.
+    |
+    | Format : 'key' => ['points' => int, 'targets' => ['website'|'software'|'global'|'*']]
+    | Mettre 'points' = 0 pour désactiver un besoin sans toucher au code.
+    */
+    'needs' => [
+        // ─── Site web ────────────────────────────────────────────────────────
+        'website_absent' => [
+            'points' => 25,
+            'targets' => ['website', 'global'],
+            'label' => 'Aucun site web déclaré',
+        ],
+        'website_dead' => [
+            'points' => 20,
+            'targets' => ['website', 'global'],
+            'label' => 'Site déclaré injoignable (404 / 5xx)',
+        ],
+        'website_outdated_copyright' => [
+            'points' => 15,
+            'targets' => ['website'],
+            'label' => 'Copyright du site daté de plus de 3 ans',
+            'min_age_years' => 3,
+        ],
+        'website_non_responsive' => [
+            'points' => 12,
+            'targets' => ['website'],
+            'label' => 'Site non responsive (pas de meta viewport)',
+        ],
+        'website_no_https' => [
+            'points' => 10,
+            'targets' => ['website'],
+            'label' => 'Site sans HTTPS (refonte / sécurité)',
+        ],
+        'website_legacy_builder' => [
+            'points' => 8,
+            'targets' => ['website'],
+            'label' => 'Site sur un constructeur historique (Wix Classic, Jimdo, Site123, e-monsite…)',
+        ],
+        'email_generique' => [
+            'points' => 8,
+            'targets' => ['website'],
+            'label' => 'Email de contact générique (gmail, free, orange…)',
+        ],
+
+        // ─── Logiciel / outils internes ──────────────────────────────────────
+        'effectif_eleve_b2b' => [
+            'points' => 20,
+            'targets' => ['software'],
+            'label' => 'Effectif élevé en secteur B2B (besoin ERP / CRM)',
+            'min_effectif_code' => '12', // 20-49 salariés
+        ],
+        'multi_etablissements' => [
+            'points' => 15,
+            'targets' => ['software'],
+            'label' => 'Plusieurs établissements (gestion multi-sites)',
+            'min_etablissements' => 3,
+        ],
+        'negoce_sans_catalogue' => [
+            'points' => 12,
+            'targets' => ['software', 'website'],
+            'label' => 'Négoce / commerce de gros sans site marchand (catalogue B2B)',
+        ],
+        'industrie_traceabilite' => [
+            'points' => 10,
+            'targets' => ['software'],
+            'label' => 'Industrie manufacturière (suivi production, traçabilité, MES)',
+        ],
+        'ca_eleve_sans_finances' => [
+            'points' => 8,
+            'targets' => ['software'],
+            'label' => 'Effectif moyen avec besoin d’automatisation comptable/RH',
+        ],
+
+        // ─── Signal transverse (web + soft) ──────────────────────────────────
+        'croissance_recente' => [
+            'points' => 8,
+            'targets' => ['*'],
+            'label' => 'Croissance récente (augmentation de capital + déménagement)',
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Probe HTTP du site web
+    |--------------------------------------------------------------------------
+    */
+    'website_probe' => [
+        'enabled' => true,
+        'timeout_seconds' => 5,
+        'cache_ttl_days' => 30,
+        'max_bytes' => 65_536,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Scoring — Couche B : Multiplicateurs non linéaires
     |--------------------------------------------------------------------------
     */

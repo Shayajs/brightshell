@@ -40,6 +40,10 @@
                     <input type="checkbox" wire:model="withGeocoding" class="rounded border-zinc-700 bg-zinc-900 text-indigo-500 focus:ring-indigo-500/40">
                     Géocodage (BAN)
                 </label>
+                <label class="inline-flex cursor-pointer items-center gap-2">
+                    <input type="checkbox" wire:model="withWebsiteProbe" class="rounded border-zinc-700 bg-zinc-900 text-indigo-500 focus:ring-indigo-500/40">
+                    Sonde site web (HTTPS / âge / plateforme)
+                </label>
                 @if ($inpiEnabled)
                     <label class="inline-flex cursor-pointer items-center gap-2">
                         <input type="checkbox" wire:model="withInpi" class="rounded border-zinc-700 bg-zinc-900 text-orange-400 focus:ring-orange-500/40">

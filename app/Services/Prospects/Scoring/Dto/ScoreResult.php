@@ -31,6 +31,14 @@ final readonly class ScoreResult
      */
     public static function excluded(array $modifiers, int $confidence, array $base = []): self
     {
+        $reason = 'Véto absolu.';
+        foreach ($modifiers as $key => $mod) {
+            if (str_starts_with((string) $key, 'veto.')) {
+                $reason = $mod['why'] ?? $reason;
+                break;
+            }
+        }
+
         return new self(
             scoreGlobal: 0,
             scoreWebsite: 0,
@@ -42,7 +50,7 @@ final readonly class ScoreResult
                 'base' => $base,
                 'modifiers' => $modifiers,
                 'brut' => 0,
-                'reason' => 'Véto : procédure collective active.',
+                'reason' => $reason,
             ],
         );
     }

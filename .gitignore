@@ -26,3 +26,4 @@ Thumbs.db
 # Docker compose personnel (dev local)
 docker-compose-shaya.dev.yaml
 composer.lock
+LOG_*

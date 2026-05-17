@@ -26,21 +26,9 @@ final class ImportRunner extends Component
     public bool $withBodacc = true;
     public bool $withGeocoding = true;
     public bool $withInpi = false;
+    public bool $withWebsiteProbe = true;
 
     public ?string $importId = null;
-
-    /**
-     * Indique si une exécution est en cours pour activer le polling.
-     */
-    public function getIsRunningProperty(): bool
-    {
-        if ($this->importId === null) {
-            return false;
-        }
-        $state = Cache::get("prospects:import:{$this->importId}");
-
-        return is_array($state) && ($state['status'] ?? null) === 'running';
-    }
 
     public function start(): void
     {
@@ -61,13 +49,14 @@ final class ImportRunner extends Component
             withBodacc: $this->withBodacc,
             withGeocoding: $this->withGeocoding,
             withInpi: $this->withInpi,
+            withWebsiteProbe: $this->withWebsiteProbe,
             importId: $this->importId,
         );
 
         ImportProspectsJob::dispatch($options);
     }
 
-    public function render(View $view = null): View
+    public function render(): View
     {
         $state = $this->importId !== null
             ? Cache::get("prospects:import:{$this->importId}")

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\Prospects\Scoring\Dto;
 
+use App\Services\Prospects\Web\WebsiteSnapshot;
 use Carbon\CarbonImmutable;
 
 /**
@@ -39,6 +40,7 @@ final readonly class ProspectInput
         public array $bodaccEvents = [],
         public bool $bodaccConsulted = false,
         public bool $financesAvailable = false,
+        public ?WebsiteSnapshot $websiteSnapshot = null,
     ) {}
 
     public function ageEntrepriseAnnees(?CarbonImmutable $reference = null): ?int
@@ -116,6 +118,37 @@ final readonly class ProspectInput
             bodaccEvents: $this->bodaccEvents,
             bodaccConsulted: $this->bodaccConsulted,
             financesAvailable: $chiffreAffairesN !== null,
+            websiteSnapshot: $this->websiteSnapshot,
+        );
+    }
+
+    /**
+     * Copie immuable enrichie avec le snapshot website (post-probe).
+     */
+    public function withWebsiteSnapshot(?WebsiteSnapshot $snapshot): self
+    {
+        return new self(
+            siren: $this->siren,
+            nomEntreprise: $this->nomEntreprise,
+            codeNaf: $this->codeNaf,
+            natureJuridique: $this->natureJuridique,
+            trancheEffectif: $this->trancheEffectif,
+            dateCreation: $this->dateCreation,
+            dateNaissanceDirigeant: $this->dateNaissanceDirigeant,
+            dateNominationDirigeant: $this->dateNominationDirigeant,
+            siteInternet: $this->siteInternet,
+            emailContact: $this->emailContact,
+            chiffreAffairesN: $this->chiffreAffairesN,
+            chiffreAffairesNm1: $this->chiffreAffairesNm1,
+            resultatNet: $this->resultatNet,
+            nombreEtablissements: $this->nombreEtablissements,
+            latitude: $this->latitude,
+            longitude: $this->longitude,
+            distanceKmHome: $this->distanceKmHome,
+            bodaccEvents: $this->bodaccEvents,
+            bodaccConsulted: $this->bodaccConsulted,
+            financesAvailable: $this->financesAvailable,
+            websiteSnapshot: $snapshot,
         );
     }
 

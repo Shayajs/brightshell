@@ -15,6 +15,8 @@ use App\Services\Prospects\Scoring\Dto\BodaccEvent;
 use App\Services\Prospects\Scoring\Dto\ProspectInput;
 use App\Services\Prospects\Scoring\ScoreBand;
 use App\Services\Prospects\Scoring\ScoreEngine;
+use App\Services\Prospects\Web\WebsiteProbe;
+use App\Services\Prospects\Web\WebsiteSnapshot;
 use Carbon\CarbonImmutable;
 use Closure;
 use Illuminate\Support\Facades\Log;
@@ -40,6 +42,7 @@ final class ImportProspectsAction
         private readonly InpiPisteClient $inpi,
         private readonly ScoreEngine $engine,
         private readonly ClearbitLogoResolver $logoResolver,
+        private readonly WebsiteProbe $websiteProbe,
     ) {}
 
     /**
@@ -72,6 +75,7 @@ final class ImportProspectsAction
             'by_band' => [],
             'by_niveau' => [],
             'by_modifier' => [],
+            'by_need' => [],
         ];
 
         $minBandOrder = (ScoreBand::tryFrom($options->minBand) ?? ScoreBand::Watch)->sortOrder();
@@ -101,6 +105,12 @@ final class ImportProspectsAction
                 foreach ((array) ($prospect->score_breakdown['modifiers'] ?? []) as $modKey => $_) {
                     $stats['by_modifier'][$modKey] = ($stats['by_modifier'][$modKey] ?? 0) + 1;
                 }
+                foreach ((array) ($prospect->score_breakdown['needs'] ?? []) as $need) {
+                    $key = is_array($need) ? ($need['key'] ?? null) : null;
+                    if (is_string($key) && $key !== '') {
+                        $stats['by_need'][$key] = ($stats['by_need'][$key] ?? 0) + 1;
+                    }
+                }
 
                 if ($band === ScoreBand::Excluded) {
                     $stats['excluded']++;
@@ -129,6 +139,7 @@ final class ImportProspectsAction
             byModifier: $stats['by_modifier'],
             csvPath: $csvPath,
             durationMs: (int) round((microtime(true) - $start) * 1000),
+            byNeed: $stats['by_need'],
         );
     }
 
@@ -190,6 +201,16 @@ final class ImportProspectsAction
             }
         }
 
+        // ─── Probe HTTP du site web (caché 30 j) ─────────────────────────────
+        $websiteSnapshot = WebsiteSnapshot::notProbed();
+        if ($options->withWebsiteProbe && is_string($siteInternet) && $siteInternet !== '' && (bool) config('prospects.website_probe.enabled', true)) {
+            try {
+                $websiteSnapshot = $this->websiteProbe->probe($siteInternet);
+            } catch (\Throwable $e) {
+                Log::info('[Prospects][WebsiteProbe] skipped', ['siren' => $siren, 'error' => $e->getMessage()]);
+            }
+        }
+
         // ─── Scoring ─────────────────────────────────────────────────────────
         $input = new ProspectInput(
             siren: $siren,
@@ -209,6 +230,7 @@ final class ImportProspectsAction
             bodaccEvents: $bodaccEvents,
             bodaccConsulted: $bodaccConsulted,
             financesAvailable: false,
+            websiteSnapshot: $websiteSnapshot,
         );
 
         $result = $this->engine->compute($input);
@@ -277,6 +299,15 @@ final class ImportProspectsAction
                 'date_creation' => $dateCreation?->toDateString(),
                 'domaine_web' => $domain,
                 'logo_url' => $logoUrl,
+                'website_probed' => $websiteSnapshot->probed,
+                'website_alive' => $websiteSnapshot->alive,
+                'website_https' => $websiteSnapshot->https,
+                'website_responsive' => $websiteSnapshot->responsive,
+                'website_platform' => $websiteSnapshot->platform,
+                'website_platform_version' => $websiteSnapshot->platformVersion,
+                'website_copyright_year' => $websiteSnapshot->copyrightYear,
+                'website_status_code' => $websiteSnapshot->statusCode,
+                'website_probed_at' => $websiteSnapshot->probed ? now() : null,
                 'chiffre_affaires' => $chiffreAffaires,
                 'chiffre_affaires_n_moins_1' => $chiffreAffairesNm1,
                 'resultat_net' => $resultatNet,
@@ -366,8 +397,9 @@ final class ImportProspectsAction
             'SIREN', 'Nom_Entreprise', 'Nom_Dirigeant', 'Code_NAF', 'Adresse_Complete',
             'Ville', 'Tranche_Effectif', 'Niveau_Interet',
             'Score_Global', 'Score_Website', 'Score_Software', 'Band',
-            'Multiplicateurs_Declenches', 'Confidence', 'Distance_Home_Km',
-        ], escape: '\\');
+            'Multiplicateurs_Declenches', 'Besoins_Detectes', 'Confidence', 'Distance_Home_Km',
+            'Site_Internet', 'Site_Vivant', 'Site_HTTPS', 'Site_Plateforme', 'Site_Copyright',
+        ], escape: '');
 
         return [$handle, $absolutePath];
     }
@@ -378,6 +410,11 @@ final class ImportProspectsAction
     private function writeCsvRow($handle, Prospect $p): void
     {
         $modifiers = array_keys((array) ($p->score_breakdown['modifiers'] ?? []));
+        $needs = array_map(
+            static fn ($need) => is_array($need) ? (string) ($need['key'] ?? '') : '',
+            (array) ($p->score_breakdown['needs'] ?? [])
+        );
+        $needs = array_values(array_filter($needs));
 
         fputcsv($handle, [
             $p->siren,
@@ -393,8 +430,14 @@ final class ImportProspectsAction
             $p->score_software,
             $p->score_band,
             implode('|', $modifiers),
+            implode('|', $needs),
             $p->score_confidence,
             $p->distance_km_home,
-        ], escape: '\\');
+            $p->site_internet,
+            $p->website_alive === null ? '' : ($p->website_alive ? 'oui' : 'non'),
+            $p->website_https === null ? '' : ($p->website_https ? 'oui' : 'non'),
+            $p->website_platform,
+            $p->website_copyright_year,
+        ], escape: '');
     }
 }

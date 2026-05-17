@@ -47,6 +47,12 @@ final class Index extends Component
     #[Url(as: 'rayon')]
     public int $rayonKm = 0; // 0 = désactivé
 
+    #[Url(as: 'besoin')]
+    public string $besoin = '';
+
+    #[Url(as: 'web_etat')]
+    public string $webEtat = ''; // '', 'absent', 'mort', 'vieux', 'no_https'
+
     #[Url(as: 'sort')]
     public string $sortBy = 'score_global';
 
@@ -55,14 +61,9 @@ final class Index extends Component
 
     public ?int $openProspectId = null;
 
-    protected function queryString(): array
-    {
-        return [];
-    }
-
     public function updating(string $name): void
     {
-        if (in_array($name, ['search', 'band', 'effectif', 'codePostal', 'departement', 'sansDigital', 'nonTraitesOnly', 'rayonKm'], true)) {
+        if (in_array($name, ['search', 'band', 'effectif', 'codePostal', 'departement', 'sansDigital', 'nonTraitesOnly', 'rayonKm', 'besoin', 'webEtat'], true)) {
             $this->resetPage();
         }
     }
@@ -99,7 +100,7 @@ final class Index extends Component
 
     public function reset_filters(): void
     {
-        $this->reset(['search', 'band', 'effectif', 'codePostal', 'departement', 'sansDigital', 'nonTraitesOnly', 'rayonKm']);
+        $this->reset(['search', 'band', 'effectif', 'codePostal', 'departement', 'sansDigital', 'nonTraitesOnly', 'rayonKm', 'besoin', 'webEtat']);
         $this->resetPage();
     }
 
@@ -150,6 +151,18 @@ final class Index extends Component
                 $query->withinKm((float) $homeLat, (float) $homeLong, $this->rayonKm);
             }
         }
+        if ($this->besoin !== '') {
+            $query->withNeed($this->besoin);
+        }
+        match ($this->webEtat) {
+            'absent' => $query->where(function ($q): void {
+                $q->whereNull('site_internet')->orWhere('site_internet', '');
+            }),
+            'mort' => $query->where('website_alive', false),
+            'vieux' => $query->where('website_copyright_year', '<=', now()->year - 3),
+            'no_https' => $query->where('website_alive', true)->where('website_https', false),
+            default => null,
+        };
 
         $prospects = $query
             ->orderBy($sortBy, $sortDir)
@@ -169,9 +182,18 @@ final class Index extends Component
             '32' => '250-499',
         ];
 
+        $needsCatalog = (array) config('prospects.needs', []);
+        $besoinsOptions = ['' => 'Tous les besoins'];
+        foreach ($needsCatalog as $key => $cfg) {
+            if ((int) ($cfg['points'] ?? 0) > 0) {
+                $besoinsOptions[$key] = (string) ($cfg['label'] ?? $key);
+            }
+        }
+
         return view('prospects.partials.index-table', [
             'prospects' => $prospects,
             'effectifOptions' => $effectifOptions,
+            'besoinsOptions' => $besoinsOptions,
             'totalDisplayed' => $prospects->total(),
         ]);
     }

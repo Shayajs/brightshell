@@ -3,6 +3,20 @@
 
     $modifiers = (array) ($prospect?->score_breakdown['modifiers'] ?? []);
     $base = (array) ($prospect?->score_breakdown['base'] ?? []);
+    $needs = $prospect?->needs ?? [];
+    $needsByTarget = ['website' => [], 'software' => [], '*' => []];
+    foreach ($needs as $need) {
+        $targets = $need['targets'] ?? ['*'];
+        if (in_array('*', $targets, true)) {
+            $needsByTarget['*'][] = $need;
+            continue;
+        }
+        foreach (['website', 'software'] as $t) {
+            if (in_array($t, $targets, true)) {
+                $needsByTarget[$t][] = $need;
+            }
+        }
+    }
 @endphp
 
 <div>
@@ -108,7 +122,7 @@
                             <p class="text-[10px] uppercase tracking-wider text-zinc-500">Multiplicateurs déclenchés</p>
                             @foreach ($modifiers as $key => $mod)
                                 @php
-                                    $isVeto = $key === 'veto.procedure_collective';
+                                    $isVeto = str_starts_with((string) $key, 'veto.');
                                     $mult = (float) ($mod['multiplier'] ?? 1);
                                     $flat = (int) ($mod['flat_bonus'] ?? 0);
                                 @endphp
@@ -131,6 +145,98 @@
                         </div>
                     @endif
                 </section>
+
+                {{-- ─── Besoins détectés ─────────────────────────────────── --}}
+                @if ($needs !== [])
+                    <section class="border-b border-slate-700 p-6">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-xs font-semibold uppercase tracking-wider text-zinc-400">Besoins détectés</h3>
+                            <span class="text-[10px] text-zinc-500">{{ count($needs) }} signal{{ count($needs) > 1 ? 'aux' : '' }}</span>
+                        </div>
+
+                        <div class="mt-3 grid gap-2">
+                            @foreach ($needs as $need)
+                                @php
+                                    $targets = $need['targets'] ?? ['*'];
+                                    $isWeb = in_array('website', $targets, true) || in_array('*', $targets, true);
+                                    $isSoft = in_array('software', $targets, true) || in_array('*', $targets, true);
+                                    $accent = $isWeb && ! $isSoft ? 'cyan' : ($isSoft && ! $isWeb ? 'purple' : 'amber');
+                                    $colors = [
+                                        'cyan' => ['bg' => 'bg-cyan-500/10', 'border' => 'border-cyan-500/30', 'text' => 'text-cyan-300', 'chip' => 'bg-cyan-500/15 text-cyan-300'],
+                                        'purple' => ['bg' => 'bg-purple-500/10', 'border' => 'border-purple-500/30', 'text' => 'text-purple-300', 'chip' => 'bg-purple-500/15 text-purple-300'],
+                                        'amber' => ['bg' => 'bg-amber-500/10', 'border' => 'border-amber-500/30', 'text' => 'text-amber-300', 'chip' => 'bg-amber-500/15 text-amber-300'],
+                                    ][$accent];
+                                @endphp
+                                <div class="flex items-start gap-3 rounded-lg border {{ $colors['border'] }} {{ $colors['bg'] }} p-3">
+                                    <span class="inline-flex shrink-0 items-center rounded-md px-2 py-0.5 text-xs font-bold {{ $colors['chip'] }} tabular-nums">+{{ (int) $need['points'] }}</span>
+                                    <div class="min-w-0 flex-1">
+                                        <div class="flex flex-wrap items-center gap-1.5">
+                                            <p class="text-sm font-semibold text-zinc-100">{{ $need['label'] ?? $need['key'] }}</p>
+                                            @foreach ($targets as $t)
+                                                <span class="inline-flex items-center rounded-full bg-zinc-800 px-1.5 py-0.5 text-[10px] uppercase tracking-wider text-zinc-400">{{ $t === '*' ? 'global' : $t }}</span>
+                                            @endforeach
+                                        </div>
+                                        <p class="mt-0.5 text-xs text-zinc-400">{{ $need['why'] ?? '' }}</p>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </section>
+                @endif
+
+                {{-- ─── Snapshot site web ────────────────────────────────── --}}
+                @if ($prospect->website_probed)
+                    <section class="border-b border-slate-700 p-6">
+                        <h3 class="text-xs font-semibold uppercase tracking-wider text-zinc-400">Snapshot site web</h3>
+                        <div class="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                            <div class="rounded-lg border border-slate-700 bg-slate-800/40 p-3">
+                                <p class="text-[10px] uppercase tracking-wider text-zinc-500">État</p>
+                                @if ($prospect->website_alive === true)
+                                    <p class="mt-1 text-sm font-semibold text-emerald-400">En ligne · {{ $prospect->website_status_code ?? '200' }}</p>
+                                @elseif ($prospect->website_alive === false)
+                                    <p class="mt-1 text-sm font-semibold text-red-400">Hors ligne · {{ $prospect->website_status_code ?? 'KO' }}</p>
+                                @else
+                                    <p class="mt-1 text-sm font-semibold text-zinc-300">Indéterminé</p>
+                                @endif
+                            </div>
+                            <div class="rounded-lg border border-slate-700 bg-slate-800/40 p-3">
+                                <p class="text-[10px] uppercase tracking-wider text-zinc-500">HTTPS</p>
+                                <p class="mt-1 text-sm font-semibold {{ $prospect->website_https ? 'text-emerald-400' : 'text-amber-400' }}">
+                                    {{ $prospect->website_https === null ? '—' : ($prospect->website_https ? 'oui' : 'non') }}
+                                </p>
+                            </div>
+                            <div class="rounded-lg border border-slate-700 bg-slate-800/40 p-3">
+                                <p class="text-[10px] uppercase tracking-wider text-zinc-500">Responsive</p>
+                                <p class="mt-1 text-sm font-semibold {{ $prospect->website_responsive ? 'text-emerald-400' : 'text-amber-400' }}">
+                                    {{ $prospect->website_responsive === null ? '—' : ($prospect->website_responsive ? 'oui' : 'non') }}
+                                </p>
+                            </div>
+                            <div class="rounded-lg border border-slate-700 bg-slate-800/40 p-3">
+                                <p class="text-[10px] uppercase tracking-wider text-zinc-500">Plateforme</p>
+                                <p class="mt-1 truncate text-sm font-semibold text-zinc-100" title="{{ $prospect->website_platform }}">
+                                    {{ $prospect->website_platform ?? '—' }}
+                                    @if ($prospect->website_platform_version) <span class="text-zinc-500">{{ $prospect->website_platform_version }}</span>@endif
+                                </p>
+                            </div>
+                            @if ($prospect->website_copyright_year)
+                                <div class="rounded-lg border border-slate-700 bg-slate-800/40 p-3 sm:col-span-2">
+                                    <p class="text-[10px] uppercase tracking-wider text-zinc-500">Copyright détecté</p>
+                                    @php $age = $prospect->age_site_annees; @endphp
+                                    <p class="mt-1 text-sm font-semibold {{ ($age ?? 0) >= 3 ? 'text-amber-400' : 'text-zinc-100' }}">
+                                        {{ $prospect->website_copyright_year }}
+                                        @if ($age !== null) <span class="text-zinc-500">— {{ $age }} an{{ $age > 1 ? 's' : '' }}</span>@endif
+                                    </p>
+                                </div>
+                            @endif
+                            @if ($prospect->website_probed_at)
+                                <div class="rounded-lg border border-slate-700 bg-slate-800/40 p-3 sm:col-span-2">
+                                    <p class="text-[10px] uppercase tracking-wider text-zinc-500">Sondé le</p>
+                                    <p class="mt-1 text-sm font-semibold text-zinc-300">{{ $prospect->website_probed_at->format('d/m/Y H:i') }}</p>
+                                </div>
+                            @endif
+                        </div>
+                    </section>
+                @endif
 
                 {{-- ─── Finances ─────────────────────────────────────────── --}}
                 @if ($prospect->chiffre_affaires || $prospect->resultat_net)

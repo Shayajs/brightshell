@@ -28,6 +28,9 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
     'code_insee_commune', 'latitude', 'longitude', 'distance_km_home',
     'date_creation', 'date_dernier_demenagement',
     'domaine_web', 'logo_url',
+    'website_probed', 'website_alive', 'website_https', 'website_responsive',
+    'website_platform', 'website_platform_version', 'website_copyright_year',
+    'website_status_code', 'website_probed_at',
     'chiffre_affaires', 'chiffre_affaires_n_moins_1', 'resultat_net', 'exercice_bilan',
     'score_global', 'score_website', 'score_software', 'score_band',
     'niveau_interet', 'score_breakdown', 'score_confidence',
@@ -61,6 +64,13 @@ class Prospect extends Model
         'traite' => 'boolean',
         'traite_at' => 'datetime',
         'scored_at' => 'datetime',
+        'website_probed' => 'boolean',
+        'website_alive' => 'boolean',
+        'website_https' => 'boolean',
+        'website_responsive' => 'boolean',
+        'website_copyright_year' => 'integer',
+        'website_status_code' => 'integer',
+        'website_probed_at' => 'datetime',
     ];
 
     /**
@@ -127,6 +137,33 @@ class Prospect extends Model
         return $this->date_naissance_dirigeant !== null ? (int) $this->date_naissance_dirigeant->diffInYears(now()) : null;
     }
 
+    /**
+     * Besoins détectés par `NeedsDetector`, persistés dans `score_breakdown.needs`.
+     *
+     * @return list<array{key: string, label: string, points: int, targets: list<string>, confidence: int, why: string, context: array<string, mixed>}>
+     */
+    public function getNeedsAttribute(): array
+    {
+        $breakdown = $this->score_breakdown;
+        if (! is_array($breakdown) || ! isset($breakdown['needs']) || ! is_array($breakdown['needs'])) {
+            return [];
+        }
+
+        return array_values($breakdown['needs']);
+    }
+
+    /**
+     * Âge du site web en années (depuis le copyright détecté).
+     */
+    public function getAgeSiteAnneesAttribute(): ?int
+    {
+        if ($this->website_copyright_year === null) {
+            return null;
+        }
+
+        return max(0, (int) now()->year - (int) $this->website_copyright_year);
+    }
+
     // ─── Scopes ──────────────────────────────────────────────────────────────
 
     public function scopeBand(Builder $query, string|ScoreBand $band): Builder
@@ -159,6 +196,22 @@ class Prospect extends Model
     public function scopeWithoutExcluded(Builder $query): Builder
     {
         return $query->where('score_band', '!=', ScoreBand::Excluded->value);
+    }
+
+    /**
+     * Filtre par clé de besoin détecté (ex. 'website_absent', 'effectif_eleve_b2b').
+     */
+    public function scopeWithNeed(Builder $query, string $needKey): Builder
+    {
+        $needKey = preg_replace('/[^a-z0-9_]/i', '', $needKey) ?? '';
+        if ($needKey === '') {
+            return $query;
+        }
+
+        return $query->whereRaw(
+            "JSON_SEARCH(JSON_EXTRACT(score_breakdown, '$.needs[*].key'), 'one', ?) IS NOT NULL",
+            [$needKey]
+        );
     }
 
     /**

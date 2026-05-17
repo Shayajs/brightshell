@@ -19,6 +19,7 @@ final readonly class ImportOptions
         public bool $withBodacc = true,
         public bool $withGeocoding = true,
         public bool $withInpi = false,
+        public bool $withWebsiteProbe = true,
         public string $minBand = 'watch',
         public ?string $importId = null,
     ) {}

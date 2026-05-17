@@ -35,7 +35,19 @@ final class NonLinearModifiers
     {
         $mods = [];
 
-        // ─── Véto absolu ─────────────────────────────────────────────────────
+        // ─── Véto NAF : hors-cible total (SCI, holding, agriculture, détail…) ──
+        if ($this->naf->categorize($in->codeNaf) === NafCategorizer::EXCLUDED) {
+            $mods['veto.naf_exclu'] = [
+                'multiplier' => 0.0,
+                'flat_bonus' => 0,
+                'targets' => ['*'],
+                'why' => 'Secteur hors-cible (NAF exclu : holdings, SCI, agriculture, commerce de détail, etc.).',
+            ];
+
+            return $mods;
+        }
+
+        // ─── Véto BODACC : procédure collective active ───────────────────────
         if ($in->hasProcedureCollective()) {
             $mods['veto.procedure_collective'] = [
                 'multiplier' => 0.0,
@@ -44,7 +56,7 @@ final class NonLinearModifiers
                 'why' => 'Procédure collective active dans le BODACC (RJ, sauvegarde ou liquidation).',
             ];
 
-            return $mods; // court-circuit : pas besoin de calculer les autres
+            return $mods;
         }
 
         // ─── Relais générationnel (×1.5) ─────────────────────────────────────
@@ -91,16 +103,9 @@ final class NonLinearModifiers
             ];
         }
 
-        // ─── Digital gap (bonus +10 pts website) ─────────────────────────────
-        if ($this->hasDigitalGap($in)) {
-            $cfg = (array) config('prospects.modifiers.digital_gap', []);
-            $mods['digital_gap'] = [
-                'multiplier' => 1.0,
-                'flat_bonus' => (int) ($cfg['bonus_points_website'] ?? 10),
-                'targets' => ['website'],
-                'why' => 'Aucun site web déclaré ou email générique : opportunité refonte web.',
-            ];
-        }
+        // NOTE : la détection « digital_gap » est remplacée par les détecteurs
+        // de besoins (`prospects.needs.*`) qui fonctionnent en signaux indépendants
+        // — voir App\Services\Prospects\Needs\Detectors\*.
 
         // ─── Hub local (bonus +5 pts) ────────────────────────────────────────
         if ($in->nombreEtablissements >= (int) config('prospects.modifiers.hub_local.min_etablissements', 3)) {
@@ -231,21 +236,6 @@ final class NonLinearModifiers
             if ($count >= $min) {
                 return true;
             }
-        }
-
-        return false;
-    }
-
-    private function hasDigitalGap(ProspectInput $in): bool
-    {
-        if (empty($in->siteInternet)) {
-            return true;
-        }
-
-        $generic = (array) config('prospects.modifiers.digital_gap.emails_generiques', []);
-        $domain = $in->emailDomain();
-        if ($domain !== null && in_array($domain, $generic, true)) {
-            return true;
         }
 
         return false;

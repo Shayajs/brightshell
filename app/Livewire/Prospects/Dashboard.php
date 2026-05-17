@@ -23,8 +23,11 @@ final class Dashboard extends Component
         $priority = Prospect::query()->band(ScoreBand::Priority)->count();
         $standard = Prospect::query()->band(ScoreBand::Standard)->count();
         $traites = Prospect::query()->withoutExcluded()->where('traite', true)->count();
+        // `score_breakdown.modifiers` est un objet associatif keyé par nom de modificateur ;
+        // on cherche les prospects pour lesquels la clé `relais_generationnel` est présente.
         $relais = Prospect::query()
-            ->whereJsonContains('score_breakdown->modifiers->relais_generationnel->multiplier', 1.5)
+            ->withoutExcluded()
+            ->whereRaw("JSON_EXTRACT(score_breakdown, '$.modifiers.relais_generationnel') IS NOT NULL")
             ->count();
 
         $tauxTraites = $total > 0 ? (int) round(($traites / $total) * 100) : 0;

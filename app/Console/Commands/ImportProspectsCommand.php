@@ -26,6 +26,7 @@ final class ImportProspectsCommand extends Command
                             {--no-csv : Ne pas générer de fichier CSV en sortie}
                             {--no-bodacc : Désactiver l’enrichissement BODACC}
                             {--no-geocoding : Désactiver le géocodage BAN}
+                            {--no-website-probe : Désactiver la sonde HTTP des sites web}
                             {--with-inpi : Activer l’enrichissement INPI (band ≥ priority uniquement)}
                             {--min-band=watch : Bande minimum incluse dans le CSV (hot|priority|standard|watch)}';
 
@@ -43,17 +44,19 @@ final class ImportProspectsCommand extends Command
             withBodacc: ! (bool) $this->option('no-bodacc'),
             withGeocoding: ! (bool) $this->option('no-geocoding'),
             withInpi: (bool) $this->option('with-inpi'),
+            withWebsiteProbe: ! (bool) $this->option('no-website-probe'),
             minBand: (string) $this->option('min-band'),
         );
 
         $this->components->info(sprintf(
-            'Import prospects — zone=%s, NAF=%s, pages=%d, bodacc=%s, geocoding=%s, inpi=%s',
+            'Import prospects — zone=%s, NAF=%s, pages=%d, bodacc=%s, geocoding=%s, inpi=%s, web-probe=%s',
             $options->zoneLabel(),
             $options->codeNaf ?? 'tous',
             $options->maxPages,
             $options->withBodacc ? 'oui' : 'non',
             $options->withGeocoding ? 'oui' : 'non',
             $options->withInpi ? 'oui' : 'non',
+            $options->withWebsiteProbe ? 'oui' : 'non',
         ));
 
         $bar = $this->output->createProgressBar();
@@ -101,6 +104,18 @@ final class ImportProspectsCommand extends Command
             $this->newLine();
             $this->components->info('Top multiplicateurs déclenchés');
             $this->table(['Modificateur', 'Occurrences'], array_map(
+                static fn (string $k, int $v) => [$k, (string) $v],
+                array_keys($top),
+                array_values($top),
+            ));
+        }
+
+        if ($result->byNeed !== []) {
+            arsort($result->byNeed);
+            $top = array_slice($result->byNeed, 0, 12, preserve_keys: true);
+            $this->newLine();
+            $this->components->info('Top besoins détectés');
+            $this->table(['Besoin', 'Occurrences'], array_map(
                 static fn (string $k, int $v) => [$k, (string) $v],
                 array_keys($top),
                 array_values($top),

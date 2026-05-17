@@ -53,6 +53,28 @@
                        placeholder="33"
                        class="mt-1 w-full rounded-lg border-zinc-700 bg-zinc-900/70 text-sm text-zinc-100 focus:border-indigo-500/60 focus:ring-0">
             </div>
+
+            <div class="lg:col-span-3">
+                <label class="block text-xs font-semibold uppercase tracking-wider text-zinc-400">Besoin détecté</label>
+                <select wire:model.live="besoin"
+                        class="mt-1 w-full rounded-lg border-zinc-700 bg-zinc-900/70 text-sm text-zinc-100 focus:border-indigo-500/60 focus:ring-0">
+                    @foreach ($besoinsOptions as $value => $label)
+                        <option value="{{ $value }}">{{ $label }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="lg:col-span-2">
+                <label class="block text-xs font-semibold uppercase tracking-wider text-zinc-400">État du site</label>
+                <select wire:model.live="webEtat"
+                        class="mt-1 w-full rounded-lg border-zinc-700 bg-zinc-900/70 text-sm text-zinc-100 focus:border-indigo-500/60 focus:ring-0">
+                    <option value="">Tous</option>
+                    <option value="absent">Pas de site</option>
+                    <option value="mort">Site mort (4xx/5xx)</option>
+                    <option value="vieux">Site vieux (≥ 3 ans)</option>
+                    <option value="no_https">Sans HTTPS</option>
+                </select>
+            </div>
         </div>
 
         <div class="mt-3 flex flex-wrap items-center gap-3 text-xs text-zinc-400">
@@ -158,9 +180,34 @@
                             <td class="px-4 py-3">
                                 <x-prospects.band-badge :prospect="$p" />
                             </td>
-                            {{-- Mini barres --}}
+                            {{-- Mini barres + needs chips --}}
                             <td class="px-4 py-3">
                                 <x-prospects.mini-bars :website="$p->score_website" :software="$p->score_software" />
+                                @php
+                                    $topNeeds = array_slice($p->needs, 0, 2);
+                                @endphp
+                                @if ($topNeeds)
+                                    <div class="mt-1 flex flex-wrap gap-1">
+                                        @foreach ($topNeeds as $n)
+                                            @php
+                                                $targets = $n['targets'] ?? ['*'];
+                                                $isWeb = in_array('website', $targets, true) && ! in_array('software', $targets, true);
+                                                $isSoft = in_array('software', $targets, true) && ! in_array('website', $targets, true);
+                                                $chipColor = $isWeb ? 'text-cyan-300 border-cyan-500/30 bg-cyan-500/10'
+                                                    : ($isSoft ? 'text-purple-300 border-purple-500/30 bg-purple-500/10'
+                                                    : 'text-amber-300 border-amber-500/30 bg-amber-500/10');
+                                            @endphp
+                                            <span class="inline-flex items-center gap-1 rounded-full border {{ $chipColor }} px-1.5 py-0.5 text-[10px]"
+                                                  title="{{ $n['why'] ?? '' }}">
+                                                +{{ (int) $n['points'] }}
+                                                <span class="opacity-80">{{ str_replace('_', ' ', (string) ($n['key'] ?? '')) }}</span>
+                                            </span>
+                                        @endforeach
+                                        @if (count($p->needs) > 2)
+                                            <span class="text-[10px] text-zinc-500">+{{ count($p->needs) - 2 }}</span>
+                                        @endif
+                                    </div>
+                                @endif
                             </td>
                             {{-- Actions --}}
                             <td class="px-4 py-3">

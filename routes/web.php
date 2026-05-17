@@ -507,7 +507,9 @@ if ($settingsHost !== '') {
             Route::get('/notifications', [NotificationPreferencesController::class, 'edit'])->name('portals.settings.notifications.edit');
             Route::put('/notifications', [NotificationPreferencesController::class, 'update'])->name('portals.settings.notifications.update');
             Route::post('/notifications/lues', [NotificationPreferencesController::class, 'markAllRead'])->name('portals.settings.notifications.read-all');
-            Route::get('/notifications/bridge', [NotificationPreferencesController::class, 'bridge'])->name('portals.settings.notifications.bridge');
+            Route::get('/notifications/bridge', [NotificationPreferencesController::class, 'bridge'])
+                ->middleware(\App\Http\Middleware\AllowBrightshellPortalFraming::class)
+                ->name('portals.settings.notifications.bridge');
 
             Route::get('/securite', [SettingsSecurityController::class, 'edit'])->name('portals.settings.security.edit');
             Route::put('/securite/mot-de-passe', [SettingsSecurityController::class, 'updatePassword'])->name('portals.settings.security.password');
