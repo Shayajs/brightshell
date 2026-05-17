@@ -67,10 +67,13 @@ final class BasePointsCalculator
             return (int) config('prospects.scoring.effectif.small_points', 10);
         }
         if (in_array($code, (array) config('prospects.scoring.effectif.large', []), true)) {
-            return (int) config('prospects.scoring.effectif.large_points', 12);
+            return (int) config('prospects.scoring.effectif.large_points', 0);
+        }
+        if (in_array($code, (array) config('prospects.scoring.effectif.mega', []), true)) {
+            return (int) config('prospects.scoring.effectif.mega_points', 0);
         }
 
-        return 5;
+        return 0;
     }
 
     private function pointsAge(ProspectInput $in): int

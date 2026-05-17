@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\Prospects\Scoring;
 
+use App\Services\Prospects\EffectifTranche;
 use App\Services\Prospects\Geo\HaversineDistance;
 use App\Services\Prospects\Scoring\Dto\BodaccEvent;
 use App\Services\Prospects\Scoring\Dto\BodaccEventType;
@@ -42,6 +43,31 @@ final class NonLinearModifiers
                 'flat_bonus' => 0,
                 'targets' => ['*'],
                 'why' => 'Secteur hors-cible (NAF exclu : holdings, SCI, agriculture, commerce de détail, etc.).',
+            ];
+
+            return $mods;
+        }
+
+        // ─── Véto effectif : groupe / ETI (hors cible site web PME) ─────────
+        $maxTranche = (string) config('prospects.import.max_tranche_effectif', '12');
+        if ($in->trancheEffectif !== null && $in->trancheEffectif !== '' && EffectifTranche::exceeds($in->trancheEffectif, $maxTranche)) {
+            $mods['veto.effectif_geant'] = [
+                'multiplier' => 0.0,
+                'flat_bonus' => 0,
+                'targets' => ['*'],
+                'why' => 'Effectif salarié hors cible PME (plus de 49 salariés déclarés).',
+            ];
+
+            return $mods;
+        }
+
+        $maxEtab = (int) config('prospects.import.max_etablissements', 25);
+        if ($maxEtab > 0 && $in->nombreEtablissements > $maxEtab) {
+            $mods['veto.reseau_etablissements'] = [
+                'multiplier' => 0.0,
+                'flat_bonus' => 0,
+                'targets' => ['*'],
+                'why' => "Réseau trop étendu ({$in->nombreEtablissements} établissements) — groupe national ou franchise, pas une PME locale.",
             ];
 
             return $mods;
@@ -107,14 +133,21 @@ final class NonLinearModifiers
         // de besoins (`prospects.needs.*`) qui fonctionnent en signaux indépendants
         // — voir App\Services\Prospects\Needs\Detectors\*.
 
-        // ─── Hub local (bonus +5 pts) ────────────────────────────────────────
-        if ($in->nombreEtablissements >= (int) config('prospects.modifiers.hub_local.min_etablissements', 3)) {
-            $cfg = (array) config('prospects.modifiers.hub_local', []);
+        // ─── Hub local (bonus +5 pts, PME multi-sites uniquement) ────────────
+        $hubCfg = (array) config('prospects.modifiers.hub_local', []);
+        $hubMin = (int) ($hubCfg['min_etablissements'] ?? 2);
+        $hubMax = (int) ($hubCfg['max_etablissements'] ?? 8);
+        $hubMaxTranche = (string) ($hubCfg['max_tranche_effectif'] ?? '12');
+        if (
+            $in->nombreEtablissements >= $hubMin
+            && $in->nombreEtablissements <= $hubMax
+            && ! EffectifTranche::exceeds($in->trancheEffectif, $hubMaxTranche)
+        ) {
             $mods['hub_local'] = [
                 'multiplier' => 1.0,
-                'flat_bonus' => (int) ($cfg['bonus_points'] ?? 5),
+                'flat_bonus' => (int) ($hubCfg['bonus_points'] ?? 5),
                 'targets' => ['*'],
-                'why' => "Plusieurs établissements : prescripteur potentiel à l'échelle locale.",
+                'why' => "Plusieurs établissements ({$in->nombreEtablissements}) : PME multi-sites locale.",
             ];
         }
 
@@ -196,6 +229,11 @@ final class NonLinearModifiers
         $minEffectif = (int) ($cfg['min_effectif'] ?? 20);
 
         // Approximation effectif via tranche INSEE.
+        $maxTranche = (string) config('prospects.import.max_tranche_effectif', '12');
+        if (EffectifTranche::exceeds($in->trancheEffectif, $maxTranche)) {
+            return false;
+        }
+
         $effectifEstime = $this->effectifEstime($in->trancheEffectif);
         if ($effectifEstime === null || $effectifEstime < $minEffectif) {
             return false;

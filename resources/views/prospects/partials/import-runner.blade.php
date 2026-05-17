@@ -10,6 +10,10 @@
 <div class="space-y-6"
      @if ($status === 'running') wire:poll.1s @endif>
     <form wire:submit.prevent="start" class="rounded-2xl border border-slate-700/60 bg-slate-800/40 p-6">
+        <p class="mb-4 text-xs text-zinc-400">
+            Cible <strong class="text-zinc-300">PME / TPE</strong> uniquement (0 à 49 salariés, max. 25 établissements).
+            Les grands groupes (Enedis, banques, La Poste…) sont exclus automatiquement.
+        </p>
         <div class="grid gap-4 md:grid-cols-3">
             <div>
                 <label class="block text-xs font-semibold uppercase tracking-wider text-zinc-400">Code postal</label>

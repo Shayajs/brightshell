@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Actions\Prospects;
 
 use App\Models\Prospect;
+use App\Services\Prospects\EffectifTranche;
 use App\Services\Prospects\ApiAdresseClient;
 use App\Services\Prospects\BodaccClient;
 use App\Services\Prospects\ClearbitLogoResolver;
@@ -88,7 +89,12 @@ final class ImportProspectsAction
                 }
 
                 try {
+                    $this->assertImportable($entreprise);
                     $prospect = $this->processOne($entreprise, $options);
+                } catch (ProspectSkippedException) {
+                    $stats['excluded']++;
+
+                    continue;
                 } catch (\Throwable $e) {
                     Log::warning('[Prospects][Import] item failed', [
                         'siren' => $entreprise['siren'] ?? null,
@@ -141,6 +147,28 @@ final class ImportProspectsAction
             durationMs: (int) round((microtime(true) - $start) * 1000),
             byNeed: $stats['by_need'],
         );
+    }
+
+    /**
+     * Filtre rapide avant BODACC / probe HTTP (économie de quota API).
+     *
+     * @param  array<string, mixed>  $entreprise
+     */
+    private function assertImportable(array $entreprise): void
+    {
+        $tranche = isset($entreprise['tranche_effectif_salarie'])
+            ? (string) $entreprise['tranche_effectif_salarie']
+            : null;
+        $maxTranche = (string) config('prospects.import.max_tranche_effectif', '12');
+        if ($tranche !== null && $tranche !== '' && EffectifTranche::exceeds($tranche, $maxTranche)) {
+            throw new ProspectSkippedException('Effectif hors cible PME');
+        }
+
+        $maxEtab = (int) config('prospects.import.max_etablissements', 25);
+        $nbEtab = (int) ($entreprise['nombre_etablissements'] ?? 0);
+        if ($maxEtab > 0 && $nbEtab > $maxEtab) {
+            throw new ProspectSkippedException('Trop d\'établissements');
+        }
     }
 
     /**

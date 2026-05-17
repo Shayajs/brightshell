@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\Prospects\Needs\Detectors;
 
+use App\Services\Prospects\EffectifTranche;
 use App\Services\Prospects\Scoring\Dto\ProspectInput;
 use App\Services\Prospects\Scoring\NafCategorizer;
 
@@ -26,11 +27,11 @@ final class EffectifEleveB2BDetector extends AbstractConfigurableDetector
     protected function passes(ProspectInput $in): ?bool
     {
         $minCode = (string) $this->config('min_effectif_code', '12');
+        $maxCode = (string) $this->config('max_effectif_code', '12');
         if ($in->trancheEffectif === null) {
             return null;
         }
-        // Comparaison alphabétique sur le code INSEE (00 < 01 < 02 < 03 < 11 < 12 < 21 < 22 …).
-        if (strcmp($in->trancheEffectif, $minCode) < 0) {
+        if (! EffectifTranche::between($in->trancheEffectif, $minCode, $maxCode)) {
             return false;
         }
 

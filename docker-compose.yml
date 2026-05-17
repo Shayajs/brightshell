@@ -7,6 +7,9 @@ services:
     user: "1000:1000"
     restart: unless-stopped
     working_dir: /var/www/html
+    environment:
+      # PsySH (artisan tinker) écrit l'historique dans $HOME/.config/psysh
+      HOME: /var/www/html/storage/psysh
     volumes:
       - .:/var/www/html
     networks:
@@ -22,6 +25,8 @@ services:
     user: "1000:1000"
     restart: unless-stopped
     working_dir: /var/www/html
+    environment:
+      HOME: /var/www/html/storage/psysh
     command: >
       php artisan queue:work database
       --sleep=3

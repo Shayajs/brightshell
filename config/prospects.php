@@ -65,6 +65,23 @@ return [
     | INSEE : 30 req/min → 2 100 ms.
     | INPI : conservateur → 800 ms.
     */
+    /*
+    |--------------------------------------------------------------------------
+    | Import — cible PME / TPE (exclut Enedis, banques, La Poste au niveau API)
+    |--------------------------------------------------------------------------
+    | tranche_effectif_salarie : liste INSEE envoyée à l'API (virgules).
+    | max_tranche_effectif : plafond post-fetch (véto si dépassement, ex. 12 = 20–49 max).
+    | max_etablissements : véto si le réseau est trop étendu (La Poste, franchises nationales).
+    */
+    'import' => [
+        'tranche_effectif_salarie' => env(
+            'BRIGHTSHELL_PROSPECTS_IMPORT_TRANCHES',
+            'NN,00,01,02,03,11,12',
+        ),
+        'max_tranche_effectif' => env('BRIGHTSHELL_PROSPECTS_IMPORT_MAX_TRANCHE', '12'),
+        'max_etablissements' => (int) env('BRIGHTSHELL_PROSPECTS_IMPORT_MAX_ETABLISSEMENTS', 25),
+    ],
+
     'throttle_us' => [
         'recherche_entreprises' => 150_000,
         'bodacc' => 300_000,
@@ -105,9 +122,11 @@ return [
             ],
             'excluded_prefixes' => [
                 '01', '02', '03', // Agriculture
+                '35.1',           // Production / transport / distribution énergie (EDF, Enedis…)
                 '47',             // Commerce de détail
                 '55', '56',       // HCR
-                '64.20',          // Holdings
+                '64',             // Activités financières (banques, assurance — Société Générale…)
+                '64.20',          // Holdings (redondant, explicite)
                 '68',             // SCI / immobilier
                 '84',             // Administration publique
                 '94',             // Associations
@@ -125,8 +144,10 @@ return [
             'sweet_spot_points' => 15,
             'small' => ['01', '02', '03'],           // 1-9
             'small_points' => 10,
-            'large' => ['21', '22', '31', '32'],     // 50+
-            'large_points' => 12,
+            'large' => [],                           // 50+ : hors cible (véto import)
+            'large_points' => 0,
+            'mega' => ['21', '22', '31', '32', '41', '42', '51', '52', '53'],
+            'mega_points' => 0,
             'zero' => ['00', 'NN', ''],
             'zero_points' => 0,
         ],
@@ -236,16 +257,18 @@ return [
 
         // ─── Logiciel / outils internes ──────────────────────────────────────
         'effectif_eleve_b2b' => [
-            'points' => 20,
+            'points' => 12,
             'targets' => ['software'],
-            'label' => 'Effectif élevé en secteur B2B (besoin ERP / CRM)',
-            'min_effectif_code' => '12', // 20-49 salariés
+            'label' => 'Effectif 20–49 en secteur B2B (besoin ERP / CRM)',
+            'min_effectif_code' => '12',
+            'max_effectif_code' => '12',
         ],
         'multi_etablissements' => [
-            'points' => 15,
+            'points' => 10,
             'targets' => ['software'],
-            'label' => 'Plusieurs établissements (gestion multi-sites)',
-            'min_etablissements' => 3,
+            'label' => '2 à 8 établissements (gestion multi-sites PME)',
+            'min_etablissements' => 2,
+            'max_etablissements' => 8,
         ],
         'negoce_sans_catalogue' => [
             'points' => 12,
@@ -321,7 +344,9 @@ return [
             'bonus_points_global' => 5,
         ],
         'hub_local' => [
-            'min_etablissements' => 3,
+            'min_etablissements' => 2,
+            'max_etablissements' => 8,
+            'max_tranche_effectif' => '12',
             'bonus_points' => 5,
         ],
         'proximite_geographique' => [

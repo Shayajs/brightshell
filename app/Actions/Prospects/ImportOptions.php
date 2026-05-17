@@ -29,11 +29,18 @@ final readonly class ImportOptions
      */
     public function toApiFilters(): array
     {
-        return array_filter([
+        $filters = [
             'code_postal' => $this->codePostal,
             'departement' => $this->departement,
             'activite_principale' => $this->codeNaf,
-        ], static fn ($v) => $v !== null && $v !== '');
+        ];
+
+        $tranches = config('prospects.import.tranche_effectif_salarie');
+        if (is_string($tranches) && $tranches !== '') {
+            $filters['tranche_effectif_salarie'] = $tranches;
+        }
+
+        return array_filter($filters, static fn ($v) => $v !== null && $v !== '');
     }
 
     public function zoneLabel(): string

@@ -18,9 +18,10 @@ final class MultiEtablissementsDetector extends AbstractConfigurableDetector
 
     protected function passes(ProspectInput $in): ?bool
     {
-        $min = (int) $this->config('min_etablissements', 3);
+        $min = (int) $this->config('min_etablissements', 2);
+        $max = (int) $this->config('max_etablissements', 8);
 
-        return $in->nombreEtablissements >= $min;
+        return $in->nombreEtablissements >= $min && $in->nombreEtablissements <= $max;
     }
 
     protected function why(ProspectInput $in): string
