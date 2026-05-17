@@ -15,6 +15,6 @@
             </p>
         </div>
 
-        @livewire('prospects.import-runner')
+        <x-livewire-mount name="prospects.import-runner" />
     </div>
 @endsection

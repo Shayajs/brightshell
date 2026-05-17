@@ -30,7 +30,7 @@
             </div>
         </div>
 
-        @livewire('prospects.dashboard')
+        <x-livewire-mount name="prospects.dashboard" />
 
         <div class="grid gap-4 sm:grid-cols-2">
             <a href="{{ route('prospects.index') }}?band=hot"

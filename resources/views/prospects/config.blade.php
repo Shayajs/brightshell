@@ -15,6 +15,6 @@
             </p>
         </div>
 
-        @livewire('prospects.config')
+        <x-livewire-mount name="prospects.config" />
     </div>
 @endsection

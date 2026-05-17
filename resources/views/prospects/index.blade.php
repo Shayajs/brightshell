@@ -19,10 +19,10 @@
             </a>
         </div>
 
-        @livewire('prospects.dashboard')
+        <x-livewire-mount name="prospects.dashboard" />
 
-        @livewire('prospects.index')
+        <x-livewire-mount name="prospects.index" />
     </div>
 
-    @livewire('prospects.slide-over')
+    <x-livewire-mount name="prospects.slide-over" />
 @endsection
