@@ -14,14 +14,14 @@ use Illuminate\Http\Client\RequestException;
  * - Limite officielle : 7 req/s (throttle interne 150 ms par défaut)
  * - Pagination : `page` + `per_page` (25 max recommandé pour rester sous le timeout)
  *
- * @see https://recherche-entreprises.api.data.gouv.fr/docs
+ * @see https://recherche-entreprises.api.gouv.fr/docs
  */
 final class RechercheEntreprisesClient extends AbstractGouvApiClient
 {
     public function __construct()
     {
         parent::__construct(
-            baseUrl: 'https://recherche-entreprises.api.data.gouv.fr',
+            baseUrl: (string) config('prospects.api.recherche_entreprises'),
             timeout: 20,
             throttleMicroseconds: (int) config('prospects.throttle_us.recherche_entreprises', 150_000),
         );

@@ -25,6 +25,20 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | URLs API publiques data.gouv.fr
+    |--------------------------------------------------------------------------
+    | Recherche Entreprises : le sous-domaine *.api.data.gouv.fr n'est pas résolu
+    | partout ; le canonique est recherche-entreprises.api.gouv.fr.
+    */
+    'api' => [
+        'recherche_entreprises' => env(
+            'BRIGHTSHELL_PROSPECTS_RECHERCHE_ENTREPRISES_URL',
+            'https://recherche-entreprises.api.gouv.fr',
+        ),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Clients API — activation conditionnelle (Bearer optionnels)
     |--------------------------------------------------------------------------
     */
