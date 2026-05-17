@@ -14,6 +14,27 @@ services:
     depends_on:
       - brightshell_db
 
+  brightshell_queue:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: brightshell_queue
+    user: "1000:1000"
+    restart: unless-stopped
+    working_dir: /var/www/html
+    command: >
+      php artisan queue:work database
+      --sleep=3
+      --tries=3
+      --timeout=120
+      --max-time=3600
+    volumes:
+      - .:/var/www/html
+    networks:
+      - brightshell_internal
+    depends_on:
+      - brightshell_db
+
   brightshell_nginx:
     image: nginx:alpine
     container_name: brightshell_nginx
