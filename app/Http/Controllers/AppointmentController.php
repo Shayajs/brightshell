@@ -5,7 +5,10 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreAppointmentBookingRequest;
 use App\Mail\AppointmentRequested;
 use App\Models\AppointmentBooking;
+use App\Models\AppointmentBusyBlock;
 use App\Models\AppointmentSlot;
+use App\Support\AvailabilityService;
+use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -13,7 +16,7 @@ use Illuminate\Support\Facades\Mail;
 
 class AppointmentController extends Controller
 {
-    public function store(StoreAppointmentBookingRequest $request): RedirectResponse
+    public function store(StoreAppointmentBookingRequest $request, AvailabilityService $availability): RedirectResponse
     {
         if ($request->isHoneypotTriggered()) {
             return redirect()
@@ -22,15 +25,55 @@ class AppointmentController extends Controller
         }
 
         $data = $request->validated();
+        $start = Carbon::parse($data['starts_at']);
+        $end = Carbon::parse($data['ends_at']);
 
-        $booking = DB::transaction(function () use ($data, $request): ?AppointmentBooking {
+        if ($start->isPast()) {
+            return back()->withInput()->with('error', 'Ce créneau n’est plus disponible. Choisissez-en un autre.');
+        }
+
+        $booking = DB::transaction(function () use ($data, $request, $availability, $start, $end): ?AppointmentBooking {
             $slot = AppointmentSlot::query()
-                ->whereKey($data['appointment_slot_id'])
+                ->where('starts_at', $start)
+                ->where('ends_at', $end)
                 ->lockForUpdate()
                 ->first();
 
-            if (! $slot || $slot->status !== AppointmentSlot::STATUS_OPEN || $slot->starts_at->isPast()) {
+            // Créneau explicite déjà pris ou bloqué.
+            if ($slot && $slot->status !== AppointmentSlot::STATUS_OPEN) {
                 return null;
+            }
+
+            // Créneau virtuel : doit correspondre à la règle par défaut.
+            if (! $slot && ! $availability->isScheduledSlot($start, $end)) {
+                return null;
+            }
+
+            // Refus si chevauchement avec une indisponibilité.
+            $busy = AppointmentBusyBlock::query()
+                ->where('starts_at', '<', $end)
+                ->where('ends_at', '>', $start)
+                ->exists();
+            if ($busy) {
+                return null;
+            }
+
+            // Refus si un autre créneau réservé/bloqué chevauche ce moment.
+            $conflict = AppointmentSlot::query()
+                ->whereIn('status', [AppointmentSlot::STATUS_BOOKED, AppointmentSlot::STATUS_BLOCKED])
+                ->where('starts_at', '<', $end)
+                ->where('ends_at', '>', $start)
+                ->exists();
+            if ($conflict) {
+                return null;
+            }
+
+            if (! $slot) {
+                $slot = AppointmentSlot::create([
+                    'starts_at' => $start,
+                    'ends_at' => $end,
+                    'status' => AppointmentSlot::STATUS_OPEN,
+                ]);
             }
 
             $booking = AppointmentBooking::create([

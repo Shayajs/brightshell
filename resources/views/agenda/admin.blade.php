@@ -10,15 +10,16 @@
         <div>
             <a href="{{ BrightshellDomain::publicSiteUrl() }}" class="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-500 transition hover:text-indigo-300">← BrightShell</a>
             <h1 class="mt-2 font-display text-3xl font-bold text-white">Agenda — Gestion</h1>
-            <p class="mt-1 text-sm text-zinc-400">Ajoutez des créneaux réservables et bloquez vos indisponibilités (RDV, boulot).</p>
+            <p class="mt-1 text-sm text-zinc-400">Vous êtes disponible automatiquement selon la plage par défaut. Bloquez vos indisponibilités (RDV, boulot) pour griser les créneaux concernés.</p>
         </div>
         <div class="flex flex-wrap items-center gap-2">
             <a href="{{ route('agenda.preview') }}" target="_blank" class="flex items-center gap-2 rounded-xl border border-amber-500/40 bg-amber-500/10 px-3 py-2.5 text-sm font-semibold text-amber-200 transition hover:bg-amber-500/20">
                 <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                 Aperçu visiteur
             </a>
+            <button type="button" id="btn-availability" class="rounded-xl border border-zinc-700 px-3 py-2.5 text-sm font-semibold text-zinc-300 transition hover:border-emerald-500/50 hover:text-emerald-300">Disponibilité par défaut</button>
             <button type="button" id="btn-busy" class="rounded-xl border border-zinc-700 px-3 py-2.5 text-sm font-semibold text-zinc-300 transition hover:border-zinc-500 hover:text-white">Occupé / indispo</button>
-            <button type="button" id="btn-bulk" class="rounded-xl border border-zinc-700 px-3 py-2.5 text-sm font-semibold text-zinc-300 transition hover:border-indigo-500/50 hover:text-indigo-300">Générer une plage</button>
+            <button type="button" id="btn-bulk" class="rounded-xl border border-zinc-700 px-3 py-2.5 text-sm font-semibold text-zinc-300 transition hover:border-indigo-500/50 hover:text-indigo-300">Plage ponctuelle</button>
             <button type="button" id="btn-new" class="rounded-xl border border-indigo-500/40 bg-indigo-600/90 px-3 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-500">+ Créneau</button>
         </div>
     </header>
@@ -91,6 +92,51 @@
     </div>
 </div>
 
+{{-- Modale : disponibilité par défaut --}}
+<div id="modal-availability" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/70 p-4">
+    <div class="w-full max-w-md rounded-2xl border border-emerald-500/25 bg-zinc-900 p-6 ring-1 ring-white/10">
+        <div class="mb-4 flex items-center justify-between"><h2 class="font-display text-lg font-bold text-white">Disponibilité par défaut</h2><button type="button" class="modal-close text-zinc-500 hover:text-white">✕</button></div>
+        <p class="mb-4 text-xs text-zinc-500">Les visiteurs peuvent réserver ces créneaux automatiquement, sauf indisponibilités et RDV déjà pris.</p>
+        <form method="POST" action="{{ route('agenda.availability.update') }}" class="space-y-4">
+            @csrf
+            @method('PATCH')
+            <label class="flex items-center gap-2 text-sm text-zinc-200">
+                <input type="checkbox" name="active" value="1" @checked($settings->active) class="h-4 w-4 rounded border-zinc-600 bg-zinc-950 text-emerald-500 focus:ring-emerald-500/40">
+                Activer la disponibilité automatique
+            </label>
+            <div>
+                <label class="block text-[11px] font-semibold uppercase tracking-[0.14em] text-zinc-500">Jours</label>
+                @php $labels = [1 => 'Lun', 2 => 'Mar', 3 => 'Mer', 4 => 'Jeu', 5 => 'Ven', 6 => 'Sam', 7 => 'Dim']; @endphp
+                <div class="mt-2 flex flex-wrap gap-1.5">
+                    @foreach ($labels as $iso => $label)
+                        <label class="cursor-pointer">
+                            <input type="checkbox" name="weekdays[]" value="{{ $iso }}" @checked(in_array($iso, $settings->weekdays ?? [])) class="peer sr-only">
+                            <span class="inline-flex rounded-lg border border-zinc-700 px-3 py-1.5 text-xs font-semibold text-zinc-400 transition peer-checked:border-emerald-500/50 peer-checked:bg-emerald-500/15 peer-checked:text-emerald-200">{{ $label }}</span>
+                        </label>
+                    @endforeach
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+                <div><label class="block text-[11px] font-semibold uppercase tracking-[0.14em] text-zinc-500">De</label><input type="time" name="start_time" value="{{ $settings->start_time }}" required class="mt-1.5 w-full rounded-lg border border-zinc-700 bg-zinc-950/80 px-3 py-2 text-sm text-zinc-100 focus:border-emerald-500/50 focus:outline-none focus:ring-2 focus:ring-emerald-500/25"></div>
+                <div><label class="block text-[11px] font-semibold uppercase tracking-[0.14em] text-zinc-500">À</label><input type="time" name="end_time" value="{{ $settings->end_time }}" required class="mt-1.5 w-full rounded-lg border border-zinc-700 bg-zinc-950/80 px-3 py-2 text-sm text-zinc-100 focus:border-emerald-500/50 focus:outline-none focus:ring-2 focus:ring-emerald-500/25"></div>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+                <div>
+                    <label class="block text-[11px] font-semibold uppercase tracking-[0.14em] text-zinc-500">Durée créneau</label>
+                    <select name="slot_minutes" class="mt-1.5 w-full rounded-lg border border-zinc-700 bg-zinc-950/80 px-3 py-2 text-sm text-zinc-100 focus:border-emerald-500/50 focus:outline-none focus:ring-2 focus:ring-emerald-500/25">
+                        @foreach ([15, 30, 45, 60] as $m)<option value="{{ $m }}" @selected($settings->slot_minutes === $m)>{{ $m }} min</option>@endforeach
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[11px] font-semibold uppercase tracking-[0.14em] text-zinc-500">Horizon (semaines)</label>
+                    <input type="number" name="horizon_weeks" min="1" max="26" value="{{ $settings->horizon_weeks }}" required class="mt-1.5 w-full rounded-lg border border-zinc-700 bg-zinc-950/80 px-3 py-2 text-sm text-zinc-100 focus:border-emerald-500/50 focus:outline-none focus:ring-2 focus:ring-emerald-500/25">
+                </div>
+            </div>
+            <button type="submit" class="w-full rounded-lg border border-emerald-500/40 bg-emerald-600/80 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-500">Enregistrer</button>
+        </form>
+    </div>
+</div>
+
 {{-- Modale : détail créneau --}}
 <div id="modal-detail" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/70 p-4">
     <div class="w-full max-w-md rounded-2xl border border-zinc-800 bg-zinc-900 p-6 ring-1 ring-white/10">
@@ -104,13 +150,12 @@
                 <input type="hidden" name="status" id="detail-toggle-value">
                 <button type="submit" id="detail-toggle-btn" class="w-full rounded-lg border border-zinc-700 px-3 py-2 text-sm font-semibold text-zinc-300 transition hover:border-zinc-600 hover:text-white"></button>
             </form>
-            <form id="detail-delete-form" method="POST" class="flex-1" onsubmit="return confirm('Supprimer ce créneau ?');">
+            <form id="detail-delete-form" method="POST" class="flex-1" onsubmit="return confirm('Confirmer ?');">
                 @csrf
                 @method('DELETE')
-                <button type="submit" class="w-full rounded-lg border border-red-500/30 px-3 py-2 text-sm font-semibold text-red-400 transition hover:bg-red-500/10">Supprimer</button>
+                <button type="submit" id="detail-delete-btn" class="w-full rounded-lg border border-red-500/30 px-3 py-2 text-sm font-semibold text-red-400 transition hover:bg-red-500/10">Supprimer</button>
             </form>
         </div>
-        <p id="detail-locked" class="mt-3 hidden text-xs text-zinc-500">Un créneau réservé ne peut être ni bloqué ni supprimé.</p>
     </div>
 </div>
 
@@ -148,11 +193,25 @@ window.__AGENDA__ = {
         blocked: { label: 'Bloqué',     dot: 'bg-zinc-600',    chip: 'border-zinc-600 bg-zinc-800 text-zinc-400' },
     };
 
+    const toLocal = (s) => s ? s.replace(' ', 'T').slice(0, 16) : '';
+
     document.getElementById('btn-new').addEventListener('click', () => AgendaCal.showModal('modal-new'));
     document.getElementById('btn-bulk').addEventListener('click', () => AgendaCal.showModal('modal-bulk'));
     document.getElementById('btn-busy').addEventListener('click', () => AgendaCal.showModal('modal-busy'));
+    document.getElementById('btn-availability').addEventListener('click', () => AgendaCal.showModal('modal-availability'));
 
     window.agendaOnSlotClick = function (slot) {
+        // Créneau virtuel déjà grisé : géré via le bloc « occupé » lui-même.
+        if (slot.kind === 'virtual' && slot.busy) return;
+
+        // Créneau virtuel disponible : proposer de le marquer occupé.
+        if (slot.kind === 'virtual' && slot.status === 'open') {
+            document.getElementById('busy-start').value = toLocal(slot.startAt);
+            document.getElementById('busy-end').value = toLocal(slot.endAt);
+            AgendaCal.showModal('modal-busy');
+            return;
+        }
+
         const meta = STATUS[slot.status] || STATUS.open;
         document.getElementById('detail-title').textContent = `${AgendaCal.prettyDay(slot.day)} · ${slot.start} – ${slot.end}`;
         document.getElementById('detail-status').innerHTML =
@@ -171,13 +230,16 @@ window.__AGENDA__ = {
 
         const toggleForm = document.getElementById('detail-toggle-form');
         const deleteForm = document.getElementById('detail-delete-form');
-        const locked = document.getElementById('detail-locked');
+        const deleteBtn = document.getElementById('detail-delete-btn');
+        deleteForm.action = SLOT_DELETE_URL.replace('__ID__', slot.id);
+
         if (slot.status === 'booked') {
-            toggleForm.classList.add('hidden'); deleteForm.classList.add('hidden'); locked.classList.remove('hidden');
+            toggleForm.classList.add('hidden');
+            deleteBtn.textContent = 'Annuler le RDV';
         } else {
-            toggleForm.classList.remove('hidden'); deleteForm.classList.remove('hidden'); locked.classList.add('hidden');
+            toggleForm.classList.remove('hidden');
+            deleteBtn.textContent = 'Supprimer';
             toggleForm.action = SLOT_UPDATE_URL.replace('__ID__', slot.id);
-            deleteForm.action = SLOT_DELETE_URL.replace('__ID__', slot.id);
             document.getElementById('detail-toggle-value').value = slot.status === 'blocked' ? 'open' : 'blocked';
             document.getElementById('detail-toggle-btn').textContent = slot.status === 'blocked' ? 'Rouvrir' : 'Bloquer';
         }

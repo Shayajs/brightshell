@@ -59,7 +59,8 @@
         <form method="post" action="{{ route('agenda.book') }}" class="space-y-3">
             @csrf
             <input type="text" name="website" tabindex="-1" autocomplete="off" class="hidden" aria-hidden="true">
-            <input type="hidden" name="appointment_slot_id" id="field-slot-id" value="{{ old('appointment_slot_id') }}">
+            <input type="hidden" name="starts_at" id="field-start" value="{{ old('starts_at') }}">
+            <input type="hidden" name="ends_at" id="field-end" value="{{ old('ends_at') }}">
             <div class="grid gap-3 sm:grid-cols-2">
                 <div>
                     <label class="block text-[11px] font-semibold uppercase tracking-[0.14em] text-zinc-500">Prénom</label>
@@ -97,28 +98,29 @@ window.__AGENDA__ = {
     busy: @json($busy),
     mode: 'visitor',
     previewMode: @json($previewMode),
-    oldSlotId: @json((string) old('appointment_slot_id')),
+    oldStartAt: @json((string) old('starts_at')),
 };
 </script>
 @include('agenda.partials.calendar-js')
 <script>
 (function () {
     const A = window.__AGENDA__;
-    const modal = document.getElementById('modal-book');
     const chosen = document.getElementById('chosen-slot');
-    const fieldId = document.getElementById('field-slot-id');
+    const fieldStart = document.getElementById('field-start');
+    const fieldEnd = document.getElementById('field-end');
 
     window.agendaOnSlotClick = function (slot) {
         if (slot.busy) return;
-        fieldId.value = slot.id;
+        fieldStart.value = slot.startAt;
+        fieldEnd.value = slot.endAt;
         chosen.textContent = `${AgendaCal.prettyDay(slot.day)} · ${slot.start} – ${slot.end}`;
         AgendaCal.showModal('modal-book');
     };
 
     AgendaCal.init();
 
-    if (A.oldSlotId) {
-        const slot = A.slots.find(s => String(s.id) === A.oldSlotId);
+    if (A.oldStartAt) {
+        const slot = A.slots.find(s => s.startAt === A.oldStartAt);
         if (slot) {
             AgendaCal.goToDay(slot.day);
             window.agendaOnSlotClick(slot);

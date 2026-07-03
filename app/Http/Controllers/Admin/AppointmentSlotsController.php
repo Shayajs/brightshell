@@ -80,12 +80,10 @@ class AppointmentSlotsController extends Controller
 
     public function destroy(AppointmentSlot $slot): RedirectResponse
     {
-        if ($slot->status === AppointmentSlot::STATUS_BOOKED) {
-            return back()->with('error', 'Impossible de supprimer un créneau réservé.');
-        }
+        $wasBooked = $slot->status === AppointmentSlot::STATUS_BOOKED;
 
         $slot->delete();
 
-        return back()->with('success', 'Créneau supprimé.');
+        return back()->with('success', $wasBooked ? 'Rendez-vous annulé.' : 'Créneau supprimé.');
     }
 }

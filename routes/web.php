@@ -5,6 +5,7 @@ use App\Http\Controllers\AgendaController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\Admin\AppointmentBusyBlocksController;
 use App\Http\Controllers\Admin\AppointmentSlotsController;
+use App\Http\Controllers\Admin\AvailabilitySettingsController;
 use App\Http\Controllers\Admin\AdminOutboundApiWidgetsController;
 use App\Http\Controllers\Admin\ApiManagerController;
 use App\Http\Controllers\Admin\ClientsController;
@@ -399,6 +400,7 @@ if ($agendaHost !== '') {
             Route::delete('/creneaux/{slot}', [AppointmentSlotsController::class, 'destroy'])->name('agenda.slots.destroy');
             Route::post('/occupations', [AppointmentBusyBlocksController::class, 'store'])->name('agenda.busy.store');
             Route::delete('/occupations/{block}', [AppointmentBusyBlocksController::class, 'destroy'])->name('agenda.busy.destroy');
+            Route::patch('/disponibilite', [AvailabilitySettingsController::class, 'update'])->name('agenda.availability.update');
         });
     });
 }

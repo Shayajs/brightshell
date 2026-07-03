@@ -20,7 +20,8 @@ class StoreAppointmentBookingRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'appointment_slot_id' => ['required', 'integer', 'exists:appointment_slots,id'],
+            'starts_at' => ['required', 'date'],
+            'ends_at' => ['required', 'date', 'after:starts_at'],
             'website' => ['nullable', 'string', 'max:0'],
             'first_name' => ['required', 'string', 'max:100'],
             'last_name' => ['required', 'string', 'max:100'],
@@ -34,8 +35,8 @@ class StoreAppointmentBookingRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'appointment_slot_id.required' => 'Choisissez un créneau disponible.',
-            'appointment_slot_id.exists' => 'Ce créneau n’existe plus.',
+            'starts_at.required' => 'Choisissez un créneau disponible.',
+            'ends_at.required' => 'Choisissez un créneau disponible.',
             'first_name.required' => 'Votre prénom est requis.',
             'last_name.required' => 'Votre nom est requis.',
             'email.required' => 'Votre adresse e-mail est requise.',
