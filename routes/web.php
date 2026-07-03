@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AgendaController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\Admin\AppointmentSlotsController;
 use App\Http\Controllers\Admin\AdminOutboundApiWidgetsController;
@@ -355,12 +356,6 @@ $registerAdminRoutes = function (): void {
     Route::post('/cv/competences', [CvAdminController::class, 'updateCompetences'])->name('admin.cv.competences.update');
     Route::get('/cv/certifications', [CvAdminController::class, 'editCertifications'])->name('admin.cv.certifications');
     Route::post('/cv/certifications', [CvAdminController::class, 'updateCertifications'])->name('admin.cv.certifications.update');
-
-    // Agenda — créneaux de rendez-vous publics
-    Route::get('/agenda', [AppointmentSlotsController::class, 'index'])->name('admin.agenda.index');
-    Route::post('/agenda', [AppointmentSlotsController::class, 'store'])->name('admin.agenda.store');
-    Route::patch('/agenda/{slot}', [AppointmentSlotsController::class, 'update'])->name('admin.agenda.update');
-    Route::delete('/agenda/{slot}', [AppointmentSlotsController::class, 'destroy'])->name('admin.agenda.destroy');
 };
 
 $adminHost = (string) config('brightshell.domains.admin_host', '');
@@ -372,6 +367,35 @@ if ($adminHost !== '') {
     Route::domain($adminHost)
         ->middleware(['auth', 'verified', EnsureUserCanAccessAdminPortal::class])
         ->group($registerAdminRoutes);
+}
+
+/*
+|--------------------------------------------------------------------------
+| Agenda / prise de rendez-vous (sous-domaine agenda.*)
+|--------------------------------------------------------------------------
+| Point d'entrée unique : un admin connecté gère les créneaux (mêmes droits
+| que le portail admin), tout autre visiteur voit la page publique de
+| réservation. Le tri admin/visiteur est fait dans AgendaController::index.
+*/
+$agendaHost = (string) config('brightshell.domains.agenda_host', '');
+if ($agendaHost === '' && $inferredRoot !== '') {
+    $agendaHost = 'agenda.'.$inferredRoot;
+}
+
+if ($agendaHost !== '') {
+    Route::domain($agendaHost)->group(function (): void {
+        Route::get('/', [AgendaController::class, 'index'])->name('agenda.index');
+
+        Route::post('/reserver', [AppointmentController::class, 'store'])
+            ->middleware('throttle:6,1')
+            ->name('agenda.book');
+
+        Route::middleware(['auth', 'verified', EnsureUserCanAccessAdminPortal::class])->group(function (): void {
+            Route::post('/creneaux', [AppointmentSlotsController::class, 'store'])->name('agenda.slots.store');
+            Route::patch('/creneaux/{slot}', [AppointmentSlotsController::class, 'update'])->name('agenda.slots.update');
+            Route::delete('/creneaux/{slot}', [AppointmentSlotsController::class, 'destroy'])->name('agenda.slots.destroy');
+        });
+    });
 }
 
 /*
@@ -419,10 +443,7 @@ Route::middleware(['block.web.on.api.host'])->group(function (): void {
         ->middleware('throttle:60,1')
         ->name('contact.markdown.preview');
 
-    Route::get('/rendez-vous', [AppointmentController::class, 'create'])->name('appointments');
-    Route::post('/rendez-vous', [AppointmentController::class, 'store'])
-        ->middleware('throttle:6,1')
-        ->name('appointments.store');
+    Route::get('/rendez-vous', fn () => redirect()->route('agenda.index'))->name('appointments');
 
     Route::permanentRedirect('/index.html', '/');
     Route::permanentRedirect('/services.html', '/services');

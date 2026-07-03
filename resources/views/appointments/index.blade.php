@@ -18,7 +18,7 @@
             <a href="{{ route('contact') }}" class="mt-2 block text-indigo-400 hover:text-indigo-300">Me contacter directement →</a>
         </div>
     @else
-        <form method="post" action="{{ route('appointments.store') }}" class="auth-form" novalidate>
+        <form method="post" action="{{ route('agenda.book') }}" class="auth-form" novalidate>
             @csrf
             <input type="text" name="website" tabindex="-1" autocomplete="off" class="auth-honeypot" aria-hidden="true">
 

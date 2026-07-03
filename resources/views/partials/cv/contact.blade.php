@@ -52,6 +52,6 @@
 
     <div class="contact-actions" style="margin-top: 1.25rem; display: flex; flex-wrap: wrap; gap: 0.75rem;">
         <a href="{{ route('contact') }}" class="bottom-link">Formulaire de contact</a>
-        <a href="{{ route('appointments') }}" class="bottom-link">Prendre rendez-vous</a>
+        <a href="{{ route('agenda.index') }}" class="bottom-link">Prendre rendez-vous</a>
     </div>
 </div>

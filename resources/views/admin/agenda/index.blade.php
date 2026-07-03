@@ -9,7 +9,7 @@
     <div class="flex flex-wrap items-end justify-between gap-4">
         <div>
             <h1 class="font-display text-2xl font-bold text-white">Créneaux de rendez-vous</h1>
-            <p class="mt-1 text-sm text-zinc-500">Créez des créneaux disponibles sur la page publique <a href="{{ route('appointments') }}" target="_blank" class="text-indigo-400 hover:text-indigo-300">/rendez-vous</a>.</p>
+            <p class="mt-1 text-sm text-zinc-500">Les visiteurs non connectés voient les créneaux disponibles sur <a href="{{ route('agenda.index') }}" target="_blank" class="text-indigo-400 hover:text-indigo-300">cette même page (agenda)</a>.</p>
         </div>
     </div>
 
@@ -20,7 +20,7 @@
         <div class="space-y-4">
             <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-5 ring-1 ring-white/5">
                 <h2 class="font-display text-sm font-bold text-white">Créneau unique</h2>
-                <form method="POST" action="{{ route('admin.agenda.store') }}" class="mt-4 space-y-3">
+                <form method="POST" action="{{ route('agenda.slots.store') }}" class="mt-4 space-y-3">
                     @csrf
                     <input type="hidden" name="mode" value="single">
                     <div>
@@ -47,7 +47,7 @@
             <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-5 ring-1 ring-white/5">
                 <h2 class="font-display text-sm font-bold text-white">Générer une plage</h2>
                 <p class="mt-1 text-xs text-zinc-500">Découpe automatiquement une journée en créneaux.</p>
-                <form method="POST" action="{{ route('admin.agenda.store') }}" class="mt-4 space-y-3">
+                <form method="POST" action="{{ route('agenda.slots.store') }}" class="mt-4 space-y-3">
                     @csrf
                     <input type="hidden" name="mode" value="bulk">
                     <div>
@@ -128,7 +128,7 @@
                                 <td class="px-5 py-3.5">
                                     <div class="flex items-center justify-end gap-2">
                                         @if ($slot->status !== AppointmentSlot::STATUS_BOOKED)
-                                            <form method="POST" action="{{ route('admin.agenda.update', $slot) }}">
+                                            <form method="POST" action="{{ route('agenda.slots.update', $slot) }}">
                                                 @csrf
                                                 @method('PATCH')
                                                 <input type="hidden" name="status" value="{{ $slot->status === AppointmentSlot::STATUS_BLOCKED ? AppointmentSlot::STATUS_OPEN : AppointmentSlot::STATUS_BLOCKED }}">
@@ -136,7 +136,7 @@
                                                     {{ $slot->status === AppointmentSlot::STATUS_BLOCKED ? 'Rouvrir' : 'Bloquer' }}
                                                 </button>
                                             </form>
-                                            <form method="POST" action="{{ route('admin.agenda.destroy', $slot) }}" onsubmit="return confirm('Supprimer ce créneau ?')">
+                                            <form method="POST" action="{{ route('agenda.slots.destroy', $slot) }}" onsubmit="return confirm('Supprimer ce créneau ?')">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="rounded-lg border border-red-500/30 px-2.5 py-1 text-xs text-red-400 transition hover:bg-red-500/10">Supprimer</button>

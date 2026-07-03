@@ -7,21 +7,9 @@ use App\Models\AppointmentSlot;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\View\View;
 
 class AppointmentSlotsController extends Controller
 {
-    public function index(): View
-    {
-        $slots = AppointmentSlot::query()
-            ->with('booking')
-            ->where('starts_at', '>=', now()->subDays(7))
-            ->orderBy('starts_at')
-            ->paginate(30);
-
-        return view('admin.agenda.index', compact('slots'));
-    }
-
     public function store(Request $request): RedirectResponse
     {
         $data = $request->validate([

@@ -40,6 +40,8 @@ return [
         'prospects_host' => env('BRIGHTSHELL_PROSPECTS_HOST'),
         /** Portail visioconférence — vide = visio.{root} */
         'visio_host' => env('BRIGHTSHELL_VISIO_HOST'),
+        /** Agenda / prise de rendez-vous public — vide = agenda.{root} */
+        'agenda_host' => env('BRIGHTSHELL_AGENDA_HOST'),
         /** API publique lecture seule — vide = api.{root} */
         'api_host' => env('BRIGHTSHELL_API_HOST'),
         /** Webmail / interface mail — vide = mail.{root} */

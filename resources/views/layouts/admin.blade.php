@@ -390,8 +390,8 @@
                                 'icon'   => '<rect x="2" y="2" width="20" height="20" rx="2"/><path d="M7 8h10M7 12h10M7 16h6"/>',
                             ])
                             @include('layouts.partials.nav-item', [
-                                'href'   => route('admin.agenda.index'),
-                                'active' => request()->routeIs('admin.agenda.*'),
+                                'href'   => route('agenda.index'),
+                                'active' => request()->routeIs('agenda.*'),
                                 'label'  => 'Agenda',
                                 'icon'   => '<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
                             ])

@@ -10,26 +10,14 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\View\View;
 
 class AppointmentController extends Controller
 {
-    public function create(): View
-    {
-        $slots = AppointmentSlot::query()
-            ->open()
-            ->upcoming()
-            ->orderBy('starts_at')
-            ->get();
-
-        return view('appointments.index', compact('slots'));
-    }
-
     public function store(StoreAppointmentBookingRequest $request): RedirectResponse
     {
         if ($request->isHoneypotTriggered()) {
             return redirect()
-                ->route('appointments')
+                ->route('agenda.index')
                 ->with('success', 'Demande de rendez-vous envoyée. Je reviens vers vous très vite !');
         }
 
@@ -81,7 +69,7 @@ class AppointmentController extends Controller
         }
 
         return redirect()
-            ->route('appointments')
+            ->route('agenda.index')
             ->with('success', 'Demande de rendez-vous envoyée. Je vous confirme le créneau très vite !');
     }
 }
