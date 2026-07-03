@@ -392,6 +392,7 @@ if ($agendaHost !== '') {
             ->name('agenda.book');
 
         Route::middleware(['auth', 'verified', EnsureUserCanAccessAdminPortal::class])->group(function (): void {
+            Route::get('/visite', [AgendaController::class, 'preview'])->name('agenda.preview');
             Route::post('/creneaux', [AppointmentSlotsController::class, 'store'])->name('agenda.slots.store');
             Route::patch('/creneaux/{slot}', [AppointmentSlotsController::class, 'update'])->name('agenda.slots.update');
             Route::delete('/creneaux/{slot}', [AppointmentSlotsController::class, 'destroy'])->name('agenda.slots.destroy');
