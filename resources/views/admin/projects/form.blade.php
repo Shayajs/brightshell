@@ -131,6 +131,23 @@
                 </form>
             </div>
 
+            <div class="rounded-xl border border-fuchsia-500/20 bg-fuchsia-500/5 p-4">
+                <h3 class="text-xs font-bold uppercase tracking-wide text-fuchsia-200/90">Visioconférence</h3>
+                <p class="mt-1 text-xs text-zinc-500">Créer rapidement une salle LiveKit liée à ce projet, puis partager les invitations depuis le module visio.</p>
+                <form method="POST" action="{{ route('admin.projects.visio.store', $project) }}" class="mt-4 flex flex-col gap-3 sm:flex-row sm:items-end">
+                    @csrf
+                    <div class="w-full sm:max-w-md">
+                        <label for="visio-title" class="block text-xs font-semibold uppercase tracking-wide text-zinc-500">Titre de session</label>
+                        <input id="visio-title" type="text" name="visio_title" required
+                            value="{{ old('visio_title', 'Visio — '.$project->name) }}"
+                            class="mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-white focus:border-fuchsia-500/50 focus:outline-none focus:ring-1 focus:ring-fuchsia-500/30">
+                    </div>
+                    <button type="submit" class="rounded-lg border border-fuchsia-500/40 bg-fuchsia-600/20 px-4 py-2 text-sm font-semibold text-fuchsia-200 transition hover:bg-fuchsia-600/30">
+                        Créer une salle visio
+                    </button>
+                </form>
+            </div>
+
             <form method="POST" action="{{ route('admin.projects.members.attach', $project) }}" class="flex flex-col gap-4 border-b border-zinc-800 pb-6 sm:flex-row sm:flex-wrap sm:items-end">
                 @csrf
                 <div class="w-full flex-1 sm:min-w-[12rem]">

@@ -20,6 +20,7 @@ class ShowController extends Controller
             'contracts',
             'priceItems',
             'requests',
+            'visioRooms',
         ]);
 
         $kanbanCardsCount = ProjectKanbanCard::query()

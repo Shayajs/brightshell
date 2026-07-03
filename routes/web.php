@@ -1,7 +1,7 @@
 <?php
 
-use App\Http\Controllers\Account\HomeController as AccountHomeController;
-use App\Http\Controllers\Admin\AdminAuditLogsController;
+use App\Http\Controllers\AppointmentController;
+use App\Http\Controllers\Admin\AppointmentSlotsController;
 use App\Http\Controllers\Admin\AdminOutboundApiWidgetsController;
 use App\Http\Controllers\Admin\ApiManagerController;
 use App\Http\Controllers\Admin\ClientsController;
@@ -63,6 +63,7 @@ use App\Http\Controllers\Project\RequestsController as ProjectRequestsController
 use App\Http\Controllers\Project\SettingsController as ProjectPortalSettingsController;
 use App\Http\Controllers\Project\ShowController as ProjectPortalShowController;
 use App\Http\Controllers\Project\SpecSectionsController as ProjectSpecSectionsController;
+use App\Http\Controllers\Project\VisioController as ProjectVisioController;
 use App\Http\Controllers\Prospects\DashboardController as ProspectsDashboardController;
 use App\Http\Controllers\QuesakoController;
 use App\Http\Controllers\RealisationsController;
@@ -74,8 +75,11 @@ use App\Http\Controllers\Settings\NotificationPreferencesController;
 use App\Http\Controllers\Settings\ProfileController as SettingsProfileController;
 use App\Http\Controllers\Settings\SecurityController as SettingsSecurityController;
 use App\Http\Controllers\Settings\SupportTicketController as SettingsSupportTicketController;
+use App\Http\Controllers\Settings\VisioInvitationsController;
 use App\Http\Controllers\Users\CompaniesController as UsersCompaniesController;
 use App\Http\Controllers\Users\DashboardController as UsersDashboardController;
+use App\Http\Controllers\Visio\JoinController as VisioJoinController;
+use App\Http\Controllers\Api\V1\Visio\VisioRuntimeApiController;
 use App\Http\Middleware\EnsureUserCanAccessAdminPortal;
 use App\Support\BrightshellDomain;
 use Illuminate\Support\Facades\Route;
@@ -260,6 +264,9 @@ $registerAdminRoutes = function (): void {
     Route::post('/projects/{project}/inviter-email', [ProjectsController::class, 'inviteByEmail'])
         ->middleware('throttle:15,1')
         ->name('admin.projects.invite-email');
+    Route::post('/projects/{project}/visio', [ProjectsController::class, 'createVisioRoom'])
+        ->middleware('throttle:20,1')
+        ->name('admin.projects.visio.store');
 
     Route::get('/invitations-projets', [ProjectInvitationsController::class, 'index'])->name('admin.project-invitations.index');
     Route::post('/invitations-projets/{project_invitation}/renvoyer', [ProjectInvitationsController::class, 'resend'])
@@ -348,6 +355,12 @@ $registerAdminRoutes = function (): void {
     Route::post('/cv/competences', [CvAdminController::class, 'updateCompetences'])->name('admin.cv.competences.update');
     Route::get('/cv/certifications', [CvAdminController::class, 'editCertifications'])->name('admin.cv.certifications');
     Route::post('/cv/certifications', [CvAdminController::class, 'updateCertifications'])->name('admin.cv.certifications.update');
+
+    // Agenda — créneaux de rendez-vous publics
+    Route::get('/agenda', [AppointmentSlotsController::class, 'index'])->name('admin.agenda.index');
+    Route::post('/agenda', [AppointmentSlotsController::class, 'store'])->name('admin.agenda.store');
+    Route::patch('/agenda/{slot}', [AppointmentSlotsController::class, 'update'])->name('admin.agenda.update');
+    Route::delete('/agenda/{slot}', [AppointmentSlotsController::class, 'destroy'])->name('admin.agenda.destroy');
 };
 
 $adminHost = (string) config('brightshell.domains.admin_host', '');
@@ -405,6 +418,11 @@ Route::middleware(['block.web.on.api.host'])->group(function (): void {
     Route::post('/contact/markdown-preview', [ContactController::class, 'markdownPreview'])
         ->middleware('throttle:60,1')
         ->name('contact.markdown.preview');
+
+    Route::get('/rendez-vous', [AppointmentController::class, 'create'])->name('appointments');
+    Route::post('/rendez-vous', [AppointmentController::class, 'store'])
+        ->middleware('throttle:6,1')
+        ->name('appointments.store');
 
     Route::permanentRedirect('/index.html', '/');
     Route::permanentRedirect('/services.html', '/services');
@@ -507,6 +525,7 @@ if ($settingsHost !== '') {
             Route::get('/notifications', [NotificationPreferencesController::class, 'edit'])->name('portals.settings.notifications.edit');
             Route::put('/notifications', [NotificationPreferencesController::class, 'update'])->name('portals.settings.notifications.update');
             Route::post('/notifications/lues', [NotificationPreferencesController::class, 'markAllRead'])->name('portals.settings.notifications.read-all');
+            Route::get('/visio-invitations', [VisioInvitationsController::class, 'index'])->name('portals.settings.visio-invitations.index');
             Route::get('/notifications/bridge', [NotificationPreferencesController::class, 'bridge'])
                 ->middleware(\App\Http\Middleware\AllowBrightshellPortalFraming::class)
                 ->name('portals.settings.notifications.bridge');
@@ -597,12 +616,49 @@ if ($projectHost !== '') {
                     Route::put('/prix/{item}', [ProjectPriceItemsController::class, 'update'])->middleware('can:update,project')->name('portals.project.prices.update');
                     Route::delete('/prix/{item}', [ProjectPriceItemsController::class, 'destroy'])->middleware('can:update,project')->name('portals.project.prices.destroy');
 
+                    Route::get('/visio', [ProjectVisioController::class, 'index'])->name('portals.project.visio.index');
+                    Route::post('/visio', [ProjectVisioController::class, 'store'])->middleware('can:update,project')->name('portals.project.visio.store');
+                    Route::post('/visio/{room}/inviter', [ProjectVisioController::class, 'invite'])->middleware('can:update,project')->name('portals.project.visio.invite');
+                    Route::delete('/visio/{room}', [ProjectVisioController::class, 'destroy'])->middleware('can:update,project')->name('portals.project.visio.destroy');
+
                     Route::get('/demandes', [ProjectRequestsController::class, 'index'])->name('portals.project.requests.index');
                     Route::post('/demandes', [ProjectRequestsController::class, 'store'])->name('portals.project.requests.store');
                     Route::put('/demandes/{project_request}', [ProjectRequestsController::class, 'update'])->middleware('can:update,project')->name('portals.project.requests.update');
                     Route::delete('/demandes/{project_request}', [ProjectRequestsController::class, 'destroy'])->middleware('can:update,project')->name('portals.project.requests.destroy');
                 });
         });
+}
+
+/*
+|--------------------------------------------------------------------------
+| Portail visioconférence (visio.*)
+|--------------------------------------------------------------------------
+*/
+$visioHost = (string) config('brightshell.domains.visio_host', '');
+if ($visioHost === '' && $inferredRoot !== '') {
+    $visioHost = 'visio.'.$inferredRoot;
+}
+if ($visioHost !== '') {
+    Route::domain($visioHost)->group(function (): void {
+        Route::get('/join/{token}', [VisioJoinController::class, 'show'])->name('visio.join.show');
+        Route::post('/join/{token}', [VisioJoinController::class, 'join'])
+            ->middleware('throttle:20,1')
+            ->name('visio.join.submit');
+        Route::get('/r/{room}', [VisioJoinController::class, 'room'])->name('visio.room.show');
+
+        Route::get('/r/{room}/runtime/context', [VisioRuntimeApiController::class, 'context'])
+            ->middleware('throttle:120,1')
+            ->name('visio.runtime.context');
+        Route::post('/r/{room}/runtime/token', [VisioRuntimeApiController::class, 'token'])
+            ->middleware('throttle:120,1')
+            ->name('visio.runtime.token');
+        Route::post('/r/{room}/runtime/heartbeat', [VisioRuntimeApiController::class, 'heartbeat'])
+            ->middleware('throttle:240,1')
+            ->name('visio.runtime.heartbeat');
+        Route::put('/r/{room}/runtime/context', [VisioRuntimeApiController::class, 'updateContext'])
+            ->middleware(['auth', 'verified'])
+            ->name('visio.runtime.context.update');
+    });
 }
 
 /*
@@ -654,7 +710,7 @@ if (is_string($rootDomain) && $rootDomain !== '' && is_array($vitrineSubs) && $v
 */
 if (is_string($rootDomain) && $rootDomain !== '') {
     $reservedSubs = array_values(array_unique(array_filter(array_merge(
-        ['account', 'admin', 'api', 'collabs', 'users', 'courses', 'settings', 'docs', 'home', 'project', 'prospects'],
+        ['account', 'admin', 'api', 'collabs', 'users', 'courses', 'settings', 'docs', 'home', 'project', 'prospects', 'visio'],
         is_array($vitrineSubs) ? $vitrineSubs : []
     ))));
 

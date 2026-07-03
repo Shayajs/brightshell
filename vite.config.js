@@ -21,6 +21,7 @@ export default defineConfig({
                 'resources/js/quesako-builder.js',
                 'resources/js/auth-perlin.js',
                 'resources/js/contact-form.js',
+                'resources/js/visio-room.js',
             ],
             refresh: true,
         }),

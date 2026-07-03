@@ -33,6 +33,7 @@
                 ['label' => 'Kanban', 'hint' => 'Cartes par colonne.', 'count' => $kanbanCardsCount, 'route' => 'portals.project.kanban.index'],
                 ['label' => 'Demandes', 'hint' => 'Demandes projet, lien support optionnel.', 'count' => $project->requests_count, 'route' => 'portals.project.requests.index'],
                 ['label' => 'Prix & devis', 'hint' => 'Lignes HT / TVA (hors factures légales).', 'count' => $project->price_items_count, 'route' => 'portals.project.prices.index'],
+                ['label' => 'Visio', 'hint' => 'Sessions LiveKit et invitations.', 'count' => $project->visio_rooms_count, 'route' => 'portals.project.visio.index'],
                 ['label' => 'Documents', 'hint' => 'Fichiers partagés.', 'count' => $project->documents_count, 'route' => 'portals.project.documents.index'],
                 ['label' => 'Cahier des charges', 'hint' => 'Sections rédactionnelles.', 'count' => $project->spec_sections_count, 'route' => 'portals.project.specs.index'],
                 ['label' => 'Contrats', 'hint' => 'Références et pièces signées.', 'count' => $project->contracts_count, 'route' => 'portals.project.contracts.index'],

@@ -28,6 +28,7 @@ final class PortalNavigation
             'docs' => '<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 7h8M8 11h6"/>',
             'project' => '<path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/>',
             'prospects' => '<path d="M22 12h-4l-3 9L9 3l-3 9H2"/>',
+            'visio' => '<path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>',
         ];
     }
 
@@ -49,6 +50,7 @@ final class PortalNavigation
             'docs' => 'bg-blue-500/20 text-blue-200 ring-blue-400/35',
             'project' => 'bg-cyan-500/20 text-cyan-200 ring-cyan-400/35',
             'prospects' => 'bg-orange-500/20 text-orange-200 ring-orange-400/35',
+            'visio' => 'bg-fuchsia-500/20 text-fuchsia-200 ring-fuchsia-400/35',
             default => 'bg-zinc-500/25 text-zinc-200 ring-zinc-400/30',
         };
     }
@@ -79,6 +81,11 @@ final class PortalNavigation
         $prospectsUrl = PortalUrls::prospectsUrl();
         if ($prospectsUrl !== '') {
             $portals['prospects'] = ['label' => 'Prospection B2B', 'href' => $prospectsUrl, 'role' => 'admin'];
+        }
+
+        $visioUrl = PortalUrls::visioUrl();
+        if ($visioUrl !== '') {
+            $portals['visio'] = ['label' => 'Visioconférence', 'href' => $visioUrl, 'role' => null];
         }
 
         // Toujours en fin de liste dans le switcher.

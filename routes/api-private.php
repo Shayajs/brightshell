@@ -22,11 +22,13 @@ use App\Http\Controllers\Api\V1\Project\ProjectNotesApiController;
 use App\Http\Controllers\Api\V1\Project\ProjectPriceItemsApiController;
 use App\Http\Controllers\Api\V1\Project\ProjectRequestsApiController;
 use App\Http\Controllers\Api\V1\Project\ProjectSpecSectionsApiController;
+use App\Http\Controllers\Api\V1\Project\ProjectVisioApiController;
 use App\Http\Controllers\Api\V1\Project\ProjectsApiController;
 use App\Http\Controllers\Api\V1\SecurityApiController;
 use App\Http\Controllers\Api\V1\StudentMaterialsController;
 use App\Http\Controllers\Api\V1\StudentQuizzesApiController;
 use App\Http\Controllers\Api\V1\SupportTicketsApiController;
+use App\Http\Controllers\Api\V1\Visio\VisioRuntimeApiController;
 use Illuminate\Support\Facades\Route;
 
 Route::delete('/auth/token', [AuthTokensController::class, 'destroy'])->name('api.v1.auth.token.destroy');
@@ -119,6 +121,14 @@ Route::get('/projets/{project}/prix', [ProjectPriceItemsApiController::class, 'i
 Route::post('/projets/{project}/prix', [ProjectPriceItemsApiController::class, 'store'])->name('api.v1.projects.prices.store');
 Route::put('/projets/{project}/prix/{item}', [ProjectPriceItemsApiController::class, 'update'])->name('api.v1.projects.prices.update');
 Route::delete('/projets/{project}/prix/{item}', [ProjectPriceItemsApiController::class, 'destroy'])->name('api.v1.projects.prices.destroy');
+
+Route::get('/projets/{project}/visio', [ProjectVisioApiController::class, 'index'])->name('api.v1.projects.visio.index');
+Route::post('/projets/{project}/visio', [ProjectVisioApiController::class, 'store'])->name('api.v1.projects.visio.store');
+
+Route::get('/visio/{room}/context', [VisioRuntimeApiController::class, 'context'])->name('api.v1.visio.context');
+Route::post('/visio/{room}/token', [VisioRuntimeApiController::class, 'token'])->name('api.v1.visio.token');
+Route::post('/visio/{room}/heartbeat', [VisioRuntimeApiController::class, 'heartbeat'])->name('api.v1.visio.heartbeat');
+Route::put('/visio/{room}/context', [VisioRuntimeApiController::class, 'updateContext'])->name('api.v1.visio.context.update');
 
 Route::prefix('admin')->group(function (): void {
     Route::get('/recherche', AdminSearchApiController::class)->middleware('throttle:60,1')->name('api.v1.admin.search');

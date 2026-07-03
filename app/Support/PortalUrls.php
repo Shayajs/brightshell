@@ -127,6 +127,23 @@ final class PortalUrls
         );
     }
 
+    public static function visioUrl(): string
+    {
+        $root = BrightshellDomain::effectiveRoot();
+        if ($root === '') {
+            return '';
+        }
+
+        $scheme = BrightshellDomain::urlScheme();
+
+        return self::resolve(
+            (string) config('brightshell.portals.visio_url', ''),
+            'visio',
+            $root,
+            $scheme
+        );
+    }
+
     private static function resolve(string $explicitUrl, string $subdomain, string $rootDomain, string $scheme): string
     {
         if ($explicitUrl !== '') {

@@ -34,12 +34,12 @@
     "personal": [
         {
             "id": "clipped",
-            "title": "Clipped Text",
-            "description": "Effet de texte clippé avec répétitions stratifiées utilisant SVG. Création d'un texte avec effet de profondeur visuel.",
+            "title": "Clipped",
+            "description": "Fork et optimisation d'une application web complexe avec focus sur la performance et l'expérience utilisateur. Effet de texte clippé avec répétitions stratifiées utilisant SVG — création d'un texte avec effet de profondeur visuel.",
             "demo_url": "/real/clipped.html",
             "preview_id": "clipped-preview",
             "image": null,
-            "tags": ["CSS", "SVG", "Expérimental"],
+            "tags": ["JavaScript", "CSS", "SVG", "Performance", "UX"],
             "published": true,
             "order": 1
         }

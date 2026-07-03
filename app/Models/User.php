@@ -179,6 +179,18 @@ class User extends Authenticatable implements MustVerifyEmailContract
         return $this->hasMany(StudentSubject::class)->orderBy('sort_order')->orderBy('id');
     }
 
+    /** @return HasMany<VisioInvitation, $this> */
+    public function visioInvitations(): HasMany
+    {
+        return $this->hasMany(VisioInvitation::class, 'invited_by_user_id')->latest('id');
+    }
+
+    /** @return HasMany<VisioParticipant, $this> */
+    public function visioParticipations(): HasMany
+    {
+        return $this->hasMany(VisioParticipant::class)->latest('id');
+    }
+
     public function hasRole(string $slug): bool
     {
         return $this->roles()->where('slug', $slug)->exists();

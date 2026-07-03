@@ -1,27 +1,30 @@
 [
   {
     "entreprise": "BrightShell",
-    "poste": "Auto-entrepreneur",
+    "poste": "Développeur Freelance Full Stack",
     "lieu": "Bussac-Forêt",
     "date_debut": "Novembre 2025",
     "date_fin": "Présent",
-    "description": "Nouvellement sur le marché des systèmes d'informations.",
+    "description": "Conception, développement et maintenance évolutive de solutions logicielles SaaS pour PME en totale autonomie.",
+    "technologies": ["PHP", "Laravel", "JavaScript", "Vue.js", "MongoDB", "CouchDB", "Redis", "Docker", "Git", "GitHub"],
     "realisations": [
-      "Deux clients de projet d'envergure",
-      "Création d'université",
-      "Gestionnaire de flux télévisé en ligne"
+      "Développement d'outils de gestion documentaire en temps réel impliquant des bases de données NoSQL (MongoDB, CouchDB) et Redis",
+      "Déploiement des applications, gestion du versioning du code source via Git/GitHub et optimisation des processus administratifs",
+      "Conception de plateformes SaaS pour PME (allotata.fr, solutions de gestion documentaire)"
     ]
   },
   {
     "entreprise": "Aéroclub Marcillac Estuaire (ACME)",
-    "poste": "Service Civique",
+    "poste": "Développeur Full Stack — Responsable technique",
     "lieu": "Val-de-Livenne",
     "date_debut": "Mars 2025",
     "date_fin": "Novembre 2025",
-    "description": "Développement d'une application de gestion de flotte et de membres (200+ utilisateurs).",
-    "technologies": ["PHP", "JS", "CSS", "MySQL", "MariaDB", "Linux"],
+    "description": "Conception technique et développement d'une application critique de gestion de flotte (200 utilisateurs actifs, plus de 1 000 comptes).",
+    "technologies": ["PHP", "JavaScript", "MySQL", "MariaDB", "Linux"],
     "realisations": [
-      "Remplacement et centralisation des processus manuels existants en partant de zéro"
+      "Mise en place, architecture et optimisation des bases de données SQL (MySQL/MariaDB) garantissant la qualité et la sécurité des livrables",
+      "Travail en collaboration avec les équipes opérationnelles, menant à une réduction du temps de traitement administratif de 30 minutes par utilisateur et par jour",
+      "Développement de takeoff.aeroclubmarcillacestuaire.fr — gestion de flotte, rendez-vous, cours et ressources"
     ]
   },
   {
@@ -30,13 +33,12 @@
     "lieu": "Bussac-Forêt",
     "date_debut": "Avril 2024",
     "date_fin": "Juin 2024",
-    "description": "Développement de solutions web pour la gestion immobilière.",
+    "description": "Développement Backend sous le framework Symfony 6 avec création et test de services web.",
     "technologies": ["PHP", "Symfony", "JavaScript", "PostgreSQL", "MySQL"],
     "realisations": [
-      "Développement de la base de données avec PostgreSQL et MySQL",
-      "Développement du site web avec PHP/Symfony et JavaScript",
-      "Mise en place du SEO",
-      "Intégration d'outils CRM"
+      "Intégration technique d'outils CRM assurant l'interopérabilité des systèmes",
+      "Optimisation SEO et structuration avancée de bases de données relationnelles (PostgreSQL)",
+      "Développement de la plateforme de gestion immobilière lotixam.fr"
     ]
   },
   {

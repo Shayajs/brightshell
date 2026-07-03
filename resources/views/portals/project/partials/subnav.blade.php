@@ -7,6 +7,7 @@
         ['route' => 'portals.project.kanban.index', 'match' => 'portals.project.kanban.*', 'label' => 'Kanban'],
         ['route' => 'portals.project.requests.index', 'match' => 'portals.project.requests.*', 'label' => 'Demandes'],
         ['route' => 'portals.project.prices.index', 'match' => 'portals.project.prices.*', 'label' => 'Prix & devis'],
+        ['route' => 'portals.project.visio.index', 'match' => 'portals.project.visio.*', 'label' => 'Visio'],
         ['route' => 'portals.project.documents.index', 'match' => 'portals.project.documents.*', 'label' => 'Documents'],
         ['route' => 'portals.project.specs.index', 'match' => 'portals.project.specs.*', 'label' => 'Cahier des charges'],
         ['route' => 'portals.project.contracts.index', 'match' => 'portals.project.contracts.*', 'label' => 'Contrats'],

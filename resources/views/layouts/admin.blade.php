@@ -9,12 +9,12 @@
     $portalKey = 'admin';
     if (count($labels) >= 3) {
         $portalKey = match ($labels[0]) {
-            'admin', 'collabs', 'users', 'courses', 'settings', 'docs', 'home', 'project', 'prospects' => $labels[0],
+            'admin', 'collabs', 'users', 'courses', 'settings', 'docs', 'home', 'project', 'prospects', 'visio' => $labels[0],
             default => 'admin',
         };
     } elseif (count($labels) === 2 && str_ends_with($host, '.localhost')) {
         $portalKey = match ($labels[0]) {
-            'admin', 'collabs', 'users', 'courses', 'settings', 'docs', 'home', 'project', 'prospects' => $labels[0],
+            'admin', 'collabs', 'users', 'courses', 'settings', 'docs', 'home', 'project', 'prospects', 'visio' => $labels[0],
             default => 'admin',
         };
     }
@@ -166,6 +166,12 @@
                                 'active' => request()->routeIs('portals.settings.notifications.*'),
                                 'label'  => 'Notifications',
                                 'icon'   => '<path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>',
+                            ])
+                            @include('layouts.partials.nav-item', [
+                                'href'   => route('portals.settings.visio-invitations.index'),
+                                'active' => request()->routeIs('portals.settings.visio-invitations.*'),
+                                'label'  => 'Invitations visio',
+                                'icon'   => '<path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>',
                             ])
                             @include('layouts.partials.nav-item', [
                                 'href'   => route('portals.settings.security.edit'),
@@ -382,6 +388,12 @@
                                 'active' => request()->routeIs('admin.cv.*'),
                                 'label'  => 'Mon CV',
                                 'icon'   => '<rect x="2" y="2" width="20" height="20" rx="2"/><path d="M7 8h10M7 12h10M7 16h6"/>',
+                            ])
+                            @include('layouts.partials.nav-item', [
+                                'href'   => route('admin.agenda.index'),
+                                'active' => request()->routeIs('admin.agenda.*'),
+                                'label'  => 'Agenda',
+                                'icon'   => '<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
                             ])
                         @endif
 

@@ -174,4 +174,10 @@ class Project extends Model
     {
         return $this->hasMany(ProjectRequest::class)->orderByDesc('id');
     }
+
+    /** @return HasMany<VisioRoom, $this> */
+    public function visioRooms(): HasMany
+    {
+        return $this->hasMany(VisioRoom::class)->orderByDesc('id');
+    }
 }

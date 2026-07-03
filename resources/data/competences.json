@@ -1,19 +1,19 @@
 {
   "langages_preferes": [
-    {"nom": "C/C++", "niveau": 85, "priorite": 1, "emoji": "🔧", "color": "#4a90e2"},
-    {"nom": "Java", "niveau": 80, "priorite": 2, "emoji": "☕", "color": "#ED8B00"},
-    {"nom": "Kotlin", "niveau": 75, "priorite": 3},
-    {"nom": "PHP", "niveau": 90, "priorite": 4, "emoji": "🐘", "color": "#777BB4"},
-    {"nom": "Bash", "niveau": 85, "priorite": 5, "emoji": "💻", "color": "#4EAA25"},
-    {"nom": "ARM64 (Assembleur)", "niveau": 70, "priorite": 6, "emoji": "🛡️", "color": "#2d5016"}
+    {"nom": "PHP", "niveau": 90, "priorite": 1, "emoji": "🐘", "color": "#777BB4"},
+    {"nom": "JavaScript", "niveau": 90, "priorite": 2, "emoji": "⚡", "color": "#F7DF1E"},
+    {"nom": "Python", "niveau": 80, "priorite": 3, "emoji": "🐍", "color": "#3776ab"},
+    {"nom": "Java", "niveau": 80, "priorite": 4, "emoji": "☕", "color": "#ED8B00"},
+    {"nom": "C/C++", "niveau": 85, "priorite": 5, "emoji": "🔧", "color": "#4a90e2"},
+    {"nom": "Bash", "niveau": 85, "priorite": 6, "emoji": "💻", "color": "#4EAA25"}
   ],
   "langages_maitrises": [
-    {"nom": "JavaScript", "niveau": 90, "priorite": 1, "emoji": "⚡", "color": "#F7DF1E"},
-    {"nom": "TypeScript", "niveau": 85, "priorite": 2, "emoji": "🔷", "color": "#3178C6"},
-    {"nom": "Python", "niveau": 80, "priorite": 3, "emoji": "🐍", "color": "#3776ab"},
-    {"nom": "SQL", "niveau": 85, "priorite": 4, "emoji": "🗄️", "color": "#336791"},
-    {"nom": "HTML/CSS", "niveau": 90, "priorite": 5},
-    {"nom": "PowerShell", "niveau": 75, "priorite": 6}
+    {"nom": "TypeScript", "niveau": 85, "priorite": 1, "emoji": "🔷", "color": "#3178C6"},
+    {"nom": "SQL", "niveau": 85, "priorite": 2, "emoji": "🗄️", "color": "#336791"},
+    {"nom": "HTML/CSS", "niveau": 90, "priorite": 3},
+    {"nom": "Kotlin", "niveau": 75, "priorite": 4},
+    {"nom": "PowerShell", "niveau": 75, "priorite": 5},
+    {"nom": "ARM64 (Assembleur)", "niveau": 70, "priorite": 6, "emoji": "🛡️", "color": "#2d5016"}
   ],
   "langages_connus": [
     {"nom": "Go", "niveau": 60, "priorite": 1, "emoji": "🐹", "color": "#00ADD8"},
@@ -26,21 +26,36 @@
     {"nom": "Swift", "niveau": 50, "priorite": 8}
   ],
   "frameworks": [
-    {"nom": "Symfony", "niveau": 85, "priorite": 1, "emoji": "⚫", "color": "#000000"},
-    {"nom": "Laravel", "niveau": 80, "priorite": 2, "emoji": "🔴", "color": "#FF2D20"},
-    {"nom": "Java EE", "niveau": 75, "priorite": 3},
-    {"nom": "T3 Stack", "niveau": 80, "priorite": 4},
-    {"nom": "Qt", "niveau": 65, "priorite": 5, "emoji": "🟢", "color": "#41CD52"}
+    {"nom": "Laravel", "niveau": 85, "priorite": 1, "emoji": "🔴", "color": "#FF2D20"},
+    {"nom": "Symfony", "niveau": 85, "priorite": 2, "emoji": "⚫", "color": "#000000"},
+    {"nom": "Vue.js 3", "niveau": 80, "priorite": 3, "emoji": "💚", "color": "#42b883"},
+    {"nom": "Alpine.js", "niveau": 80, "priorite": 4, "emoji": "🏔️", "color": "#77c1d2"},
+    {"nom": "Tailwind CSS", "niveau": 85, "priorite": 5, "emoji": "🎨", "color": "#06b6d4"},
+    {"nom": "T3 Stack", "niveau": 80, "priorite": 6},
+    {"nom": "Java EE", "niveau": 75, "priorite": 7},
+    {"nom": "Qt", "niveau": 65, "priorite": 8, "emoji": "🟢", "color": "#41CD52"}
   ],
   "outils_devops": [
     {"nom": "Git", "niveau": 90, "priorite": 1},
-    {"nom": "Docker", "niveau": 75, "priorite": 2, "emoji": "❤️", "color": "#ff6b9d"},
-    {"nom": "Composer", "niveau": 80, "priorite": 3}
+    {"nom": "GitHub", "niveau": 90, "priorite": 2},
+    {"nom": "GitLab", "niveau": 80, "priorite": 3},
+    {"nom": "GitHub Actions", "niveau": 80, "priorite": 4, "emoji": "⚙️", "color": "#2088FF"},
+    {"nom": "Docker", "niveau": 75, "priorite": 5, "emoji": "❤️", "color": "#ff6b9d"},
+    {"nom": "Composer", "niveau": 80, "priorite": 6},
+    {"nom": "Linux", "niveau": 85, "priorite": 7},
+    {"nom": "OCI", "niveau": 70, "priorite": 8},
+    {"nom": "OVHcloud", "niveau": 75, "priorite": 9},
+    {"nom": "OWASP", "niveau": 75, "priorite": 10},
+    {"nom": "RGPD", "niveau": 75, "priorite": 11},
+    {"nom": "Scrum/Kanban", "niveau": 80, "priorite": 12}
   ],
   "bases_de_donnees": [
     {"nom": "PostgreSQL", "niveau": 85, "priorite": 1},
     {"nom": "MySQL/MariaDB", "niveau": 85, "priorite": 2},
-    {"nom": "Oracle SQL", "niveau": 70, "priorite": 3}
+    {"nom": "MongoDB", "niveau": 75, "priorite": 3, "emoji": "🍃", "color": "#47A248"},
+    {"nom": "Redis", "niveau": 75, "priorite": 4, "emoji": "🔴", "color": "#DC382D"},
+    {"nom": "CouchDB", "niveau": 70, "priorite": 5},
+    {"nom": "Oracle SQL", "niveau": 70, "priorite": 6}
   ],
   "langues": [
     {"nom": "Français", "niveau": "Natif"},

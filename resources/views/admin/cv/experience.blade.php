@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
         container.querySelector('button[data-remove-item]')?.addEventListener('click', () => container.remove());
     }
 
-    list.querySelectorAll('[data-remove-item]').forEach(btn => {
+    list.querySelectorAll('button[data-remove-item]').forEach(btn => {
         btn.addEventListener('click', () => btn.closest('[data-remove-item]').remove());
     });
 

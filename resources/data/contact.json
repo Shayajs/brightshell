@@ -3,11 +3,11 @@
     "photo": "img/cv.png",
     "prenom": "Lucas",
     "nom": "ESPINAR",
-    "titre": "Développeur Full Stack",
+    "titre": "Développeur Full Stack Freelance — JavaScript, PHP, Python | Web & API REST",
     "email": "espinar.lucas0@gmail.com",
     "telephone": "+33 6 44 07 30 37",
     "site_web": "https://brightshell.fr",
-    "localisation": "Bussac-Forêt",
+    "localisation": "Bordeaux, France",
     "permis": "Permis B"
   },
   "reseaux_sociaux": {
@@ -15,5 +15,5 @@
     "linkedin": "@lucas-espinar",
     "twitter_x": "@lucas_shaya"
   },
-  "resume_profil": "Développeur Full Stack motivé ayant construit des outils de gestion et participé à des projets web complets pendant son parcours académique et ses missions opérationnelles."
+  "resume_profil": "Développeur Full Stack spécialisé dans l'écosystème PHP (Symfony & Laravel) avec 3 ans d'expérience (depuis 2024). Avec expérience en développement web, gestion technique de projet et activité indépendante. Conception de solutions web orientées performance, maintenabilité et optimisation des processus. Sensibilité forte aux problématiques de sécurité, d'architecture applicative et d'expérience utilisateur."
 }

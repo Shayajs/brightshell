@@ -38,6 +38,8 @@ return [
         'project_host' => env('BRIGHTSHELL_PROJECT_HOST'),
         /** Portail prospection B2B (admins uniquement) — vide = prospects.{root} */
         'prospects_host' => env('BRIGHTSHELL_PROSPECTS_HOST'),
+        /** Portail visioconférence — vide = visio.{root} */
+        'visio_host' => env('BRIGHTSHELL_VISIO_HOST'),
         /** API publique lecture seule — vide = api.{root} */
         'api_host' => env('BRIGHTSHELL_API_HOST'),
         /** Webmail / interface mail — vide = mail.{root} */
@@ -61,6 +63,7 @@ return [
         'home_url' => rtrim((string) env('BRIGHTSHELL_PORTAL_HOME_URL', ''), '/'),
         'project_url' => rtrim((string) env('BRIGHTSHELL_PORTAL_PROJECT_URL', ''), '/'),
         'prospects_url' => rtrim((string) env('BRIGHTSHELL_PORTAL_PROSPECTS_URL', ''), '/'),
+        'visio_url' => rtrim((string) env('BRIGHTSHELL_PORTAL_VISIO_URL', ''), '/'),
     ],
 
     /*
@@ -139,6 +142,17 @@ return [
             'signature' => 'L’équipe BrightShell',
             'legal' => 'Ce message est envoyé automatiquement.',
         ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Visioconférence (LiveKit)
+    |--------------------------------------------------------------------------
+    */
+    'livekit' => [
+        'ws_url' => env('LIVEKIT_WS_URL', ''),
+        'api_key' => env('LIVEKIT_API_KEY', ''),
+        'api_secret' => env('LIVEKIT_API_SECRET', ''),
     ],
 
 ];

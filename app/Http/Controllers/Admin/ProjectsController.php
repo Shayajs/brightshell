@@ -199,6 +199,30 @@ class ProjectsController extends Controller
         return back()->with('success', 'Invitation envoyée à '.$email.'.');
     }
 
+    public function createVisioRoom(Request $request, Project $project): RedirectResponse
+    {
+        $request->validate([
+            'visio_title' => ['required', 'string', 'max:255'],
+        ]);
+
+        $room = $project->visioRooms()->create([
+            'host_user_id' => $request->user()?->id,
+            'title' => $request->string('visio_title')->toString(),
+            'starts_at' => now(),
+            'status' => 'live',
+            'meta' => [],
+        ]);
+
+        AdminAudit::record('visio.room_created_from_admin', $project, [
+            'room_id' => $room->id,
+            'title' => $room->title,
+        ]);
+
+        return redirect()
+            ->route('portals.project.visio.index', $project)
+            ->with('success', 'Salle visio créée pour le projet.');
+    }
+
     /** @return array<string, mixed> */
     private function validatedProjectPayload(Request $request, ?Project $project): array
     {

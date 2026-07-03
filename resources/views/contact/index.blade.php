@@ -31,6 +31,10 @@
 
     <h1 class="auth-title">Prendre contact</h1>
     <p class="auth-subtitle" data-contact-subtitle>{{ $typeIntros[$activeType] }}</p>
+    <p class="text-center text-xs text-zinc-500" style="margin-top: -0.5rem; margin-bottom: 1rem;">
+        Vous préférez un créneau ?
+        <a href="{{ route('appointments') }}" class="text-indigo-400 hover:text-indigo-300">Prendre rendez-vous</a>
+    </p>
 
     <div
         class="contact-form-root"
