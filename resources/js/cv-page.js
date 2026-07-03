@@ -21,7 +21,7 @@ function initTimelineToggles() {
         btn.addEventListener('click', () => {
             const expanded = btn.getAttribute('aria-expanded') === 'true';
             items.forEach((item, i) => {
-                item.classList.toggle('timeline-item-hidden', !expanded && i >= 3);
+                item.classList.toggle('timeline-item-hidden', expanded && i >= 3);
             });
             btn.setAttribute('aria-expanded', !expanded);
             btn.textContent = expanded ? `Voir plus (${hiddenCount})` : 'Voir moins';
