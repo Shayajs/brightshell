@@ -28,3 +28,7 @@ Thumbs.db
 docker-compose-shaya.dev.yaml
 composer.lock
 LOG_*
+
+# Roo Files
+.roo/
+.roomodes

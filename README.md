@@ -1,4 +1,4 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+<p align="center"><a href="https://brightshell.fr" target="_blank"><img src="img/logo_sans_fond_contours_epais.webp" width="400" alt="BrightShell Logo"></a></p>
 
 <p align="center">
 <a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
@@ -141,6 +141,57 @@ Si tu vois **deux cookies** `*-session` / `XSRF-TOKEN` (un sur `.tondomaine` et 
 - `AppServiceProvider` force aussi `session.domain` sur `.{root}` au boot pour éviter les cookies **host-only** sur un sous-domaine.
 - Après changement : supprime **tous** les cookies du site, ou change `SESSION_COOKIE` (ex. `brightshell-portal-session`) une fois.
 - Évite `php artisan config:cache` avec un `.env` incohérent sur le serveur (valeurs figées).
+
+## Architecture du Projet
+
+BrightShell est une application Laravel complexe avec une architecture multi-domaines qui permet de gérer différents types d'utilisateurs et de portails spécifiques. L'application est organisée en plusieurs domaines principaux :
+
+### Structure des Domaines Principaux
+
+1. **Portail Compte (account.*)** - Pour l'authentification et la gestion du profil utilisateur
+2. **Portail Administration (admin.*)** - Interface d'administration complète avec tous les outils de gestion
+3. **Portail Collaborateurs (collabs.*)** - Espace collaboratif pour les équipes et messages
+4. **Portail Clients (users.*)** - Espace réservé aux clients pour gérer leurs sociétés
+5. **Portail Élèves (courses.*)** - Système d'apprentissage avec cours, quiz et documents
+6. **Portail Réglages (settings.*)** - Gestion des préférences et sécurité utilisateur
+7. **Portail Projets (project.*)** - Gestion de projets clients avec documents, kanban, rendez-vous
+8. **Portail Prospection B2B (prospects.*)** - Outil de gestion de prospects B2B
+9. **Portail Visioconférence (visio.*)** - Système de visioconférence intégré
+10. **Portail Documentation (docs.*)** - Système de documentation interne
+11. **Portail Agenda (agenda.*)** - Gestion des créneaux de rendez-vous
+12. **Vitrine Principale** - Site vitrine public accessible à tous
+
+### Structure du Code
+
+#### Dossier `app/`
+- **Models/** : Modèles Eloquent pour toutes les entités du système
+- **Http/Controllers/** : Contrôleurs organisés par domaine (Admin, Collabs, Courses, etc.)
+- **Http/Middleware/** : Middlewares spécifiques à l'architecture multi-portails
+- **Policies/** : Politiques d'accès et autorisations
+- **Services/** : Services métier avec logique métier complexe
+- **Support/** : Classes utilitaires et helpers pour l'architecture BrightShell
+- **Providers/** : Fournisseurs de services Laravel
+
+#### Dossier `config/`
+- **brightshell.php** : Configuration principale des domaines et portails
+- **app.php** : Configuration générale de l'application Laravel
+
+#### Dossier `routes/`
+- **web.php** : Définition complète des routes par domaine avec middleware appropriés
+
+### Système de Rôles et d'Accès
+
+L'application gère plusieurs rôles :
+- `admin` - Administrateur système
+- `collaborator` - Collaborateur interne
+- `client` - Client (accès portail clients)
+- `student` - Élève (accès portail cours)
+
+Les redirections après authentification sont basées sur le rôle le plus prioritaire.
+
+### Session Multi-Sous-domaines
+
+L'application supporte une architecture multi-sous-domaines avec gestion spéciale des sessions pour éviter les conflits de cookies entre domaines différents.
 
 ## License
 
