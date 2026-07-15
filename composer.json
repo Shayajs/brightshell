@@ -9,6 +9,7 @@
         "php": "^8.4",
         "laravel/boost": "^2.4",
         "laravel/framework": "^13.0",
+        "laravel/passport": "^13.7",
         "laravel/sanctum": "^4.3",
         "laravel/tinker": "^3.0",
         "league/commonmark": "^2.6",

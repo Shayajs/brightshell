@@ -13,7 +13,7 @@ class ApiTokensController extends Controller
 {
     public function index(Request $request): View
     {
-        $tokens = $request->user()->tokens()->orderByDesc('id')->get();
+        $tokens = $request->user()->sanctumTokens()->orderByDesc('id')->get();
 
         return view('portals.settings.api-tokens', [
             'tokens' => $tokens,
@@ -26,7 +26,7 @@ class ApiTokensController extends Controller
             'name' => ['required', 'string', 'max:255'],
         ]);
 
-        $token = $request->user()->createToken($validated['name']);
+        $token = $request->user()->createSanctumToken($validated['name']);
 
         return redirect()
             ->route('portals.settings.api.index')

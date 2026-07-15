@@ -16,7 +16,9 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Laravel\Sanctum\HasApiTokens;
+use Laravel\Sanctum\HasApiTokens as HasSanctumApiTokens;
+use Laravel\Passport\Contracts\OAuthenticatable;
+use Laravel\Passport\HasApiTokens as HasPassportApiTokens;
 
 #[Fillable([
     'name',
@@ -32,10 +34,15 @@ use Laravel\Sanctum\HasApiTokens;
     'browser_notifications_enabled',
 ])]
 #[Hidden(['password', 'remember_token', 'email_reverse_verification_token'])]
-class User extends Authenticatable implements MustVerifyEmailContract
+class User extends Authenticatable implements MustVerifyEmailContract, OAuthenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasApiTokens, HasFactory, MustVerifyEmail, Notifiable, SoftDeletes;
+    use HasPassportApiTokens, HasSanctumApiTokens, HasFactory, MustVerifyEmail, Notifiable, SoftDeletes {
+        HasPassportApiTokens::tokens insteadof HasSanctumApiTokens;
+        HasPassportApiTokens::createToken insteadof HasSanctumApiTokens;
+        HasSanctumApiTokens::tokens as sanctumTokens;
+        HasSanctumApiTokens::createToken as createSanctumToken;
+    }
 
     protected static function booted(): void
     {

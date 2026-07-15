@@ -74,6 +74,7 @@ use App\Http\Controllers\RealisationsController;
 use App\Http\Controllers\ServicesController;
 use App\Http\Controllers\Settings\AccountClosureController;
 use App\Http\Controllers\Settings\ApiTokensController;
+use App\Http\Controllers\Settings\ConnectedAppsController;
 use App\Http\Controllers\Settings\DashboardController as SettingsDashboardController;
 use App\Http\Controllers\Settings\NotificationPreferencesController;
 use App\Http\Controllers\Settings\ProfileController as SettingsProfileController;
@@ -434,7 +435,7 @@ if ($prospectsHost !== '') {
 |--------------------------------------------------------------------------
 | Sans contrainte d’hôte : évite de servir la vitrine sur api.* (middleware).
 */
-Route::middleware(['block.web.on.api.host'])->group(function (): void {
+Route::middleware(['block.web.on.api.host', 'block.web.on.shield.host'])->group(function (): void {
     Route::get('/', [HomeController::class, 'index'])->name('home');
     Route::get('/quesako', [QuesakoController::class, 'index'])->name('quesako.index');
     Route::get('/quesako/{tabSlug}', [QuesakoController::class, 'show'])->name('quesako.tab');
@@ -561,6 +562,9 @@ if ($settingsHost !== '') {
             Route::get('/securite', [SettingsSecurityController::class, 'edit'])->name('portals.settings.security.edit');
             Route::put('/securite/mot-de-passe', [SettingsSecurityController::class, 'updatePassword'])->name('portals.settings.security.password');
             Route::delete('/securite/autres-sessions', [SettingsSecurityController::class, 'destroyOtherSessions'])->name('portals.settings.security.sessions.destroy-others');
+
+            Route::get('/applications-connectees', [ConnectedAppsController::class, 'index'])->name('portals.settings.connected-apps.index');
+            Route::delete('/applications-connectees/{clientId}', [ConnectedAppsController::class, 'destroy'])->name('portals.settings.connected-apps.destroy');
 
             Route::get('/demande', [SettingsSupportTicketController::class, 'create'])->name('portals.settings.support-ticket.create');
             Route::post('/demande', [SettingsSupportTicketController::class, 'store'])

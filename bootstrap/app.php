@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Middleware\BlockWebVitrineOnApiHost;
+use App\Http\Middleware\BlockWebVitrineOnShieldHost;
 use App\Http\Middleware\DeveloperApiCors;
+use App\Http\Middleware\EnsureBrightShieldUser;
 use App\Http\Middleware\EnsureSanctumApiUser;
 use App\Http\Middleware\EnsureUserCanAccessProjectPortal;
 use App\Http\Middleware\EnsureUserHasAnyRole;
@@ -26,6 +28,26 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
         then: function (): void {
+            /*
+            |------------------------------------------------------------------
+            | BrightShield (shield.*) — fichier de routes dissocié par sécurité.
+            | Seules les routes OAuth2/OIDC répondent sur cet hôte ; tout le
+            | reste tombe en 404 JSON (pas de contournement possible).
+            |------------------------------------------------------------------
+            */
+            $shieldHost = BrightshellDomain::effectiveShieldHost();
+            if ($shieldHost !== '') {
+                Route::domain($shieldHost)
+                    ->middleware(['web'])
+                    ->group(base_path('routes/brightshield.php'));
+
+                Route::domain($shieldHost)->group(function (): void {
+                    Route::fallback(static fn () => response()->json([
+                        'message' => 'Cet hôte est réservé à BrightShield (OAuth2 / OIDC).',
+                    ], 404))->name('brightshield.fallback');
+                });
+            }
+
             $apiHost = trim((string) config('brightshell.domains.api_host', ''));
             $root = BrightshellDomain::effectiveRoot();
             if ($apiHost === '' && $root !== '') {
@@ -34,6 +56,25 @@ return Application::configure(basePath: dirname(__DIR__))
             if ($apiHost === '') {
                 return;
             }
+
+            /*
+            |------------------------------------------------------------------
+            | BrightShield sur l'hôte API : lecture des données autorisées via
+            | jeton Passport (scopes) uniquement. Les jetons Sanctum de l'API
+            | privée ne donnent pas accès à ces routes, et inversement.
+            |------------------------------------------------------------------
+            */
+            Route::domain($apiHost)
+                ->middleware([
+                    ForceJsonForApiRequests::class,
+                    PublicApiCors::class,
+                    'throttle:120,1',
+                    'auth:api',
+                    EnsureBrightShieldUser::class,
+                ])
+                ->prefix('v1/brightshield')
+                ->group(base_path('routes/brightshield-api.php'));
+
             Route::domain($apiHost)
                 ->middleware([
                     PublicApiCors::class,
@@ -68,8 +109,19 @@ return Application::configure(basePath: dirname(__DIR__))
             'role.developer' => EnsureUserHasDeveloperRole::class,
             'portal.project' => EnsureUserCanAccessProjectPortal::class,
             'block.web.on.api.host' => BlockWebVitrineOnApiHost::class,
+            'block.web.on.shield.host' => BlockWebVitrineOnShieldHost::class,
+            'brightshield.user' => EnsureBrightShieldUser::class,
         ]);
-        $middleware->redirectGuestsTo(fn () => route('login'));
+        $middleware->redirectGuestsTo(function () {
+            $host = request()->getHost();
+            $shieldHost = \App\Support\BrightshellDomain::effectiveShieldHost();
+
+            if ($shieldHost !== '' && $host === $shieldHost) {
+                return \App\Support\BrightshellAccount::loginUrl();
+            }
+
+            return route('login');
+        });
         $middleware->redirectUsersTo(function () {
             $user = auth()->user();
             if ($user === null) {

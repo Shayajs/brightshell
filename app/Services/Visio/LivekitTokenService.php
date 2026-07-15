@@ -10,6 +10,36 @@ use RuntimeException;
 class LivekitTokenService
 {
     /**
+     * Vérifie que LiveKit est activé et configuré.
+     */
+    private function ensureLiveKitConfigured(): void
+    {
+        $enabled = filter_var(config('brightshell.livekit.enabled', false), FILTER_VALIDATE_BOOLEAN);
+        
+        if (! $enabled) {
+            throw new RuntimeException(
+                'La visioconférence LiveKit est désactivée. Configurez LIVEKIT_ENABLED=true dans .env.'
+            );
+        }
+        
+        $apiKey = (string) config('brightshell.livekit.api_key', '');
+        $apiSecret = (string) config('brightshell.livekit.api_secret', '');
+        $wsUrl = (string) config('brightshell.livekit.ws_url', '');
+        
+        if ($apiKey === '' || $apiSecret === '') {
+            throw new RuntimeException(
+                'LiveKit activé mais non configuré. Définissez LIVEKIT_API_KEY et LIVEKIT_API_SECRET dans .env.'
+            );
+        }
+        
+        if ($wsUrl === '') {
+            throw new RuntimeException(
+                'LiveKit activé mais ws_url manquant. Définissez LIVEKIT_WS_URL dans .env.'
+            );
+        }
+    }
+
+    /**
      * Génère un JWT LiveKit "Access Token" sans dépendance externe.
      *
      * @param  array<string, mixed>  $grants
@@ -20,11 +50,10 @@ class LivekitTokenService
         ?VisioParticipant $participant,
         array $grants = []
     ): string {
+        $this->ensureLiveKitConfigured();
+        
         $apiKey = (string) config('brightshell.livekit.api_key', '');
         $apiSecret = (string) config('brightshell.livekit.api_secret', '');
-        if ($apiKey === '' || $apiSecret === '') {
-            throw new RuntimeException('LiveKit non configuré (clé/secret manquants).');
-        }
 
         $identity = $user?->id !== null
             ? 'user-'.$user->id

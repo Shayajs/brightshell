@@ -78,4 +78,36 @@ final class BrightshellDomain
 
         return $apiHost;
     }
+
+    /**
+     * Hôte effectif de BrightShield (OAuth2 / OIDC).
+     */
+    public static function effectiveShieldHost(): string
+    {
+        $shieldHost = trim((string) config('brightshell.domains.shield_host', ''));
+        $root = self::effectiveRoot();
+        if ($shieldHost === '' && $root !== '') {
+            $shieldHost = 'shield.'.$root;
+        }
+
+        return $shieldHost;
+    }
+
+    /**
+     * URL de base BrightShield (schéma + hôte).
+     */
+    public static function shieldUrl(): string
+    {
+        $configured = trim((string) config('brightshield.issuer', ''));
+        if ($configured !== '') {
+            return rtrim($configured, '/');
+        }
+
+        $host = self::effectiveShieldHost();
+        if ($host === '') {
+            return rtrim((string) config('app.url'), '/');
+        }
+
+        return self::urlScheme().'://'.$host;
+    }
 }

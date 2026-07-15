@@ -44,6 +44,8 @@ return [
         'agenda_host' => env('BRIGHTSHELL_AGENDA_HOST'),
         /** API publique lecture seule — vide = api.{root} */
         'api_host' => env('BRIGHTSHELL_API_HOST'),
+        /** BrightShield (OAuth2 / OIDC) — vide = shield.{root} */
+        'shield_host' => env('BRIGHTSHELL_SHIELD_HOST'),
         /** Webmail / interface mail — vide = mail.{root} */
         'mail_web_host' => env('BRIGHTSHELL_MAIL_WEB_HOST'),
         /** Sous-domaines qui servent la même vitrine que le site principal (ex. www) */
@@ -152,6 +154,8 @@ return [
     |--------------------------------------------------------------------------
     */
     'livekit' => [
+        /** Si true : les routes visio sont activées. Requiert LIVEKIT_WS_URL, LIVEKIT_API_KEY, LIVEKIT_API_SECRET. */
+        'enabled' => filter_var(env('LIVEKIT_ENABLED', false), FILTER_VALIDATE_BOOLEAN),
         'ws_url' => env('LIVEKIT_WS_URL', ''),
         'api_key' => env('LIVEKIT_API_KEY', ''),
         'api_secret' => env('LIVEKIT_API_SECRET', ''),

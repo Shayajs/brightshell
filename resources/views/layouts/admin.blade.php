@@ -180,6 +180,12 @@
                                 'icon'   => '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
                             ])
                             @include('layouts.partials.nav-item', [
+                                'href'   => route('portals.settings.connected-apps.index'),
+                                'active' => request()->routeIs('portals.settings.connected-apps.*'),
+                                'label'  => 'Applications connectées',
+                                'icon'   => '<path d="M4 7h16M4 12h10M4 17h7"/>',
+                            ])
+                            @include('layouts.partials.nav-item', [
                                 'href'   => route('portals.settings.support-ticket.create'),
                                 'active' => request()->routeIs('portals.settings.support-ticket.*'),
                                 'label'  => 'Demande & support',
