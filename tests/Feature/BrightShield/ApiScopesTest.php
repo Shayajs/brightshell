@@ -3,6 +3,7 @@
 namespace Tests\Feature\BrightShield;
 
 use App\Models\User;
+use App\Support\BrightshellDomain;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -19,9 +20,9 @@ class ApiScopesTest extends TestCase
 
         $token = $user->createToken('Test', ['openid', 'email']);
 
-        $this->withHeader('Host', $this->apiHost())
-            ->withHeader('Authorization', 'Bearer '.$token->accessToken)
-            ->getJson('/v1/brightshield/me')
+        $this->getJsonOnHost($this->apiHost(), '/v1/brightshield/me', [
+            'Authorization' => 'Bearer '.$token->accessToken,
+        ])
             ->assertOk()
             ->assertJsonPath('email', $user->email)
             ->assertJsonMissingPath('phone_number')
@@ -37,10 +38,9 @@ class ApiScopesTest extends TestCase
 
         $token = $user->createToken('Test', ['openid', 'email']);
 
-        $this->withHeader('Host', $this->apiHost())
-            ->withHeader('Authorization', 'Bearer '.$token->accessToken)
-            ->getJson('/v1/brightshield/me/telephone')
-            ->assertForbidden();
+        $this->getJsonOnHost($this->apiHost(), '/v1/brightshield/me/telephone', [
+            'Authorization' => 'Bearer '.$token->accessToken,
+        ])->assertForbidden();
     }
 
     public function test_phone_endpoint_returns_phone_with_scope(): void
@@ -52,9 +52,9 @@ class ApiScopesTest extends TestCase
 
         $token = $user->createToken('Test', ['phone']);
 
-        $this->withHeader('Host', $this->apiHost())
-            ->withHeader('Authorization', 'Bearer '.$token->accessToken)
-            ->getJson('/v1/brightshield/me/telephone')
+        $this->getJsonOnHost($this->apiHost(), '/v1/brightshield/me/telephone', [
+            'Authorization' => 'Bearer '.$token->accessToken,
+        ])
             ->assertOk()
             ->assertJsonPath('phone_number', '+33612345678');
     }
@@ -65,21 +65,13 @@ class ApiScopesTest extends TestCase
 
         $token = $user->createToken('Test', ['openid', 'email', 'profile']);
 
-        $this->withHeader('Host', $this->apiHost())
-            ->withHeader('Authorization', 'Bearer '.$token->accessToken)
-            ->getJson('/v1/me')
-            ->assertUnauthorized();
+        $this->getJsonOnHost($this->apiHost(), '/v1/me', [
+            'Authorization' => 'Bearer '.$token->accessToken,
+        ])->assertUnauthorized();
     }
 
     private function apiHost(): string
     {
-        $host = (string) config('brightshell.domains.api_host', '');
-        if ($host !== '') {
-            return $host;
-        }
-
-        $root = (string) parse_url((string) config('app.url'), PHP_URL_HOST);
-
-        return 'api.'.$root;
+        return BrightshellDomain::effectiveApiHost();
     }
 }

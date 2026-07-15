@@ -3,6 +3,7 @@
 namespace Tests\Feature\BrightShield;
 
 use App\Models\User;
+use App\Support\BrightshellDomain;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Passport\ClientRepository;
 use Tests\TestCase;
@@ -15,10 +16,8 @@ class OpenIdDiscoveryTest extends TestCase
     {
         $host = $this->shieldHost();
 
-        $response = $this->withHeader('Host', $host)
-            ->get('/.well-known/openid-configuration');
-
-        $response->assertOk()
+        $this->getOnHost($host, '/.well-known/openid-configuration')
+            ->assertOk()
             ->assertJsonPath('issuer', 'https://'.$host)
             ->assertJsonPath('authorization_endpoint', 'https://'.$host.'/oauth/authorize')
             ->assertJsonPath('token_endpoint', 'https://'.$host.'/oauth/token')
@@ -28,19 +27,13 @@ class OpenIdDiscoveryTest extends TestCase
 
     public function test_web_routes_are_blocked_on_shield_host(): void
     {
-        $host = $this->shieldHost();
-
-        $this->withHeader('Host', $host)
-            ->get('/')
+        $this->getOnHost($this->shieldHost(), '/')
             ->assertNotFound();
     }
 
     public function test_userinfo_requires_bearer_token(): void
     {
-        $host = $this->shieldHost();
-
-        $this->withHeader('Host', $host)
-            ->getJson('/oauth/userinfo')
+        $this->getJsonOnHost($this->shieldHost(), '/oauth/userinfo')
             ->assertUnauthorized();
     }
 
@@ -54,16 +47,16 @@ class OpenIdDiscoveryTest extends TestCase
             'email_verified_at' => now(),
         ]);
 
-        $client = app(ClientRepository::class)->createAuthorizationCodeGrantClient(
+        app(ClientRepository::class)->createAuthorizationCodeGrantClient(
             'Futurmeal',
             ['https://futurmeal.test/auth/brightshield/callback'],
         );
 
         $token = $user->createToken('Test', ['openid', 'profile', 'email']);
 
-        $this->withHeader('Host', $host)
-            ->withHeader('Authorization', 'Bearer '.$token->accessToken)
-            ->getJson('/oauth/userinfo')
+        $this->getJsonOnHost($host, '/oauth/userinfo', [
+            'Authorization' => 'Bearer '.$token->accessToken,
+        ])
             ->assertOk()
             ->assertJsonPath('sub', (string) $user->id)
             ->assertJsonPath('email', 'ada@example.test')
@@ -72,26 +65,16 @@ class OpenIdDiscoveryTest extends TestCase
 
     public function test_unverified_user_cannot_access_userinfo(): void
     {
-        $host = $this->shieldHost();
         $user = User::factory()->unverified()->create();
-
         $token = $user->createToken('Test', ['openid', 'email']);
 
-        $this->withHeader('Host', $host)
-            ->withHeader('Authorization', 'Bearer '.$token->accessToken)
-            ->getJson('/oauth/userinfo')
-            ->assertForbidden();
+        $this->getJsonOnHost($this->shieldHost(), '/oauth/userinfo', [
+            'Authorization' => 'Bearer '.$token->accessToken,
+        ])->assertForbidden();
     }
 
     private function shieldHost(): string
     {
-        $host = (string) config('brightshell.domains.shield_host', '');
-        if ($host !== '') {
-            return $host;
-        }
-
-        $root = (string) parse_url((string) config('app.url'), PHP_URL_HOST);
-
-        return 'shield.'.$root;
+        return BrightshellDomain::effectiveShieldHost();
     }
 }

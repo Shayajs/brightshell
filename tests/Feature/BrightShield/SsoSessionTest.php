@@ -4,6 +4,7 @@ namespace Tests\Feature\BrightShield;
 
 use App\Models\BrightshieldUserConsent;
 use App\Models\User;
+use App\Support\BrightshellDomain;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Passport\Client;
 use Laravel\Passport\ClientRepository;
@@ -21,8 +22,7 @@ class SsoSessionTest extends TestCase
     {
         $client = $this->makeClient();
 
-        $this->withHeader('Host', $this->shieldHost())
-            ->get('/oauth/authorize?'.$this->authorizeQuery($client))
+        $this->getOnHost($this->shieldHost(), '/oauth/authorize?'.$this->authorizeQuery($client))
             ->assertRedirectContains('/login');
     }
 
@@ -32,8 +32,7 @@ class SsoSessionTest extends TestCase
         $client = $this->makeClient();
 
         $this->actingAs($user)
-            ->withHeader('Host', $this->shieldHost())
-            ->get('/oauth/authorize?'.$this->authorizeQuery($client))
+            ->getOnHost($this->shieldHost(), '/oauth/authorize?'.$this->authorizeQuery($client))
             ->assertOk()
             ->assertSee('Autoriser')
             ->assertSee($user->email);
@@ -47,8 +46,7 @@ class SsoSessionTest extends TestCase
         BrightshieldUserConsent::record($user, (string) $client->getKey(), ['openid', 'profile', 'email']);
 
         $response = $this->actingAs($user)
-            ->withHeader('Host', $this->shieldHost())
-            ->get('/oauth/authorize?'.$this->authorizeQuery($client));
+            ->getOnHost($this->shieldHost(), '/oauth/authorize?'.$this->authorizeQuery($client));
 
         $response->assertRedirect();
         $this->assertStringStartsWith(
@@ -63,8 +61,7 @@ class SsoSessionTest extends TestCase
         $client = $this->makeClient();
 
         $this->actingAs($user)
-            ->withHeader('Host', $this->shieldHost())
-            ->get('/oauth/authorize?'.$this->authorizeQuery($client))
+            ->getOnHost($this->shieldHost(), '/oauth/authorize?'.$this->authorizeQuery($client))
             ->assertRedirect(route('verification.notice'));
     }
 
@@ -89,13 +86,6 @@ class SsoSessionTest extends TestCase
 
     private function shieldHost(): string
     {
-        $host = (string) config('brightshell.domains.shield_host', '');
-        if ($host !== '') {
-            return $host;
-        }
-
-        $root = (string) parse_url((string) config('app.url'), PHP_URL_HOST);
-
-        return 'shield.'.$root;
+        return BrightshellDomain::effectiveShieldHost();
     }
 }
