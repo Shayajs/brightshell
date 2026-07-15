@@ -38,7 +38,7 @@ class AuthTokensController extends Controller
         }
 
         $tokenName = (string) ($credentials['device_name'] ?? 'machine');
-        $token = $user->createToken($tokenName);
+        $token = $user->createSanctumToken($tokenName);
 
         return response()->json([
             'token_type' => 'Bearer',
@@ -54,7 +54,7 @@ class AuthTokensController extends Controller
 
     public function destroy(Request $request): JsonResponse
     {
-        $token = $request->user()?->currentAccessToken();
+        $token = $request->user()?->currentSanctumToken();
 
         if ($token !== null) {
             $token->delete();

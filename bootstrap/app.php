@@ -37,8 +37,9 @@ return Application::configure(basePath: dirname(__DIR__))
             */
             $shieldHost = BrightshellDomain::effectiveShieldHost();
             if ($shieldHost !== '') {
+                // Pas de middleware web global : le token OAuth doit rester sans CSRF.
+                // Session web uniquement sur authorize / approve / deny (voir routes/brightshield.php).
                 Route::domain($shieldHost)
-                    ->middleware(['web'])
                     ->group(base_path('routes/brightshield.php'));
 
                 Route::domain($shieldHost)->group(function (): void {
@@ -104,6 +105,10 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->trustProxies(at: '*');
+        $middleware->validateCsrfTokens(except: [
+            'oauth/token',
+            'oauth/token/*',
+        ]);
         $middleware->alias([
             'roles.any' => EnsureUserHasAnyRole::class,
             'role.developer' => EnsureUserHasDeveloperRole::class,

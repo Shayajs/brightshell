@@ -2,15 +2,61 @@
 
 BrightShield est le fournisseur d'identité (IdP) de BrightShell. Il permet à des applications tierces (Futurmeal en premier) d'authentifier des utilisateurs via OAuth2 et OpenID Connect.
 
-## URLs (dev)
+## URLs
 
-| Service | URL |
-|---------|-----|
-| Issuer / discovery | `https://shield.brightshell.test/.well-known/openid-configuration` |
-| Autorisation | `https://shield.brightshell.test/oauth/authorize` |
-| Token | `https://shield.brightshell.test/oauth/token` |
-| UserInfo | `https://shield.brightshell.test/oauth/userinfo` |
-| JWKS | `https://shield.brightshell.test/oauth/jwks` |
+| Env | Issuer / authorize / token |
+|-----|----------------------------|
+| **Dev** | `http://shield.brightshell.test` |
+| **Prod** | `https://shield.brightshell.fr` |
+
+| Endpoint | Chemin |
+|----------|--------|
+| Discovery | `/.well-known/openid-configuration` |
+| Autorisation | `/oauth/authorize` |
+| Token | `/oauth/token` |
+| UserInfo | `/oauth/userinfo` |
+| JWKS | `/oauth/jwks` |
+| API scopes (prod) | `https://api.brightshell.fr/v1/brightshield/me` |
+
+### Prod — Futurmeal (`futurmeal.pp.ua`) ↔ BrightShell (`brightshell.fr`)
+
+**BrightShell `.env` :**
+```env
+APP_URL=https://brightshell.fr
+BRIGHTSHELL_ROOT_DOMAIN=brightshell.fr
+SESSION_DOMAIN=.brightshell.fr
+BRIGHTSHELL_SHIELD_HOST=shield.brightshell.fr
+BRIGHTSHIELD_ISSUER=https://shield.brightshell.fr
+BRIGHTSHIELD_FUTURMEAL_REDIRECT_URIS=https://futurmeal.pp.ua/auth/brightshield/callback
+BRIGHTSHIELD_FUTURMEAL_ICON_URL=https://futurmeal.pp.ua/apple-touch-icon.png
+BRIGHTSHIELD_FUTURMEAL_ICON_HOSTS=futurmeal.pp.ua,www.futurmeal.pp.ua
+```
+
+**DNS / NPM :** `shield.brightshell.fr` → même app BrightShell que les autres sous-domaines.
+
+**Enregistrer le client (une fois, sur le serveur BrightShell) :**
+```bash
+php artisan brightshield:register-client futurmeal \
+  --redirect=https://futurmeal.pp.ua/auth/brightshield/callback
+# Copier Client ID + secret dans le .env Futurmeal
+```
+
+**Futurmeal `.env` (prod) :**
+```env
+APP_URL=https://futurmeal.pp.ua
+BRIGHTSHIELD_BASE_URL=https://shield.brightshell.fr
+# En prod Docker : laisser vide si le conteneur résout shield.brightshell.fr via DNS public
+BRIGHTSHIELD_API_BASE_URL=
+BRIGHTSHIELD_API_HOST_HEADER=
+BRIGHTSHIELD_CLIENT_ID=...
+BRIGHTSHIELD_CLIENT_SECRET=...
+BRIGHTSHIELD_REDIRECT_URI=https://futurmeal.pp.ua/auth/brightshield/callback
+BRIGHTSHIELD_UX_MODE=redirect
+BRIGHTSHIELD_APP_ICON=https://futurmeal.pp.ua/apple-touch-icon.png
+BRIGHTSHIELD_SCOPES="openid profile email"
+```
+
+En prod, **pas besoin** de `host.docker.internal` : navigateur et PHP parlent tous les deux à `https://shield.brightshell.fr` (DNS public + HTTPS).
 
 ## Installation
 
@@ -41,12 +87,27 @@ Futurmeal demande par défaut : `openid profile email` (configurable via `BRIGHT
 
 L'écran de consentement affiche **les valeurs exactes** qui seront partagées (e-mail, nom, téléphone…) avant que l'utilisateur autorise.
 
-## Modes de redirection (côté client)
+## Icône de l’application (écran de consentement)
 
-Deux types d'intégration côté site client (ex. Futurmeal) :
+L’écran BrightShield affiche **BrightShell × logo de l’app** :
+- **Desktop** : logos en grand sur la zone gauche (espace libre), panneau de consentement à droite
+- **Mobile** : logos au-dessus du panneau
 
-1. **Redirection GET classique** (défaut) : le navigateur part sur `shield.*`, revient sur le callback avec le code, et le site fait « demi-tour » avec les données autorisées.
-2. **Popup avec retour** : `GET /auth/brightshield/redirect?mode=popup` ouvre le flux dans une fenêtre popup ; à la fin, la popup renvoie le résultat au parent via `postMessage` (origine vérifiée) puis se ferme.
+L’app cliente envoie son icône via la query `app_icon` sur `/oauth/authorize` (Futurmeal le fait automatiquement via Socialite).
+
+Exemple :
+```
+GET https://shield.brightshell.fr/oauth/authorize?...&app_icon=https://futurmeal.fr/apple-touch-icon.png
+```
+
+Sécurité : seuls les hôtes issus des `redirect_uris` du client OAuth (ou `icon_hosts` / `icon_url` en config) sont acceptés.
+
+## Modes UX (choisis par chaque app cliente)
+
+BrightShield expose deux façons de terminer le flux OAuth ; **l’app cliente choisit** (pas l’utilisateur final) :
+
+1. **`redirect`** — redirection web classique : aller sur `shield.*`, revenir sur le callback avec le `code`, échange token côté serveur. **Futurmeal utilise ce mode** (`BRIGHTSHIELD_UX_MODE=redirect`).
+2. **`popup`** — fenêtrage : l’app ouvre BrightShield en popup ; à la fin la fenêtre se ferme et renvoie le résultat au parent via `postMessage` (origine vérifiée). Disponible pour d’autres clients BrightShield.
 
 ## Isolation des routes (sécurité)
 
@@ -69,6 +130,16 @@ Les sites clients peuvent relire les données autorisées avec leur `access_toke
 | `GET /v1/brightshield/me/compte` | `account` | Infos complètes du compte |
 
 Un scope manquant → **403** avec message explicite. Routes définies dans [`routes/brightshield-api.php`](../routes/brightshield-api.php).
+
+## Session partagée : connecté à BrightShell = connecté à BrightShield
+
+La session BrightShell est portée par un cookie sur tout le domaine (`SESSION_DOMAIN=.brightshell.fr`, appliqué automatiquement par `BrightshellSession::applySharedCookieDomain()`). Conséquences :
+
+- Un utilisateur connecté sur `account.*` (ou n'importe quel portail) est **déjà connecté** sur `shield.*` : aucun mot de passe redemandé lors d'une autorisation OAuth.
+- S'il a déjà consenti pour l'application, l'autorisation est **instantanée** (redirection directe avec le code, sans écran).
+- Un invité qui arrive sur `/oauth/authorize` est envoyé vers le login `account.*`, puis revient automatiquement à l'autorisation (URL « intended » stockée dans la session partagée).
+- La déconnexion BrightShell invalide la session partout, y compris sur `shield.*`.
+- Comptes non vérifiés → redirigés vers la vérification e-mail ; comptes archivés → déconnectés (middleware `EnsureBrightShieldWebUser`).
 
 ## Flux OAuth (Authorization Code)
 

@@ -1,7 +1,6 @@
-@extends('layouts.auth')
+@extends('layouts.brightshield')
 
 @section('title', 'Autoriser l’application')
-@section('auth_panel_class', 'auth-panel--wide')
 
 @section('content')
     <div class="space-y-6">

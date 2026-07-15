@@ -45,11 +45,21 @@ class BrightShieldServiceProvider extends ServiceProvider
             $sharedData = app(\App\Services\BrightShield\UserClaimsBuilder::class)
                 ->preview($parameters['user'], $scopeIds);
 
+            /** @var \Illuminate\Http\Request $request */
+            $request = $parameters['request'] ?? request();
+
+            $appIconUrl = app(\App\Services\BrightShield\ClientIconResolver::class)->resolve(
+                $request,
+                $client,
+                is_string($labels['icon_url'] ?? null) ? $labels['icon_url'] : null,
+            );
+
             return (new SimpleViewResponse('brightshield.consent'))
                 ->withParameters([
                     ...$parameters,
                     'clientLabel' => $labels,
                     'sharedData' => $sharedData,
+                    'appIconUrl' => $appIconUrl,
                 ]);
         });
     }

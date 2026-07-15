@@ -1593,6 +1593,172 @@ html:has(body.brightshell-vitrine)::-webkit-scrollbar-thumb:hover {
 }
 
 /* -------------------------------------------------------------------------
+   BrightShield — logos BrightShell × app cliente
+   Mobile : logos au-dessus du panneau
+   Desktop : logos en grand à gauche (zone libre), panneau à droite
+   ------------------------------------------------------------------------- */
+.auth-shell__brand-sep {
+    margin: 0 0.45rem;
+    color: rgba(180, 210, 240, 0.35);
+    font-size: 0.8rem;
+}
+
+.auth-shell__brand-sub {
+    color: rgba(180, 210, 240, 0.7);
+    font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+    font-size: 0.74rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+}
+
+.auth-shell__layout--brightshield {
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 1.25rem;
+    padding-top: 4.5rem;
+    padding-bottom: 1.5rem;
+}
+
+.brightshield-brand-stage {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.85rem;
+    padding: 0.5rem 1rem 0;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.brightshield-brand-stage__tagline {
+    max-width: 22rem;
+    margin: 0;
+    font-size: 0.88rem;
+    line-height: 1.4;
+    color: rgba(190, 215, 240, 0.78);
+}
+
+.brightshield-logo-pair {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.brightshield-logo-pair__item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.55rem;
+    margin: 0;
+}
+
+.brightshield-logo-pair__img {
+    width: 4.5rem;
+    height: 4.5rem;
+    object-fit: contain;
+    border-radius: 1.15rem;
+    background: rgba(8, 16, 28, 0.55);
+    border: 1px solid rgba(175, 211, 247, 0.22);
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.35);
+    padding: 0.45rem;
+}
+
+.brightshield-logo-pair__fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 4.5rem;
+    height: 4.5rem;
+    border-radius: 1.15rem;
+    background: linear-gradient(145deg, rgba(74, 111, 165, 0.55), rgba(16, 62, 113, 0.7));
+    border: 1px solid rgba(175, 211, 247, 0.22);
+    font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: #e8f0f8;
+}
+
+.brightshield-logo-pair__x {
+    font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+    font-size: 1.6rem;
+    font-weight: 800;
+    line-height: 1;
+    color: rgba(200, 225, 250, 0.55);
+    user-select: none;
+}
+
+.brightshield-logo-pair__caption {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(190, 215, 240, 0.7);
+}
+
+.auth-shell__panel--brightshield {
+    margin-inline: auto;
+}
+
+@media (min-width: 1024px) {
+    .auth-shell__layout--brightshield {
+        flex-direction: row;
+        align-items: stretch;
+        justify-content: flex-end;
+        gap: 0;
+        padding: 0;
+    }
+
+    .brightshield-brand-stage {
+        position: fixed;
+        inset: 0 auto 0 0;
+        width: calc(100vw - min(52vw, 46rem));
+        max-width: none;
+        padding: 0 2rem;
+        pointer-events: none;
+    }
+
+    .brightshield-brand-stage__tagline {
+        max-width: 28rem;
+        font-size: 1.05rem;
+    }
+
+    .brightshield-logo-pair {
+        gap: 2.25rem;
+    }
+
+    .brightshield-logo-pair__img,
+    .brightshield-logo-pair__fallback {
+        width: 10.5rem;
+        height: 10.5rem;
+        border-radius: 1.75rem;
+        padding: 0.85rem;
+    }
+
+    .brightshield-logo-pair__fallback {
+        font-size: 3.2rem;
+    }
+
+    .brightshield-logo-pair__x {
+        font-size: 3.5rem;
+    }
+
+    .brightshield-logo-pair__caption {
+        font-size: 0.85rem;
+        letter-spacing: 0.14em;
+    }
+
+    .auth-shell__panel--brightshield {
+        margin-inline: 0;
+        width: min(52vw, 46rem);
+        max-width: min(52vw, 46rem);
+    }
+}
+
+/* -------------------------------------------------------------------------
    Portail documentation — lecture Markdown soignée
    ------------------------------------------------------------------------- */
 .docs-page {

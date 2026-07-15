@@ -2,10 +2,16 @@
 
 namespace App\Http\Controllers\BrightShield;
 
+use App\Models\BrightshieldUserConsent;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Laravel\Passport\Bridge\Client;
+use Laravel\Passport\Bridge\Scope;
+use Laravel\Passport\Bridge\User as PassportUser;
 use Laravel\Passport\Http\Controllers\ApproveAuthorizationController as PassportApproveAuthorizationController;
-use Laravel\Passport\Http\Controllers\RetrievesAuthRequestFromSession;
 use League\OAuth2\Server\AuthorizationServer;
+use League\OAuth2\Server\RequestTypes\AuthorizationRequest;
+use League\OAuth2\Server\RequestTypes\AuthorizationRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -19,18 +25,23 @@ class ApproveAuthorizationController extends PassportApproveAuthorizationControl
 
     public function approve(Request $request, ResponseInterface $psrResponse): Response
     {
-        $authRequest = $this->getAuthRequestFromSession($request);
+        // Lire sans pull : parent::approve() consommera authToken / authRequest.
+        $authRequest = $this->peekAuthRequest($request);
         $user = $request->user();
 
         $response = parent::approve($request, $psrResponse);
 
-        if ($user instanceof \App\Models\User && $response->isRedirect()) {
+        if (
+            $authRequest instanceof AuthorizationRequestInterface
+            && $user instanceof User
+            && $response->isRedirect()
+        ) {
             $scopeIds = collect($authRequest->getScopes())
                 ->map(fn ($scope) => $scope->getIdentifier())
                 ->values()
                 ->all();
 
-            \App\Models\BrightshieldUserConsent::record(
+            BrightshieldUserConsent::record(
                 $user,
                 $authRequest->getClient()->getIdentifier(),
                 $scopeIds,
@@ -38,5 +49,27 @@ class ApproveAuthorizationController extends PassportApproveAuthorizationControl
         }
 
         return $response;
+    }
+
+    private function peekAuthRequest(Request $request): ?AuthorizationRequestInterface
+    {
+        if (
+            $request->isNotFilled('auth_token')
+            || $request->session()->get('authToken') !== $request->input('auth_token')
+            || ! $request->session()->has('authRequest')
+        ) {
+            return null;
+        }
+
+        $authRequest = unserialize($request->session()->get('authRequest'), [
+            'allowed_classes' => [
+                AuthorizationRequest::class,
+                Client::class,
+                Scope::class,
+                PassportUser::class,
+            ],
+        ]);
+
+        return $authRequest instanceof AuthorizationRequestInterface ? $authRequest : null;
     }
 }

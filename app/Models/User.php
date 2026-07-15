@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasBrightShieldTokens;
 use Database\Factories\UserFactory;
 use Illuminate\Auth\MustVerifyEmail;
 use Illuminate\Contracts\Auth\MustVerifyEmail as MustVerifyEmailContract;
@@ -16,9 +17,8 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Laravel\Sanctum\HasApiTokens as HasSanctumApiTokens;
 use Laravel\Passport\Contracts\OAuthenticatable;
-use Laravel\Passport\HasApiTokens as HasPassportApiTokens;
+use Laravel\Sanctum\HasApiTokens as HasSanctumApiTokens;
 
 #[Fillable([
     'name',
@@ -36,12 +36,28 @@ use Laravel\Passport\HasApiTokens as HasPassportApiTokens;
 #[Hidden(['password', 'remember_token', 'email_reverse_verification_token'])]
 class User extends Authenticatable implements MustVerifyEmailContract, OAuthenticatable
 {
-    /** @use HasFactory<UserFactory> */
-    use HasPassportApiTokens, HasSanctumApiTokens, HasFactory, MustVerifyEmail, Notifiable, SoftDeletes {
-        HasPassportApiTokens::tokens insteadof HasSanctumApiTokens;
-        HasPassportApiTokens::createToken insteadof HasSanctumApiTokens;
+    /**
+     * Sanctum = jetons API développeur (auth:sanctum).
+     * HasBrightShieldTokens = OAuth Passport / BrightShield (auth:api).
+     * Les méthodes OAuth (tokens, createToken, tokenCan, …) priment ;
+     * Sanctum est aliasé (sanctumTokens, createSanctumToken, …).
+     *
+     * @use HasFactory<UserFactory>
+     */
+    use HasSanctumApiTokens, HasBrightShieldTokens, HasFactory, MustVerifyEmail, Notifiable, SoftDeletes {
         HasSanctumApiTokens::tokens as sanctumTokens;
         HasSanctumApiTokens::createToken as createSanctumToken;
+        HasSanctumApiTokens::tokenCan as sanctumTokenCan;
+        HasSanctumApiTokens::tokenCant as sanctumTokenCant;
+        HasSanctumApiTokens::currentAccessToken as currentSanctumToken;
+        HasSanctumApiTokens::withAccessToken as withSanctumAccessToken;
+
+        HasBrightShieldTokens::tokens insteadof HasSanctumApiTokens;
+        HasBrightShieldTokens::createToken insteadof HasSanctumApiTokens;
+        HasBrightShieldTokens::tokenCan insteadof HasSanctumApiTokens;
+        HasBrightShieldTokens::tokenCant insteadof HasSanctumApiTokens;
+        HasBrightShieldTokens::currentAccessToken insteadof HasSanctumApiTokens;
+        HasBrightShieldTokens::withAccessToken insteadof HasSanctumApiTokens;
     }
 
     protected static function booted(): void
